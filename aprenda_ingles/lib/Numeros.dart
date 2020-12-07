@@ -41,7 +41,7 @@ class _NumerosState extends State<Numeros> {
         ),
         GestureDetector(
           onTap: () async{
-            //audioPlayer = await player.play("3.mp3");
+
              await player.play("3.mp3");
           },
           child: Image.asset("assets/imagens/3.png"),
