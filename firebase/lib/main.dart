@@ -7,6 +7,22 @@ void main() async {
 
   Firestore db = Firestore.instance;
 
+  QuerySnapshot querySnapshot = await db
+      .collection("usuarios")
+      //.where("nome", isEqualTo: "André")
+      //.where("idade", isLessThan: 30)
+      //.where("idade", isGreaterThanOrEqualTo: 20)
+      .orderBy("idade", descending: true)
+      .orderBy("nome", descending: false)
+      .limit(2)
+      .getDocuments();
+
+  for (DocumentSnapshot item in querySnapshot.documents) {
+    var dados = item.data;
+    print("filtro nome: ${dados["nome"]}  idade: ${dados["idade"]}");
+  }
+
+/*
   // faz consulta no banco de dados a cada alteracao no banco de forma automatica
   db.collection("usuarios").snapshots().listen((snapshot) {
     for (DocumentSnapshot item in snapshot.documents) {
@@ -18,7 +34,6 @@ void main() async {
     }
   });
 
-/*
 //recupera dados do banco de dados
 QuerySnapshot querySnapshot = await db.collection("usuarios").getDocuments();
  //print("dados usuarios: " + querySnapshot.documents.toString());
