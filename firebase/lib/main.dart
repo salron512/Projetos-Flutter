@@ -1,20 +1,86 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   Firestore db = Firestore.instance;
+  FirebaseAuth auth = FirebaseAuth.instance;
+  String email = "andre.vicensotti@gmail.com";
+  String senha = "123456";
 
+
+
+
+
+
+ QuerySnapshot querySnapshot = await db.collection("usuarios").getDocuments();
+  //print("dados usuarios: " + querySnapshot.documents.toString());
+  for(DocumentSnapshot item in querySnapshot.documents){
+    var dados = item.documentID;
+    var usuario = item.data;
+    print(" id usuarios: $dados"
+        " ${"nome: " +usuario["nome"]} "
+        " ${"idade: " +usuario["idade"].toString()} ");
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+  /*
+  //desloga o usuario
+  //auth.signOut();
+
+  //loga o usuario
+  auth.signInWithEmailAndPassword(email: email, password: senha
+  ).then((firebaseUser){
+    print("usuario logado: " + firebaseUser.email);
+  }).catchError((erro){
+    print("erro");
+  });
+
+
+//verifica se o usuario esta logado
+  FirebaseUser usuarioAtual = await auth.currentUser();
+  if(usuarioAtual != null){
+    print("logado atualmente: " + usuarioAtual.email);
+  }else{
+    print("deslogado");
+  }
+
+
+
+  // cria usuario no firebase
+
+  auth.createUserWithEmailAndPassword(email: email, password: senha
+  ).then((firebaseUser){
+    print("novo usuario cadastrado: " + firebaseUser.email);
+  }).catchError((erro){
+    print("novo usuario cadastrado erro" + erro.toString());
+  });
+
+
+   // faz filtros para consultado no banco de dados
   QuerySnapshot querySnapshot = await db
       .collection("usuarios")
       //.where("nome", isEqualTo: "André")
       //.where("idade", isLessThan: 30)
       //.where("idade", isGreaterThanOrEqualTo: 20)
-      .orderBy("idade", descending: true)
-      .orderBy("nome", descending: false)
-      .limit(2)
+      //.orderBy("idade", descending: true)
+      //.orderBy("nome", descending: false)
+      //.limit(2)
+        .where("nome", isGreaterThanOrEqualTo: "m")
+      .where("nome", isLessThanOrEqualTo: "m" + "\uf8ff")
       .getDocuments();
 
   for (DocumentSnapshot item in querySnapshot.documents) {
@@ -22,7 +88,7 @@ void main() async {
     print("filtro nome: ${dados["nome"]}  idade: ${dados["idade"]}");
   }
 
-/*
+
   // faz consulta no banco de dados a cada alteracao no banco de forma automatica
   db.collection("usuarios").snapshots().listen((snapshot) {
     for (DocumentSnapshot item in snapshot.documents) {
