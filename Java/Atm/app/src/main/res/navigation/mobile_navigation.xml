@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_inicial">
+    <fragment
+        android:id="@+id/nav_inicial"
+        android:name="com.curosandroid.atm.ui.inicio.InicioFragment"
+        android:label="@string/menu_inicio"
+        tools:layout="@layout/fragment_inicio" />
+    <fragment
+        android:id="@+id/nav_clientes"
+        android:name="com.curosandroid.atm.ui.clientes.ClientesFragment"
+        android:label="@string/menu_clientes"
+        tools:layout="@layout/fragment_clientes" />
+    <fragment
+        android:id="@+id/nav_contato"
+        android:name="com.curosandroid.atm.ui.contato.ContatoFragment"
+        android:label="@string/menu_contatos"
+        tools:layout="@layout/fragment_contato" />
+    <fragment
+        android:id="@+id/nav_servicos"
+        android:name="com.curosandroid.atm.ui.servicos.ServicosFragment"
+        android:label="@string/menu_servicos"
+        tools:layout="@layout/fragment_servicos" />
+    <fragment
+        android:id="@+id/nav_sobre"
+        android:name="com.curosandroid.atm.ui.Sobre.SobreFragment"
+        android:label="@string/menu_sobre"
+        tools:layout="@layout/fragment_sobre" />
+
+</navigation>

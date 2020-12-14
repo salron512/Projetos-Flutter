@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#FFD470</color>
+    <color name="colorPrimaryDark">#FF9800</color>
+    <color name="colorAccent">#FFD470</color>
+    <color name="CorFundo" />
+    <color name="laranja_claro">#FFD470</color>
+</resources>
