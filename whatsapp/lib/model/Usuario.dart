@@ -3,6 +3,7 @@
 
 class Usuario{
 
+  String _idUsuario;
   String _nome;
   String _email;
   String _senha;
@@ -19,6 +20,13 @@ class Usuario{
 
     return map;
 
+  }
+
+
+  String get idUsuario => _idUsuario;
+
+  set idUsuario(String value) {
+    _idUsuario = value;
   }
 
   String get urlImagem => _urlImagem;

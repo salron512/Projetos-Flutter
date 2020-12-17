@@ -3,10 +3,13 @@ import 'package:whatsapp/Cadastro.dart';
 import 'package:whatsapp/Configuracao.dart';
 import 'package:whatsapp/Home.dart';
 import 'package:whatsapp/Login.dart';
+import 'Mensagens.dart';
 
 
 class RouteGenerator{
   static Route<dynamic> generateRoute(RouteSettings settings){
+
+    final args = settings.arguments;
 
     switch(settings.name){
 
@@ -17,6 +20,10 @@ class RouteGenerator{
       case "/login" :
         return MaterialPageRoute(
             builder: (_) => Login()
+        );
+      case "/mensagens" :
+        return MaterialPageRoute(
+            builder: (_) => Mensagens(args)
         );
       case "cadastro" :
         return MaterialPageRoute(

@@ -28,7 +28,6 @@ class _ConfiguracaoState extends State<Configuracao> {
       imagemSelecionada = await ImagePicker.pickImage(source: ImageSource.gallery);
     }
     setState(() {
-
       _imagem = imagemSelecionada;
       if(_imagem != null) {
         _subindoImagem = true;

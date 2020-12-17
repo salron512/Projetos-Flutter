@@ -26,13 +26,16 @@ class _ContatosState extends State<Contatos> {
 
   Future<List<Usuario>> _recuperaContatos() async {
     Firestore db = Firestore.instance;
-    QuerySnapshot snapshot = await db.collection("usuarios").getDocuments();
+    QuerySnapshot snapshot = await db.collection("usuarios")
+        .orderBy("nome", descending: false)
+        .getDocuments();
     List<Usuario> listaUsuarios = List();
     for (DocumentSnapshot item in snapshot.documents) {
       var dados = item.data;
       if(dados["email"] == _emailsuarioLogado ) continue;
 
       Usuario usuario = Usuario();
+      usuario.idUsuario = item.documentID;
       usuario.email = dados["email"];
       usuario.nome = dados["nome"];
       usuario.urlImagem = dados["urlImagem"];
@@ -52,6 +55,7 @@ class _ContatosState extends State<Contatos> {
 
   @override
   Widget build(BuildContext context) {
+
     return FutureBuilder<List<Usuario>>(
         future: _recuperaContatos(),
         // ignore: missing_return
@@ -62,7 +66,7 @@ class _ContatosState extends State<Contatos> {
               return Center(
                   child: Column(
                    mainAxisAlignment:  MainAxisAlignment.center,
-                children: [
+                    children: [
                    CircularProgressIndicator(),
                     Padding(padding: EdgeInsets.all(8),
                       child:  Text("Carregando contatos") ,
@@ -81,6 +85,10 @@ class _ContatosState extends State<Contatos> {
                     Usuario usuario = listaItens[indice];
 
                     return ListTile(
+                      onTap: (){
+                        Navigator.pushNamed(context, "/mensagens",
+                            arguments: usuario );
+                      },
                       contentPadding: EdgeInsets.fromLTRB(16, 8, 16, 8),
                       leading: CircleAvatar(
                           maxRadius: 30,
