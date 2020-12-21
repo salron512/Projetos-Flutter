@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "258305821021",
+    "project_id": "lista-mercado-92eca",
+    "storage_bucket": "lista-mercado-92eca.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:258305821021:android:54ed12a776689cf64a00b4",
+        "android_client_info": {
+          "package_name": "com.example.lista_mercado"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "258305821021-e9rqk4pjv76kra50o0us7sbtc7m4kgq4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcss89jFJvk1_OO5eGryoV-iDzMQgSSto"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "258305821021-e9rqk4pjv76kra50o0us7sbtc7m4kgq4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

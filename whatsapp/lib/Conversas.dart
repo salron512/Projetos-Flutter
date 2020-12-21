@@ -11,8 +11,6 @@ class _ConversasState extends State<Conversas> {
   List<Conversa> listaConversas = [
     Conversa("Jose Renato", "olá tudo bem?",
         "https://firebasestorage.googleapis.com/v0/b/whatsapp-projeto-eea4d.appspot.com/o/perfil%2Fperfil4.jpg?alt=media&token=4fc3f109-2fa2-4e81-a5f8-8ec4872bb18d"),
-    Conversa("Renata", "Oii",
-        "https://firebasestorage.googleapis.com/v0/b/whatsapp-projeto-eea4d.appspot.com/o/perfil%2Fperfil1.jpg?alt=media&token=be7574e6-09c6-402b-87ec-ed4f7f02d555"),
     Conversa("Jamilton", "olá tudo bem?",
         "https://firebasestorage.googleapis.com/v0/b/whatsapp-projeto-eea4d.appspot.com/o/perfil%2Fperfil5.jpg?alt=media&token=b5d2ec90-e9ed-4916-bdb1-90337d669ad9"),
   ];
