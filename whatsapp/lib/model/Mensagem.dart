@@ -20,9 +20,7 @@ class Mensagem {
       "tipo" : this.tipo,
       "data" : this.data
     };
-
     return map;
-
   }
 
 

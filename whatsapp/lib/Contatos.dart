@@ -87,7 +87,7 @@ class _ContatosState extends State<Contatos> {
                     return ListTile(
                       onTap: (){
                         Navigator.pushNamed(context, "/mensagens",
-                            arguments: usuario );
+                            arguments: usuario);
                       },
                       contentPadding: EdgeInsets.fromLTRB(16, 8, 16, 8),
                       leading: CircleAvatar(

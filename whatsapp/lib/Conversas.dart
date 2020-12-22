@@ -1,6 +1,10 @@
+import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:whatsapp/model/Usuario.dart';
 import 'model/Conversa.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Conversas extends StatefulWidget {
   @override
@@ -8,38 +12,136 @@ class Conversas extends StatefulWidget {
 }
 
 class _ConversasState extends State<Conversas> {
-  List<Conversa> listaConversas = [
-    Conversa("Jose Renato", "olá tudo bem?",
-        "https://firebasestorage.googleapis.com/v0/b/whatsapp-projeto-eea4d.appspot.com/o/perfil%2Fperfil4.jpg?alt=media&token=4fc3f109-2fa2-4e81-a5f8-8ec4872bb18d"),
-    Conversa("Jamilton", "olá tudo bem?",
-        "https://firebasestorage.googleapis.com/v0/b/whatsapp-projeto-eea4d.appspot.com/o/perfil%2Fperfil5.jpg?alt=media&token=b5d2ec90-e9ed-4916-bdb1-90337d669ad9"),
-  ];
+  final _controller = StreamController<QuerySnapshot>.broadcast();
+  Firestore db = Firestore.instance;
+  String _idUsuarioLogado;
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _recuperaDadosUsuario();
+  }
+  _recuperaDadosUsuario() async{
+
+    FirebaseAuth auth =  FirebaseAuth.instance;
+    FirebaseUser usuarioLogado = await auth.currentUser();
+    _idUsuarioLogado = usuarioLogado.uid;
+
+    _adicionarListenerConversas();
+
+  }
+
+
+   Stream<QuerySnapshot> _adicionarListenerConversas(){
+
+    final  strem = db.collection("conversas")
+        .document(_idUsuarioLogado)
+        .collection("ultima_conversa")
+        .snapshots();
+
+    strem.listen((dados) {
+      _controller.add(dados);
+    });
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _controller.close();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-        itemCount: listaConversas.length,
-        // ignore: missing_return
-        itemBuilder: (context, indice) {
-          // ignore: missing_return
-          Conversa conversa = listaConversas[indice];
 
-          return ListTile(
-            contentPadding: EdgeInsets.fromLTRB(16, 8, 16, 8),
-            leading: CircleAvatar(
-              maxRadius: 30,
-              backgroundColor: Colors.grey,
-              backgroundImage: NetworkImage(conversa.caminhoFoto),
-            ),
-            title: Text(
-              conversa.nome,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            subtitle: Text(
-              conversa.mensagem,
-              style: TextStyle(color: Colors.grey, fontSize: 16),
-            ),
-          );
-        });
+      return StreamBuilder<QuerySnapshot>(
+        stream: _controller.stream ,
+        // ignore: missing_return
+        builder:( context, snapshot){
+        switch(snapshot.connectionState) {
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+            return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    Padding(padding: EdgeInsets.all(8),
+                      child: Text("Carregando conversas"),
+                    )
+                  ],
+                )
+            );
+            break;
+          case ConnectionState.active:
+          case ConnectionState.done:
+            if (snapshot.hasError) {
+              return Text("Erro ao carregar suas conversas");
+            } else {
+              QuerySnapshot querySnapshot = snapshot.data;
+
+              if (querySnapshot.documents.length == 0) {
+                return Center(
+                  child: Text("Você não tem nehuma menssagem ainda :(",
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold
+                    ),
+                  ),
+                );
+              }
+
+              return ListView.builder(
+                  itemCount: querySnapshot.documents.length,
+                  // ignore: missing_return
+                  itemBuilder: (context, indice) {
+                    List<DocumentSnapshot> conversas = querySnapshot.documents
+                        .toList();
+                    DocumentSnapshot item = conversas[indice];
+
+                    String urlImagem = item["caminhoFoto"];
+                    String tipo = item["tipoMensagem"];
+                    String mensagem = item["mensagem"];
+                    String nome = item["nome"];
+                    String idDestinatario = item["idDestinatario"];
+
+                    Usuario usuario = Usuario();
+                    usuario.nome = nome;
+                    usuario.urlImagem = urlImagem;
+                    usuario.idUsuario = idDestinatario;
+
+                    return ListTile(
+                      onTap: (){
+                        Navigator.pushNamed(context, "/mensagens",
+                        arguments: usuario);
+                      },
+                      contentPadding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+                      leading: CircleAvatar(
+                        maxRadius: 30,
+                        backgroundColor: Colors.grey,
+                        backgroundImage: urlImagem != null
+                            ? NetworkImage(urlImagem)
+                            : null,
+                      ),
+                      title: Text(
+                        nome,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      subtitle: Text(
+                            tipo=="texto"
+                                ? mensagem
+                                : "Imagem...",
+                        style: TextStyle(color: Colors.grey, fontSize: 16),
+                      ),
+                    );
+                  }
+              );
+            }
+          }
+        } ,
+      );
   }
 }

@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsapp/Contatos.dart';
 import 'Conversas.dart';
+import 'dart:io';
 
 class Home extends StatefulWidget {
   @override
@@ -70,9 +71,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     return Scaffold(
       appBar: AppBar(
         title: Text("Whatsapp"),
+        elevation: Platform.isIOS ? 0 : 4,
         bottom: TabBar(
           labelStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          indicatorColor: Colors.white,
+          indicatorColor: Platform.isIOS ? Colors.grey[400] : Colors.white,
           controller: _tabController,
           tabs: <Widget>[
             Tab(

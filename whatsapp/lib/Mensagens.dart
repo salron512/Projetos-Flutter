@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,6 +8,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:whatsapp/model/Mensagem.dart';
 import 'package:whatsapp/model/Usuario.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+
+import 'model/Conversa.dart';
 
 
 class Mensagens extends StatefulWidget {
@@ -26,8 +29,10 @@ class _MensagensState extends State<Mensagens> {
   Firestore db = Firestore.instance;
   File _imagem;
   bool _subindoImagem = false;
+  ScrollController _scrollController = ScrollController();
 
   TextEditingController _controllerMensagem = TextEditingController();
+  final _controller = StreamController<QuerySnapshot>.broadcast();
 
 
   _enviarMensagem(){
@@ -47,9 +52,33 @@ class _MensagensState extends State<Mensagens> {
 
       _salvaMensagem(_idUsuarioLogado, _idUsuarioDestinatario , mensagem);
       _salvaMensagem(_idUsuarioDestinatario, _idUsuarioLogado , mensagem);
+      _salvarConversa(mensagem);
 
     }
 
+  }
+
+  _salvarConversa( Mensagem msg){
+
+    //salva para o remetente
+    Conversa cRemetente = Conversa();
+    cRemetente.idRemetente = _idUsuarioLogado;
+    cRemetente.idDestinatario = _idUsuarioDestinatario;
+    cRemetente.mensagem = msg.mensagem;
+    cRemetente.nome = widget.contato.nome;
+    cRemetente.caminhoFoto = widget.contato.urlImagem;
+    cRemetente.tipoMensagem = msg.tipo;
+    cRemetente.salvar();
+
+    //salva para o destinatario
+    Conversa cDestinatario = Conversa();
+    cDestinatario.idRemetente = _idUsuarioDestinatario;
+    cDestinatario.idDestinatario = _idUsuarioLogado;
+    cDestinatario.mensagem = msg.mensagem;
+    cDestinatario.nome = widget.contato.nome;
+    cDestinatario.caminhoFoto = widget.contato.urlImagem;
+    cDestinatario.tipoMensagem = msg.tipo;
+    cDestinatario.salvar();
   }
 
   _salvaMensagem(String idRemetente, String idDestinatario, Mensagem msg) async{
@@ -72,6 +101,8 @@ class _MensagensState extends State<Mensagens> {
     _idUsuarioLogado = usuarioLogado.uid;
     _idUsuarioDestinatario = widget.contato.idUsuario;
 
+    __adicionarListenerMensagens();
+
   }
 
 
@@ -80,9 +111,10 @@ class _MensagensState extends State<Mensagens> {
       // ignore: deprecated_member_use
       imagemSelecionada = await ImagePicker.pickImage(source: ImageSource.gallery);
 
-
     String nomeImagem = DateTime.now().millisecondsSinceEpoch.toString();
-    _subindoImagem = true;
+    if( imagemSelecionada != null){
+      _subindoImagem = true;
+    }
     FirebaseStorage storage = FirebaseStorage.instance;
     StorageReference pastaRaiz = storage.ref();
     StorageReference arquivo = pastaRaiz
@@ -91,9 +123,7 @@ class _MensagensState extends State<Mensagens> {
         .child(nomeImagem + ".jpg");
     StorageUploadTask task = arquivo.putFile(imagemSelecionada);
     task.events.listen((StorageTaskEvent storageTaskEvent) {
-
       if(storageTaskEvent.type == StorageTaskEventType.progress){
-
         setState(() {
           _subindoImagem= true;
         });
@@ -102,14 +132,11 @@ class _MensagensState extends State<Mensagens> {
         setState(() {
           _subindoImagem= false;
         });
-
       }
     });
-
     //recupera a url da imagem
     task.onComplete.then((StorageTaskSnapshot snapshot){
       _recuperarUrlImagem(snapshot);
-
     });
 
   }
@@ -129,6 +156,21 @@ class _MensagensState extends State<Mensagens> {
     _salvaMensagem(_idUsuarioDestinatario, _idUsuarioLogado , mensagem);
 
 
+  }
+  Stream<QuerySnapshot> __adicionarListenerMensagens(){
+
+   final stream = db.collection("mensagens")
+        .document(_idUsuarioLogado)
+        .collection(_idUsuarioDestinatario)
+        .orderBy("data", descending: false)
+        .snapshots();
+
+        stream.listen((dados) {
+      _controller.add(dados);
+      Timer(Duration(seconds: 1), (){
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      });
+    });
   }
 
   @override
@@ -173,7 +215,11 @@ class _MensagensState extends State<Mensagens> {
             ),
             ),
           ),
-          FloatingActionButton(
+          Platform.isIOS ?  CupertinoButton(
+            child: Text("Enviar"),
+            onPressed: _enviarMensagem,
+          )
+              : FloatingActionButton(
             backgroundColor: Color(0xff075E54),
             child: Icon(Icons.send, color: Colors.white ,),
             mini: true,
@@ -182,13 +228,8 @@ class _MensagensState extends State<Mensagens> {
         ],
       ),
     );
-
     var stream = StreamBuilder(
-      stream: db.collection("mensagens")
-          .document(_idUsuarioLogado)
-          .collection(_idUsuarioDestinatario)
-          .orderBy("data", descending: false)
-          .snapshots(),
+      stream: _controller.stream,
       // ignore: missing_return
       builder: (context, snapshot){
         switch(snapshot.connectionState){
@@ -203,7 +244,8 @@ class _MensagensState extends State<Mensagens> {
                     child:  Text("Carregando sua mensagens") ,
                   )
                 ],
-              ));
+              )
+          );
           break;
           case ConnectionState.active:
           case ConnectionState.done:
@@ -217,6 +259,7 @@ class _MensagensState extends State<Mensagens> {
             }else{
               return Expanded(
                 child: ListView.builder(
+                  controller: _scrollController,
                   itemCount: querySnapshot.documents.length,
                   // ignore: missing_return
                   itemBuilder: (context, indice){

@@ -1,11 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'dart:io';
-import 'dart:convert';
-import 'dart:async';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:lista_mercado/Itens.dart';
+
 
 class Home extends StatefulWidget {
   @override
@@ -14,37 +10,15 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   Firestore db = Firestore.instance;
-  Map<String, dynamic> _ultimoTarefaRemovida = Map();
   TextEditingController _controllerTarefa = TextEditingController();
-  List <Itens> _listaTarefas = List();
-
   FirebaseAuth auth = FirebaseAuth.instance;
-  final String email = "andre.lptv@hotmail.com";
-  final String senha = "andre512";
+  final String email = "teste@hotmail.com";
+  final String senha = "teste123456";
   String _data;
 
-  Itens itens = Itens();
-
-   /* _recuperalista() async {
-
-      Itens itens = Itens();
-    QuerySnapshot querySnapshot = await db.collection("item").getDocuments();
-    for (DocumentSnapshot item in querySnapshot.documents) {
-      var dados = item.data;
-      Itens itens = Itens();
-      itens.item = dados["item"];
-      itens.estado = dados["estado"];
-      itens.data = dados["data"];
-
-     return  _listaTarefas.add(itens);
-    }
-    print(_listaTarefas);
-  }
-    */
 
   _logarUsuario() async* {
-    auth
-        .signInWithEmailAndPassword(email: email, password: senha)
+    auth.signInWithEmailAndPassword(email: email, password: senha)
         .then((firebaseUser) {})
         .catchError((erro) {
       print("erro");
@@ -52,7 +26,7 @@ class _HomeState extends State<Home> {
   }
 
   _salvarTarefa() async {
-    DocumentReference ref = await db.collection("item").add({
+      await db.collection("item").add({
       "data": _data = DateTime.now().millisecondsSinceEpoch.toString(),
       "titulo": _controllerTarefa.text,
       "estado": false
@@ -79,7 +53,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.purple,
-          title: Text("Lista de compras"),
+          title: Text("Lista Compartilhada"),
         ),
          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         floatingActionButton: FloatingActionButton(
@@ -90,11 +64,11 @@ class _HomeState extends State<Home> {
                 context: context,
                 builder: (context) {
                   return AlertDialog(
-                    title: Text("Adicionar Tarefa"),
+                    title: Text("Adicionar item"),
                     content: TextField(
                       controller: _controllerTarefa,
                       decoration:
-                          InputDecoration(labelText: "Digite sua tarefa"),
+                          InputDecoration(labelText: "Digite o item"),
                       onChanged: (text) {},
                     ),
                     actions: <Widget>[
@@ -108,7 +82,6 @@ class _HomeState extends State<Home> {
                         child: Text("Salvar"),
                         onPressed: () {
                           _salvarTarefa();
-                          //_recuperalista();
                           Navigator.pop(context);
                         },
                       )
@@ -119,16 +92,26 @@ class _HomeState extends State<Home> {
         ),
         body: Container(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-
             StreamBuilder(
               stream: db.collection("item")
               .orderBy("data", descending: false)
                   .snapshots(),
-          // ignore: missing_return
+              // ignore: missing_return
             builder: (context, snapshot){
             switch(snapshot.connectionState){
               case ConnectionState.none:
+                return Center(
+                    child: Column(
+                      mainAxisAlignment:  MainAxisAlignment.center,
+                      children: [
+                        Padding(padding: EdgeInsets.all(8),
+                          child:  Text("Sem conexão!") ,
+                        )
+                      ],
+                    )
+                );
               case ConnectionState.waiting:
                 return Center(
                     child: Column(
@@ -136,19 +119,18 @@ class _HomeState extends State<Home> {
                       children: [
                         CircularProgressIndicator(),
                         Padding(padding: EdgeInsets.all(8),
-                          child:  Text("Carregando sua mensagens") ,
+                          child:  Text("Carregando seus itens") ,
                         )
                       ],
-                    ));
+                    )
+                );
                 break;
               case ConnectionState.active:
               case ConnectionState.done:
-
                 QuerySnapshot querySnapshot = snapshot.data;
-
                 if(snapshot.hasError){
                   return Expanded(
-                    child: Text("Erro ao carregar os dados!"),
+                       child: Text("Erro ao carregar os dados!"),
                   );
                 }else{
                   return Expanded(
@@ -156,8 +138,8 @@ class _HomeState extends State<Home> {
                       itemCount: querySnapshot.documents.length,
                       // ignore: missing_return
                       itemBuilder: (context, indice){
-                        List<DocumentSnapshot> mensagens = querySnapshot.documents.toList();
-                        DocumentSnapshot item = mensagens[indice];
+                        List<DocumentSnapshot> itens = querySnapshot.documents.toList();
+                        DocumentSnapshot item = itens[indice];
                         return  Dismissible(
                           direction: DismissDirection.endToStart,
                           background: Container(
