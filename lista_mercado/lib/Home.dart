@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:lista_mercado/Login.dart';
 
 
 class Home extends StatefulWidget {
@@ -12,35 +13,50 @@ class _HomeState extends State<Home> {
   Firestore db = Firestore.instance;
   TextEditingController _controllerTarefa = TextEditingController();
   FirebaseAuth auth = FirebaseAuth.instance;
-  final String email = "teste@hotmail.com";
-  final String senha = "teste123456";
   String _data;
-
-
-  _logarUsuario() async* {
-    auth.signInWithEmailAndPassword(email: email, password: senha)
-        .then((firebaseUser) {})
-        .catchError((erro) {
-      print("erro");
-    });
-  }
+  String _idUsuarioLogado;
+  List<String> itensMenu = ["Deslogar"];
+  Color _cor = Colors.purple;
 
   _salvarTarefa() async {
       await db.collection("item").add({
       "data": _data = DateTime.now().millisecondsSinceEpoch.toString(),
       "titulo": _controllerTarefa.text,
-      "estado": false
+      "estado": false,
+        "idUsuario" : _idUsuarioLogado
     });
 
     _controllerTarefa.clear();
+
+  }
+  
+
+  _escolhaMenuItem(String itemEscolhido) {
+    switch (itemEscolhido) {
+      case "Deslogar":
+        _deslogarUsuario();
+        break;
+    }
+  }
+
+  _deslogarUsuario() async{
+    auth.signOut();
+    Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Login()));
+  }
+  _recuperaDadosUsuario() async{
+
+    FirebaseAuth auth =  FirebaseAuth.instance;
+    FirebaseUser usuarioLogado = await auth.currentUser();
+    _idUsuarioLogado = usuarioLogado.uid;
   }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _logarUsuario();
-    //_recuperalista();
+    _recuperaDadosUsuario();
   }
 
 
@@ -54,6 +70,20 @@ class _HomeState extends State<Home> {
         appBar: AppBar(
           backgroundColor: Colors.purple,
           title: Text("Lista Compartilhada"),
+          actions: [
+            PopupMenuButton<String>(
+              onSelected: _escolhaMenuItem,
+              // ignore: missing_return
+              itemBuilder: (context) {
+                return itensMenu.map((String item) {
+                  return PopupMenuItem<String>(
+                    value: item,
+                    child: Text(item),
+                  );
+                }).toList();
+              },
+            )
+          ],
         ),
          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         floatingActionButton: FloatingActionButton(
@@ -75,7 +105,7 @@ class _HomeState extends State<Home> {
                       FlatButton(
                           child: Text("Cancelar"),
                           onPressed: () {
-                            _controllerTarefa.text = "";
+                            _controllerTarefa.clear();
                             Navigator.pop(context);
                           }),
                       FlatButton(
@@ -159,13 +189,15 @@ class _HomeState extends State<Home> {
                                 .delete();
                           },
                           child: CheckboxListTile(
-                            activeColor: Colors.purple,
-                            title: Text( item["titulo"]),
+                            activeColor: item["idUsuario"] == _idUsuarioLogado ?
+                            Colors.purple
+                                : Colors.blue,
+                            title: Text(item["titulo"]),
                             value: item["estado"],
                             onChanged: (valorAlterado){
-
                             Map<String, dynamic> dadosAtualizar = {
-                              "estado": valorAlterado
+                              "estado": valorAlterado,
+                              "idUsuario": _idUsuarioLogado,
                             };
                               db.collection("item")
                                   .document(item.documentID)
