@@ -25,6 +25,8 @@ class Mensagens extends StatefulWidget {
 class _MensagensState extends State<Mensagens> {
 
   String _idUsuarioLogado;
+  String _urlImagem;
+  String _nomeUsario;
   String _idUsuarioDestinatario;
   Firestore db = Firestore.instance;
   File _imagem;
@@ -75,8 +77,8 @@ class _MensagensState extends State<Mensagens> {
     cDestinatario.idRemetente = _idUsuarioDestinatario;
     cDestinatario.idDestinatario = _idUsuarioLogado;
     cDestinatario.mensagem = msg.mensagem;
-    cDestinatario.nome = widget.contato.nome;
-    cDestinatario.caminhoFoto = widget.contato.urlImagem;
+    cDestinatario.nome = _nomeUsario;
+    cDestinatario.caminhoFoto = _urlImagem;
     cDestinatario.tipoMensagem = msg.tipo;
     cDestinatario.salvar();
   }
@@ -102,6 +104,13 @@ class _MensagensState extends State<Mensagens> {
     _idUsuarioDestinatario = widget.contato.idUsuario;
 
     __adicionarListenerMensagens();
+
+    DocumentSnapshot snapshot = await db.collection("usuarios").document(_idUsuarioLogado).get();
+    var dados = snapshot.data;
+    _nomeUsario = dados["nome"];
+    _urlImagem = dados["urlImagem"];
+
+
 
   }
 

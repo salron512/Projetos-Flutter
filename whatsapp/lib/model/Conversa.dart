@@ -1,41 +1,42 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+class Conversa {
 
-class Conversa{
   String _idRemetente;
   String _idDestinatario;
   String _nome;
   String _mensagem;
   String _caminhoFoto;
-  String _tipoMensagem;
+  String _tipoMensagem;//texto ou imagem
 
 
+  Conversa();
 
+  salvar() async {
 
-Conversa();
+    Firestore db = Firestore.instance;
+    await db.collection("conversas")
+        .document( this.idRemetente )
+        .collection( "ultima_conversa" )
+        .document( this.idDestinatario )
+        .setData( this.toMap() );
 
+  }
 
-  salvar() async{
-   Firestore db = Firestore.instance;
-
-   await db.collection("conversas")
-   .document(this.idRemetente)
-   .collection("ultima_conversa")
-   .document(this.idDestinatario)
-   .setData(this.toMap());
- }
   Map<String, dynamic> toMap(){
 
     Map<String, dynamic> map = {
       "idRemetente"     : this.idRemetente,
-      "idDestinatario"  : this._idDestinatario,
+      "idDestinatario"  : this.idDestinatario,
       "nome"            : this.nome,
       "mensagem"        : this.mensagem,
       "caminhoFoto"     : this.caminhoFoto,
       "tipoMensagem"    : this.tipoMensagem,
     };
+
     return map;
+
   }
+
 
   String get idRemetente => _idRemetente;
 
@@ -49,9 +50,9 @@ Conversa();
     _nome = value;
   }
 
-String get mensagem => _mensagem;
+  String get mensagem => _mensagem;
 
-String get caminhoFoto => _caminhoFoto;
+  String get caminhoFoto => _caminhoFoto;
 
   set caminhoFoto(String value) {
     _caminhoFoto = value;
@@ -72,4 +73,6 @@ String get caminhoFoto => _caminhoFoto;
   set tipoMensagem(String value) {
     _tipoMensagem = value;
   }
+
+
 }
