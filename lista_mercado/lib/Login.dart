@@ -51,7 +51,7 @@ class _LoginState extends State<Login> {
         .then((firebaseUser) {
       Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => Home()));
+           MaterialPageRoute(builder: (context) => Home()));
     }).catchError((error) {
       setState(() {
         _mensagemErro =
@@ -66,8 +66,7 @@ class _LoginState extends State<Login> {
 
   Future _verificaUsuarioLogado() async {
     FirebaseAuth auth = FirebaseAuth.instance;
-    //auth.signOut();
-    FirebaseUser usuariologado = await auth.currentUser();
+    User usuariologado = await auth.currentUser;
 
     if (usuariologado != null) {
       Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));

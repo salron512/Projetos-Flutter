@@ -1,6 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'Home.dart';
 import 'Model/Usuario.dart';
@@ -54,13 +54,15 @@ class _CadastroState extends State<Cadastro> {
   _cadastrarUsuairo(Usuario usuario) {
     FirebaseAuth auth = FirebaseAuth.instance;
 
-    auth
-        .createUserWithEmailAndPassword(
+    auth.createUserWithEmailAndPassword(
         email: usuario.email, password: usuario.senha)
         .then((firebase) {
+      // ignore: deprecated_member_use
       Firestore db = Firestore.instance;
 
-      db.collection("usuarios").document(firebase.uid).setData(usuario.toMap());
+      // ignore: deprecated_member_use
+      db.collection("usuarios").document(firebase.user.uid).setData(usuario.toMap());
+
 
       Navigator.push(
           context,
