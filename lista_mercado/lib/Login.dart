@@ -45,13 +45,10 @@ class _LoginState extends State<Login> {
   _logarUsuario(Usuario usuario) {
     FirebaseAuth auth = FirebaseAuth.instance;
 
-    auth
-        .signInWithEmailAndPassword(
+    auth.signInWithEmailAndPassword(
         email: usuario.email, password: usuario.senha)
         .then((firebaseUser) {
-      Navigator.push(
-          context,
-           MaterialPageRoute(builder: (context) => Home()));
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
     }).catchError((error) {
       setState(() {
         _mensagemErro =
@@ -60,23 +57,23 @@ class _LoginState extends State<Login> {
     });
 
     setState(() {
-      _controllerSenha.text = "";
+      _controllerSenha.clear();
     });
   }
 
   Future _verificaUsuarioLogado() async {
     FirebaseAuth auth = FirebaseAuth.instance;
     User usuariologado = await auth.currentUser;
-
     if (usuariologado != null) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => Home()));
     }
   }
 
   @override
   void initState() {
-    _verificaUsuarioLogado();
     super.initState();
+    _verificaUsuarioLogado();
   }
 
   @override
@@ -148,10 +145,8 @@ class _LoginState extends State<Login> {
                         ),
                       ),
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => Cadastro()));
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => Cadastro()));
                       },
                     ),
                   ),

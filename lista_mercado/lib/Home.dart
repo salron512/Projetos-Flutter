@@ -1,6 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:lista_mercado/Adicionar.dart';
 import 'package:lista_mercado/Login.dart';
 
 class Home extends StatefulWidget {
@@ -11,17 +14,14 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
 
-
-  //Firestore db = Firestore.instance;
-  // ignore: deprecated_member_use
-  FirebaseFirestore db = Firestore.instance;
+  FirebaseFirestore db = FirebaseFirestore.instance;
   TextEditingController _controllerTarefa = TextEditingController();
   FirebaseAuth auth = FirebaseAuth.instance;
   String _data;
   String _idUsuarioLogado;
-  List<String> itensMenu = ["Deslogar"];
+  String _usuarioLogado ="";
   Color _cor = Colors.purple;
-
+  int index = 0;
   _salvarTarefa() async {
     await db.collection("item").add({
       "data": _data = DateTime.now().millisecondsSinceEpoch.toString(),
@@ -33,31 +33,37 @@ class _HomeState extends State<Home> {
     _controllerTarefa.clear();
   }
 
-  _escolhaMenuItem(String itemEscolhido) {
-    switch (itemEscolhido) {
-      case "Deslogar":
-        _deslogarUsuario();
-        break;
-    }
+    _recuperaNomeUsuario() async{
+    DocumentSnapshot snapshot = await db.collection("usuarios").doc(_idUsuarioLogado).get();
+     var dados = snapshot.data();
+     print("Usuario " + dados["nome"]);
+     setState(() {
+       _usuarioLogado = dados["nome"];
+     });
   }
 
-  _deslogarUsuario() async {
-    auth.signOut();
-    Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
-  }
 
-  _recuperaDadosUsuario() async {
+
+
+   _verificaUsuarioLogado() async {
     FirebaseAuth auth = FirebaseAuth.instance;
-    User usuarioLogado = await auth.currentUser;
-    _idUsuarioLogado = usuarioLogado.uid;
+    User usuariologado = await auth.currentUser;
+    _idUsuarioLogado = usuariologado.uid;
+    print("ID usuario " + _idUsuarioLogado);
+
+    if (usuariologado == null) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+    }
+    _recuperaNomeUsuario();
   }
+
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    _recuperaDadosUsuario();
+    _verificaUsuarioLogado();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -65,20 +71,55 @@ class _HomeState extends State<Home> {
         appBar: AppBar(
           backgroundColor: Colors.purple,
           title: Text("Lista Compartilhada"),
-          actions: [
-            PopupMenuButton<String>(
-              onSelected: _escolhaMenuItem,
-              // ignore: missing_return
-              itemBuilder: (context) {
-                return itensMenu.map((String item) {
-                  return PopupMenuItem<String>(
-                    value: item,
-                    child: Text(item),
-                  );
-                }).toList();
-              },
-            )
-          ],
+        ),
+        drawer: Drawer(
+          child: ListView(
+            // Important: Remove any padding from the ListView.
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              DrawerHeader(
+                child: Center(
+                  child: Column(
+                    children:<Widget> [
+                      Text(_usuarioLogado),
+                    ],
+                  ),
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.purple,
+                ),
+              ),
+              ListTile(
+                leading: Icon(Icons.list),
+                title: Text('Lista'),
+                onTap: () {
+                  setState(() {
+                    index = 0;
+                  });
+                 Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.add),
+                title: Text('Adicionar membros'),
+                onTap: () {
+                  Navigator.push
+                    (context, MaterialPageRoute(builder: (context) => Adicionar()));
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.exit_to_app),
+                title: Text("Deslogar"),
+                onTap: () {
+                  auth.signOut();
+                  Navigator.push
+                    (context, MaterialPageRoute(builder: (context) => Login()));
+                  setState(() {
+                  });
+                },
+              ),
+            ],
+          ),
         ),
         floatingActionButtonLocation:
             FloatingActionButtonLocation.miniEndFloat,
@@ -130,8 +171,8 @@ class _HomeState extends State<Home> {
                     case ConnectionState.none:
                       return Center(
                           child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
+                          mainAxisAlignment: MainAxisAlignment.center,
+                           children: [
                           Padding(
                             padding: EdgeInsets.all(8),
                             child: Text("Sem conexão!"),
