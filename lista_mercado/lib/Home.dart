@@ -1,10 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:lista_mercado/Adicionar.dart';
 import 'package:lista_mercado/Login.dart';
+import 'dart:async';
 
 class Home extends StatefulWidget {
   @override
@@ -41,7 +40,45 @@ class _HomeState extends State<Home> {
        _usuarioLogado = dados["nome"];
      });
   }
+  _verificaConvite() async{
 
+    QuerySnapshot querySnapshot  = await db
+        .collection("convites")
+        .where("idDestinatario", isEqualTo: _idUsuarioLogado )
+        .get();
+
+    for(DocumentSnapshot item in querySnapshot.docs){
+      var dados = item.data();
+
+      print("ID RE"+ dados["idDestinatario"]);
+
+      if(dados["idDestinatario"] == _idUsuarioLogado){
+
+        return AlertDialog(
+          title: Text("Você recebeu um de convite"+dados["NomeRemetente"]+
+              "para compartilhar uma lista",
+          style:
+            TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          actions: [
+            FlatButton(onPressed: (){
+
+            },
+                child: Text("Aceitar")
+            ),
+            FlatButton(onPressed: (){
+
+            },
+                child: Text("Aceitar")
+            ),
+          ],
+        );
+      }
+    }
+  }
 
 
 
@@ -62,6 +99,7 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     _verificaUsuarioLogado();
+    _verificaConvite();
   }
 
 
@@ -80,8 +118,14 @@ class _HomeState extends State<Home> {
               DrawerHeader(
                 child: Center(
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children:<Widget> [
-                      Text(_usuarioLogado),
+                      Text(_usuarioLogado,
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.white
+                      ),
+                      ),
                     ],
                   ),
                 ),

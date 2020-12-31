@@ -57,11 +57,10 @@ class _CadastroState extends State<Cadastro> {
     auth.createUserWithEmailAndPassword(
         email: usuario.email, password: usuario.senha)
         .then((firebase) {
-      // ignore: deprecated_member_use
-      Firestore db = Firestore.instance;
+      FirebaseFirestore db = FirebaseFirestore.instance;
 
-      // ignore: deprecated_member_use
-      db.collection("usuarios").document(firebase.user.uid).setData(usuario.toMap());
+
+      db.collection("usuarios").doc(firebase.user.uid).set(usuario.toMap());
 
 
       Navigator.push(
