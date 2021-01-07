@@ -1,15 +1,20 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:minio/minio.dart';
 import 'package:minio/io.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:test_minio/Login.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    home: Home(),
+    home: Login(),
   ));
 }
 
@@ -61,23 +66,6 @@ class _HomeState extends State<Home> {
     });
     final url = await minio.presignedGetObject(bucket, object, expires: 1000);
     print('--- presigned url:' + url);
-  }
-
-  _inserirJson() async {
-    var url = "https://lista-albuns-default-rtdb.firebaseio.com/artista.json";
-    http.Response response = await http.get(url);
-    Map<String, dynamic> dadosJson = json.decode(response.body);
-
-    print("resposta: " + response.statusCode.toString());
-    print("resposta: " + dadosJson.toString());
-    print("resposta filtro: " + dadosJson["Mike Shinoda"]["album2"].toString());
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    _inserirJson();
   }
 
   @override
