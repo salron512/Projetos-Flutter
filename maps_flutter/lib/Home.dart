@@ -9,9 +9,11 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  CameraPosition  _posicaoCamera ;
   Set<Marker> _marcadadores = {};
   Set<Polygon> _polygons = {};
   Set<Polyline> _polyline = {};
+  Position _positionUsuario;
 
   Completer<GoogleMapController> _controller = Completer();
 
@@ -22,12 +24,8 @@ class _HomeState extends State<Home> {
   _movimentarCamera() async {
     GoogleMapController googleMapController = await _controller.future;
 
-    googleMapController.animateCamera(CameraUpdate.newCameraPosition(
-        CameraPosition(
-            target: LatLng(-15.579162, -57.913824),
-            zoom: 18,
-            tilt: 0,
-            bearing: 0)));
+    googleMapController.animateCamera(CameraUpdate.newCameraPosition
+      (_posicaoCamera));
   }
   /*
 
@@ -125,20 +123,65 @@ class _HomeState extends State<Home> {
       _polyline = listaPolylines;
     });
   }
-  */
+
 
   _recuperaLocalizacaoUSuario() async {
     Position position = await Geolocator()
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
 
     print("Minha localização" + position.toString());
+    setState(() {
+    _posicaoCamera = CameraPosition(target: LatLng(
+        position.latitude, position.longitude),
+      zoom: 17
+    );
+    });
   }
+   */
+  _adicionarListenerLocalizacao(){
+    var geolocator = Geolocator();
+    var locationOptions = LocationOptions(
+      accuracy: LocationAccuracy.best,
+      distanceFilter: 2
+    );
+
+    geolocator.getPositionStream(locationOptions).listen((Position position) {
+
+      Set<Marker> _marcadadoresLocal = {};
+
+      Marker marcadorUsuario = Marker(
+        markerId: MarkerId("marcador-inicial"),
+        position: LatLng(position.latitude, position.longitude),
+        infoWindow: InfoWindow(title: "Usuario"),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+        onTap: () {
+          print("Usuario clicado");
+        },
+        //rotation: 45
+      );
+      setState(() {
+        _marcadadores.add(marcadorUsuario);
+
+        _posicaoCamera = CameraPosition(target: LatLng(
+            position.latitude, position.longitude),
+            zoom: 17
+        );
+      });
+      _movimentarCamera();
+
+    });
+
+  }
+
+
+
 
   @override
   void initState() {
     super.initState();
     // _carregarMarcadores();
-    _recuperaLocalizacaoUSuario();
+    //_recuperaLocalizacaoUSuario();
+    _adicionarListenerLocalizacao();
   }
 
   @override
@@ -157,15 +200,12 @@ class _HomeState extends State<Home> {
       body: Container(
         child: GoogleMap(
           mapType: MapType.hybrid,
-          initialCameraPosition: CameraPosition(
-              target: LatLng(-15.580060, -57.914791),
-              zoom: 17,
-              tilt: 0,
-              bearing: 30),
+          initialCameraPosition: _posicaoCamera,
           onMapCreated: _onMapCreated,
+         myLocationEnabled: true,
           markers: _marcadadores,
-          polygons: _polygons,
-          polylines: _polyline,
+          //polygons: _polygons,
+          //polylines: _polyline,
         ),
       ),
     );
