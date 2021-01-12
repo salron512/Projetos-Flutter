@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:minio/minio.dart';
+import 'package:test_minio/Detalhes.dart';
 import 'dart:convert';
+import 'Dados.dart';
 
 class Home extends StatefulWidget {
   Home({Key key}) : super(key: key);
@@ -10,13 +13,14 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  Dados dados = Dados();
   var passadadosAlbum;
   var passadadosNome;
+  String _url = "";
   var resultado;
   int index;
   _consulta() async {
-    String url =
-        "https://lista-albuns-default-rtdb.firebaseio.com/artista.json";
+    String url = "https://lista-albuns-default-rtdb.firebaseio.com/artista.json";
 
     http.Response response = await http.get(url);
     setState(() {
@@ -24,6 +28,9 @@ class _HomeState extends State<Home> {
     });
     print("Status: " + response.statusCode.toString());
   }
+
+
+
 
   @override
   void initState() {
@@ -35,48 +42,6 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Lista de Albuns")),
-      drawer: Drawer(
-        child: ListView(
-          // Important: Remove any padding from the ListView.
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              child: Container(
-                child: Column(
-                  children: <Widget>[
-                    Text("Titulo"),
-                  ],
-                ),
-              ),
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.ac_unit),
-              title: Text("Primeira tela"),
-              onTap: () {
-                //Navigator.push(context, MaterialPageRoute(builder: (context) => SegundaTela()));
-                setState(() {
-                  index = 0;
-                  Navigator.pop(context);
-                });
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.account_balance_wallet),
-              title: Text('Segunda Tela'),
-              onTap: () {
-                setState(() {
-                  index = 1;
-                });
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
       body: resultado == null
           ? Center(
               child: CircularProgressIndicator(),
@@ -92,12 +57,18 @@ class _HomeState extends State<Home> {
                       subtitle: Text("Artista: " +
                           resultado["Serj tankian"]["nome"].toString()),
                       onTap: () {
-                        setState(() {
-                          passadadosAlbum = resultado["Serj tankian"]["album1"];
-                          passadadosNome = resultado["Serj tankian"]["nome"];
+                        setState((){
+                          dados.album = resultado["Serj tankian"]["album1"];
+                          dados.nome = resultado["Serj tankian"]["nome"];
+                            dados.object = "perfil_Harakiri.jpg";
+                            dados.objectUpload = "/Harakiri/";
                         });
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => Home()));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Detalhes(dados)
+                            )
+                        );
                       },
                     ),
                   ),
@@ -107,6 +78,19 @@ class _HomeState extends State<Home> {
                           resultado["Serj tankian"]["album2"].toString()),
                       subtitle: Text("Artista: " +
                           resultado["Serj tankian"]["nome"].toString()),
+                      onTap: (){
+                        setState(() {
+                          dados.album = resultado["Serj tankian"]["album2"];
+                          dados.nome = resultado["Serj tankian"]["nome"];
+                          dados.object = "black-blooms.jpg";
+                        });
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Detalhes(dados)
+                            )
+                        );
+                      },
                     ),
                   ),
                   Card(
@@ -115,6 +99,19 @@ class _HomeState extends State<Home> {
                           resultado["Serj tankian"]["album3"].toString()),
                       subtitle: Text("Artista: " +
                           resultado["Serj tankian"]["nome"].toString()),
+                      onTap: (){
+                        setState(() {
+                          dados.album = resultado["Serj tankian"]["album3"];
+                          dados.nome = resultado["Serj tankian"]["nome"];
+                          dados.object = "trd.jpg";
+                        });
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Detalhes(dados)
+                            )
+                        );
+                      },
                     ),
                   ),
                   Card(
@@ -123,6 +120,208 @@ class _HomeState extends State<Home> {
                           resultado["Mike Shinoda"]["album1"].toString()),
                       subtitle: Text("Artista: " +
                           resultado["Mike Shinoda"]["nome"].toString()),
+                      onTap: (){
+                        setState(() {
+                          dados.album = resultado["Mike Shinoda"]["album1"];
+                          dados.nome = resultado["Mike Shinoda"]["nome"];
+                          dados.object = "The Rising Tied.jpeg";
+                        });
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Detalhes(dados)
+                            )
+                        );
+                      },
+                    ),
+                  ),
+                  Card(
+                    child: ListTile(
+                      title: Text("Album: " +
+                          resultado["Mike Shinoda"]["album2"].toString()),
+                      subtitle: Text("Artista: " +
+                          resultado["Mike Shinoda"]["nome"].toString()),
+                      onTap: (){
+                        setState(() {
+                          dados.album = resultado["Mike Shinoda"]["album2"];
+                          dados.nome = resultado["Mike Shinoda"]["nome"];
+                          dados.object ="post traumatic.jpg";
+                        });
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Detalhes(dados)
+                            )
+                        );
+                      },
+                    ),
+                  ),
+                  Card(
+                    child: ListTile(
+                      title: Text("Album: " +
+                          resultado["Mike Shinoda"]["album3"].toString()),
+                      subtitle: Text("Artista: " +
+                          resultado["Mike Shinoda"]["nome"].toString()),
+                      onTap: (){
+                        setState(() {
+                          dados.album = resultado["Mike Shinoda"]["album3"];
+                          dados.nome = resultado["Mike Shinoda"]["nome"];
+                          dados.object = 'Post_Traumatic_EP.jpg';
+                        });
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Detalhes(dados)
+                            )
+                        );
+                      },
+                    ),
+                  ),
+                  Card(
+                    child: ListTile(
+                      title: Text("Album: " +
+                          resultado["Mike Shinoda"]["album4"].toString()),
+                      subtitle: Text("Artista: " +
+                          resultado["Mike Shinoda"]["nome"].toString()),
+                      onTap: (){
+                        setState(() {
+                          dados.album = resultado["Mike Shinoda"]["album4"];
+                          dados.nome = resultado["Mike Shinoda"]["nome"];
+                          dados.object = "where.jpg";
+                        });
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Detalhes(dados)
+                            )
+                        );
+                      },
+                    ),
+                  ),
+                  Card(
+                    child: ListTile(
+                      title: Text("Album: " +
+                          resultado["Michel Teló"]["album1"].toString()),
+                      subtitle: Text("Artista: " +
+                          resultado["Michel Teló"]["nome"].toString()),
+                      onTap: (){
+                        setState(() {
+                          dados.album = resultado["Michel Teló"]["album1"];
+                          dados.nome = resultado["Michel Teló"]["nome"];
+                          dados.object = "bem_sertanejo.jpg";
+                        });
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Detalhes(dados)
+                            )
+                        );
+                      },
+                    ),
+                  ),
+                  Card(
+                    child: ListTile(
+                      title: Text("Album: " +
+                          resultado["Michel Teló"]["album2"].toString()),
+                      subtitle: Text("Artista: " +
+                          resultado["Michel Teló"]["nome"].toString()),
+                      onTap: (){
+                        setState(() {
+                          dados.album = resultado["Michel Teló"]["album2"];
+                          dados.nome = resultado["Michel Teló"]["nome"];
+                          dados.object = "bem_sertanejo_aovivo.jpg";
+                        });
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Detalhes(dados)
+                            )
+                        );
+                      },
+                    ),
+                  ),
+                  Card(
+                    child: ListTile(
+                      title: Text("Album: " +
+                          resultado["Michel Teló"]["album3"].toString()),
+                      subtitle: Text("Artista: " +
+                          resultado["Michel Teló"]["nome"].toString()),
+                      onTap: (){
+                        setState(() {
+                          dados.album = resultado["Michel Teló"]["album3"];
+                          dados.nome = resultado["Michel Teló"]["nome"];
+                          dados.object = "bem_sertanejo_EP.jpg";
+                        });
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Detalhes(dados)
+                            )
+                        );
+                      },
+                    ),
+                  ),
+                  Card(
+                    child: ListTile(
+                      title: Text("Album: " +
+                          resultado["Guns N' Roses"]["album1"].toString()),
+                      subtitle: Text("Artista: " +
+                          resultado["Guns N' Roses"]["nome"].toString()),
+                      onTap: (){
+                        setState(() {
+                          dados.album = resultado["Guns N' Roses"]["album1"];
+                          dados.nome = resultado["Guns N' Roses"]["nome"];
+                          dados.object = "Use Your IIIlusion I.jpg";
+                        });
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Detalhes(dados)
+                            )
+                        );
+                      },
+                    ),
+                  ),
+                  Card(
+                    child: ListTile(
+                      title: Text("Album: " +
+                          resultado["Guns N' Roses"]["album2"].toString()),
+                      subtitle: Text("Artista: " +
+                          resultado["Guns N' Roses"]["nome"].toString()),
+                      onTap: (){
+                        setState(() {
+                          dados.album = resultado["Guns N' Roses"]["album3"];
+                          dados.nome = resultado["Guns N' Roses"]["nome"];
+                          dados.object = "Use Your IIIlusion II.jpg";
+                        });
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Detalhes(dados)
+                            )
+                        );
+                      },
+                    ),
+                  ),
+                  Card(
+                    child: ListTile(
+                      title: Text("Album: " +
+                          resultado["Guns N' Roses"]["album3"].toString()),
+                      subtitle: Text("Artista: " +
+                          resultado["Guns N' Roses"]["nome"].toString()),
+                      onTap: (){
+                        setState(() {
+                          dados.album = resultado["Guns N' Roses"]["album3"];
+                          dados.nome = resultado["Guns N' Roses"]["nome"];
+                          dados.object = "Greatest_Hits.jpg";
+                        });
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Detalhes(dados)
+                            )
+                        );
+                      },
                     ),
                   ),
                 ],

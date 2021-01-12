@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:test_minio/Lista.dart';
 
 import 'Home.dart';
 import 'Usuario.dart';
@@ -49,7 +50,7 @@ class _LoginState extends State<Login> {
         .signInWithEmailAndPassword(
             email: usuario.email, password: usuario.senha)
         .then((firebaseUser) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Lista()));
     }).catchError((error) {
       setState(() {
         _mensagemErro =
@@ -68,7 +69,7 @@ class _LoginState extends State<Login> {
     var usuariologado = await auth.currentUser;
 
     if (usuariologado != null) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Lista()));
     }
   }
 
