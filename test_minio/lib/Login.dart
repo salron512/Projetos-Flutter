@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:test_minio/Lista.dart';
 
+import 'Cadastro.dart';
 import 'Home.dart';
 import 'Usuario.dart';
 
@@ -130,7 +131,7 @@ class _LoginState extends State<Login> {
                         "Entrar",
                         style: TextStyle(color: Colors.black, fontSize: 20),
                       ),
-                      color: Colors.white,
+                      color: Colors.grey,
                       padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(32)),
@@ -147,7 +148,9 @@ class _LoginState extends State<Login> {
                             color: Colors.white,
                           ),
                         ),
-                        onTap: () {}),
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => Cadastro()));
+                        }),
                   ),
                   Padding(
                       padding: EdgeInsets.only(top: 16),

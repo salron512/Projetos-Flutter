@@ -3,9 +3,24 @@ class Dados {
   String _nome;
   String _object;
   String _objectUpload;
-
+  String _duracao;
+  String _parametroPesquisa;
+  String _ano;
+  String _totalFaixas;
   Dados();
 
+
+  String get parametroPesquisa => _parametroPesquisa;
+
+  set parametroPesquisa(String value) {
+    _parametroPesquisa = value;
+  }
+
+  String get duracao => _duracao;
+
+  set duracao(String value) {
+    _duracao = value;
+  }
 
   String get objectUpload => _objectUpload;
 
@@ -29,5 +44,17 @@ class Dados {
 
   set album(String value) {
     _album = value;
+  }
+
+  String get ano => _ano;
+
+  String get totalFaixas => _totalFaixas;
+
+  set totalFaixas(String value) {
+    _totalFaixas = value;
+  }
+
+  set ano(String value) {
+    _ano = value;
   }
 }

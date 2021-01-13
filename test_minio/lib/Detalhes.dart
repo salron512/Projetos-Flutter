@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:minio/minio.dart';
+import 'package:test_minio/Grid.dart';
 import 'Dados.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:minio/models.dart';
+import 'package:minio/io.dart';
 
 class Detalhes extends StatefulWidget {
   Dados dados;
@@ -11,10 +13,13 @@ class Detalhes extends StatefulWidget {
   _DetalhesState createState() => _DetalhesState();
 }
 
-
-
 class _DetalhesState extends State<Detalhes> {
-  var minio = Minio(
+  // ignore: deprecated_member_use
+  List<String> listaRecuperada = List<String>();
+  String _carregadoImagem = "";
+  String urlImagen;
+  var reultado;
+  final minio = Minio(
     port: 9000,
     endPoint: 'play.min.io',
     accessKey: 'Q3AM3UQ867SPQQA43P2F',
@@ -22,8 +27,7 @@ class _DetalhesState extends State<Detalhes> {
     useSSL: true,
   );
   String _url;
-  _consultaImagens()async{
-
+  _consultaImagens() async {
     String bucket = "imagens-albuns";
 
     String url = await minio.presignedGetObject(bucket, widget.dados.object);
@@ -31,23 +35,9 @@ class _DetalhesState extends State<Detalhes> {
     setState(() {
       _url = url;
     });
-
-    print("url teste: " + _url);
   }
 
-  _recuperaImagem() async{
-    final picker = ImagePicker();
-    String bucket = "imagens-albuns";
-    String object = widget.dados.objectUpload;
-/*
-   var imagemRecuperada = await picker.getImage(source: ImageSource.gallery);
-   var url = imagemRecuperada.path;
-   print(bucket + url);
-   if(url.isNotEmpty){
-     int size = url.length;
-   }
- */
-  }
+
 
 
 
@@ -55,57 +45,102 @@ class _DetalhesState extends State<Detalhes> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
     _consultaImagens();
   }
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Detalhes do Album"),
-      ),
-      body: Center(
-        child:  SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Padding(
-                  child: _url == null ?
-                  Center(
-                    child: CircularProgressIndicator(),
-                  )
-                      :
-                  Image.network(_url,
-                    alignment: Alignment.center,
-                    height: 300,
-                    width: 300,
-                  ),
-
-                  padding: EdgeInsets.all(8)),
-              Padding(
-                  child:  Text("Artista: " + widget.dados.nome,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  ),
-                  padding: EdgeInsets.only(top: 8),
-              ),
-              Padding(
-                  child: Text("Album: " + widget.dados.album,
+        appBar: AppBar(
+          title: Text("Detalhes do Album"),
+        ),
+        body: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                    child: _url == null
+                        ? Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : Image.network(
+                            _url,
+                            alignment: Alignment.center,
+                            height: 300,
+                            width: 300,
+                          ),
+                    padding: EdgeInsets.all(8)),
+                Padding(
+                  child: Text(
+                    "Artista: " + widget.dados.nome,
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  padding: EdgeInsets.all(8)),
-            ],
+                  padding: EdgeInsets.only(top: 8),
+                ),
+                Padding(
+                    child: Text(
+                      "Album: " + widget.dados.album,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    padding: EdgeInsets.only(top: 8)),
+                Padding(
+                  child: Text(
+                    "Ano de lançamento: " + widget.dados.ano,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  padding: EdgeInsets.only(top: 8),
+                ),
+                Padding(
+                  child: Text(
+                    "Duração: " + widget.dados.duracao +" minutos",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  padding: EdgeInsets.only(top: 8),
+                ),
+                Padding(
+                  child: Text(
+                    "Total faixas: " + widget.dados.totalFaixas,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  padding: EdgeInsets.only(top: 8),
+                ),
+                Padding(padding: EdgeInsets.all(8),
+                  child: RaisedButton(
+                  child: Text("Ver Galeria"),
+                    onPressed:(){
+
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => Grid(widget.dados)
+                          )
+                      );
+                    }
+
+                ),
+                ),
+                Text(_carregadoImagem),
+              ],
+            ),
           ),
-        ),
-      )
+        )
     );
   }
 }
-

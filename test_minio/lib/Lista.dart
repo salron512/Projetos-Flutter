@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:test_minio/Login.dart';
+import 'package:test_minio/Pesquisa.dart';
+import 'Dados.dart';
 import 'Home.dart';
 
 class Lista extends StatefulWidget {
@@ -9,11 +11,13 @@ class Lista extends StatefulWidget {
 }
 
 class _ListaState extends State<Lista> {
+  Dados dados = Dados();
   var auth = FirebaseAuth.instance;
   int index = 0;
 
   List<Widget> _listatelas = [
     Home(),
+    Pesquisa()
 
   ];
   @override
@@ -38,13 +42,40 @@ class _ListaState extends State<Lista> {
               ),
             ),
             ListTile(
-              leading: Icon(Icons.ac_unit),
-              title: Text("Primeira tela"),
+              leading: Icon(Icons.library_music),
+              title: Text("Lista de albuns"),
               onTap: () {
                 //Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
                 setState(() {
                   index = 0;
                   Navigator.pop(context);
+                  //Navigator.push(context, MaterialPageRoute(builder: (context) => Pesquisa()));
+                });
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.search),
+              title: Text("Pesquisar  albuns"),
+              onTap: () {
+                //Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+                setState(() {
+                  dados.parametroPesquisa = "album";
+                  index = 1;
+                  Navigator.pop(context);
+                  //Navigator.push(context, MaterialPageRoute(builder: (context) => Pesquisa()));
+                });
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.pageview),
+              title: Text("Pesquisar artistas"),
+              onTap: () {
+                dados.parametroPesquisa = "artista";
+                //Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+                setState(() {
+                  index = 1;
+                 Navigator.pop(context);
+                  //Navigator.push(context, MaterialPageRoute(builder: (context) => Pesquisa()));
                 });
               },
             ),
@@ -52,10 +83,9 @@ class _ListaState extends State<Lista> {
               leading: Icon(Icons.exit_to_app),
               title: Text('Deslogar'),
               onTap: () {
-                setState(() {
+
                   Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
                   auth.signOut();
-                });
               },
             ),
           ],
