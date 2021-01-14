@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:test_minio/Lista.dart';
 
 import 'Cadastro.dart';
 import 'Home.dart';
@@ -51,7 +50,7 @@ class _LoginState extends State<Login> {
         .signInWithEmailAndPassword(
             email: usuario.email, password: usuario.senha)
         .then((firebaseUser) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => Lista()));
+      Navigator.popAndPushNamed(context, "/home");
     }).catchError((error) {
       setState(() {
         _mensagemErro =
@@ -66,14 +65,13 @@ class _LoginState extends State<Login> {
 
   Future _verificaUsuarioLogado() async {
     FirebaseAuth auth = FirebaseAuth.instance;
-    //auth.signOut();
     var usuariologado = await auth.currentUser;
 
     if (usuariologado != null) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => Lista()));
+      print("usuario logado");
+      Navigator.popAndPushNamed(context, "/home");
     }
   }
-
   @override
   void initState() {
     _verificaUsuarioLogado();
@@ -131,7 +129,7 @@ class _LoginState extends State<Login> {
                         "Entrar",
                         style: TextStyle(color: Colors.black, fontSize: 20),
                       ),
-                      color: Colors.grey,
+                      color: Colors.lightBlueAccent,
                       padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(32)),
@@ -149,7 +147,7 @@ class _LoginState extends State<Login> {
                           ),
                         ),
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => Cadastro()));
+                          Navigator.pushNamed(context, "/cadastro");
                         }),
                   ),
                   Padding(

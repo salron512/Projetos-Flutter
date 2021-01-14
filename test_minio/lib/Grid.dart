@@ -75,10 +75,10 @@ class _GridState extends State<Grid> {
 
         print("estado " + estado);
         setState(() {
-          _carregadoImagem = "Carregado imagem";
         });
       }).whenComplete((){
-
+        // _recuperaGrid();
+        print("Carregamento da imagens completo");
       }).catchError((erro){
         setState(() {
           _carregadoImagem = "erro ao carregar";
@@ -86,7 +86,6 @@ class _GridState extends State<Grid> {
       });
     }
   }
-
   // ignore: deprecated_member_use
   @override
   void initState() {
@@ -113,8 +112,13 @@ class _GridState extends State<Grid> {
             switch (snapshot.connectionState) {
               case ConnectionState.none:
               case ConnectionState.waiting:
-                return Center(
-                  child: CircularProgressIndicator(),
+                return Container(
+                  decoration: BoxDecoration(color: Colors.blue),
+                  child: Center(
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.white,
+                  ),
+                  )
                 );
                 break;
               case ConnectionState.active:
@@ -122,6 +126,7 @@ class _GridState extends State<Grid> {
                 if (snapshot.hasData) {
                   List<String> item = snapshot.data;
                   return Container(
+                      decoration: BoxDecoration(color: Colors.blue),
                       padding: EdgeInsets.all(8),
                       child: GridView.count(
                         crossAxisCount: 3,
@@ -140,6 +145,7 @@ class _GridState extends State<Grid> {
                 } else {
                   return Center(
                     child: Text(_mensagem),
+
                   );
                 }
                 break;
@@ -148,13 +154,11 @@ class _GridState extends State<Grid> {
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.lightBlue,
           child: Icon(Icons.add),
           onPressed: () async{
             await _recuperaImagem();
-            setState(() {
-              _mensagem = "Carregando...";
-            });
-           await _recuperaGrid();
+          // await _recuperaGrid();
           },
         ),
     );

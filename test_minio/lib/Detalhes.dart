@@ -54,93 +54,106 @@ class _DetalhesState extends State<Detalhes> {
         appBar: AppBar(
           title: Text("Detalhes do Album"),
         ),
-        body: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Padding(
-                    child: _url == null
-                        ? Center(
-                            child: CircularProgressIndicator(),
-                          )
-                        : Image.network(
-                            _url,
-                            alignment: Alignment.center,
-                            height: 300,
-                            width: 300,
-                          ),
-                    padding: EdgeInsets.all(8)),
-                Padding(
-                  child: Text(
-                    "Artista: " + widget.dados.nome,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  padding: EdgeInsets.only(top: 8),
-                ),
-                Padding(
+        body: Container(
+          decoration: BoxDecoration(color: Colors.blue),
+          child: Center(
+
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                      child: _url == null
+                          ? Center(
+                        child: CircularProgressIndicator(
+                          backgroundColor: Colors.white,
+                        ),
+                      )
+                          : Image.network(
+                        _url,
+                        alignment: Alignment.center,
+                        height: 300,
+                        width: 300,
+                      ),
+                      padding: EdgeInsets.all(8)),
+                  Padding(
                     child: Text(
-                      "Album: " + widget.dados.album,
+                      "Artista: " + widget.dados.nome,
                       style: TextStyle(
+                        color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    padding: EdgeInsets.only(top: 8)),
-                Padding(
-                  child: Text(
-                    "Ano de lançamento: " + widget.dados.ano,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    padding: EdgeInsets.only(top: 8),
                   ),
-                  padding: EdgeInsets.only(top: 8),
-                ),
-                Padding(
-                  child: Text(
-                    "Duração: " + widget.dados.duracao +" minutos",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  Padding(
+                      child: Text(
+                        "Album: " + widget.dados.album,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      padding: EdgeInsets.only(top: 8)),
+                  Padding(
+                    child: Text(
+                      "Ano de lançamento: " + widget.dados.ano,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
+                    padding: EdgeInsets.only(top: 8),
                   ),
-                  padding: EdgeInsets.only(top: 8),
-                ),
-                Padding(
-                  child: Text(
-                    "Total faixas: " + widget.dados.totalFaixas,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  Padding(
+                    child: Text(
+                      "Duração: " + widget.dados.duracao +" minutos",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
+                    padding: EdgeInsets.only(top: 8),
                   ),
-                  padding: EdgeInsets.only(top: 8),
-                ),
-                Padding(padding: EdgeInsets.all(8),
-                  child: RaisedButton(
-                  child: Text("Ver Galeria"),
-                    onPressed:(){
+                  Padding(
+                    child: Text(
+                      "Total faixas: " + widget.dados.totalFaixas,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    padding: EdgeInsets.only(top: 8),
+                  ),
+                  Padding(padding: EdgeInsets.all(8),
+                    child: RaisedButton(
+                        child: Text("Ver Galeria",
+                        style: TextStyle(
+                          color: Colors.white
+                        ),
+                        ),
+                        color: Colors.lightBlue,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(32)),
+                        onPressed:(){
+                          Navigator.pushNamed(context, "/grid", arguments: widget.dados);
+                        }
 
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => Grid(widget.dados)
-                          )
-                      );
-                    }
-
-                ),
-                ),
-                Text(_carregadoImagem),
-              ],
+                    ),
+                  ),
+                  Text(_carregadoImagem),
+                ],
+              ),
             ),
           ),
-        )
+        ),
     );
   }
 }

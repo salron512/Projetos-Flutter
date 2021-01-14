@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:test_minio/Lista.dart';
+import 'package:test_minio/Home.dart';
 
 import 'Usuario.dart';
 
@@ -60,9 +60,8 @@ class _CadastroState extends State<Cadastro> {
       var db = FirebaseFirestore.instance;
 
       db.collection("usuarios").doc(firebase.user.uid).set(usuario.toMap());
+      Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
 
-
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Lista()));
     }).catchError((error) {
       setState(() {
         _mensagemErro =
@@ -78,7 +77,7 @@ class _CadastroState extends State<Cadastro> {
         title: Text("Cadastro"),
       ),
       body: Container(
-        decoration: BoxDecoration(color: Colors.white),
+        decoration: BoxDecoration(color: Colors.blue),
         padding: EdgeInsets.all(16),
         child: Center(
           child: SingleChildScrollView(
@@ -150,7 +149,7 @@ class _CadastroState extends State<Cadastro> {
                         "Cadastrar",
                         style: TextStyle(color: Colors.black, fontSize: 20),
                       ),
-                      color: Colors.grey,
+                      color: Colors.lightBlueAccent,
                       padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(32)),
