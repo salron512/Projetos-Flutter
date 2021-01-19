@@ -173,7 +173,67 @@ class _HomeState extends State<Home> {
 
   }
 
+  _recuperarLocalParaEndereco() async {
 
+    List<Placemark> listaEnderecos = await Geolocator()
+        .placemarkFromAddress("Av. Paulista, 1372");
+
+    print("total: " + listaEnderecos.length.toString() );
+
+    if( listaEnderecos != null && listaEnderecos.length > 0 ){
+
+      Placemark endereco = listaEnderecos[0];
+
+      String resultado;
+
+      resultado  = "\n administrativeArea " + endereco.administrativeArea ;
+      resultado += "\n subAdministrativeArea " + endereco.subAdministrativeArea ;
+      resultado += "\n locality " + endereco.locality ;
+      resultado += "\n subLocality " + endereco.subLocality ;
+      resultado += "\n thoroughfare " + endereco.thoroughfare ;
+      resultado += "\n subThoroughfare " + endereco.subThoroughfare ;
+      resultado += "\n postalCode " + endereco.postalCode ;
+      resultado += "\n country " + endereco.country ;
+      resultado += "\n isoCountryCode " + endereco.isoCountryCode ;
+      resultado += "\n position " + endereco.position.toString() ;
+
+      print("resultado: " + resultado );
+      //-23.565564, -46.652753
+
+    }
+
+  }
+
+  _recuperarLocalParaEnderecoLT() async {
+
+    List<Placemark> listaEnderecos = await Geolocator()
+        .placemarkFromCoordinates(-23.565564, -46.652753);
+
+    print("total: " + listaEnderecos.length.toString() );
+
+    if( listaEnderecos != null && listaEnderecos.length > 0 ){
+
+      Placemark endereco = listaEnderecos[0];
+
+      String resultado;
+
+      resultado  = "\n administrativeArea " + endereco.administrativeArea ;
+      resultado += "\n subAdministrativeArea " + endereco.subAdministrativeArea ;
+      resultado += "\n locality " + endereco.locality ;
+      resultado += "\n subLocality " + endereco.subLocality ;
+      resultado += "\n thoroughfare " + endereco.thoroughfare ;
+      resultado += "\n subThoroughfare " + endereco.subThoroughfare ;
+      resultado += "\n postalCode " + endereco.postalCode ;
+      resultado += "\n country " + endereco.country ;
+      resultado += "\n isoCountryCode " + endereco.isoCountryCode ;
+      resultado += "\n position " + endereco.position.toString() ;
+
+      print("resultado: " + resultado );
+      //-23.565564, -46.652753
+
+    }
+
+  }
 
 
   @override
@@ -181,7 +241,9 @@ class _HomeState extends State<Home> {
     super.initState();
     // _carregarMarcadores();
     //_recuperaLocalizacaoUSuario();
-    _adicionarListenerLocalizacao();
+     _adicionarListenerLocalizacao();
+    //_recuperarLocalParaEndereco();
+    _recuperarLocalParaEnderecoLT();
   }
 
   @override
