@@ -1,10 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:minio/minio.dart';
-import 'package:test_minio/Grid.dart';
 import 'Dados.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:minio/io.dart';
 
 class Detalhes extends StatefulWidget {
   Dados dados;
@@ -36,9 +33,6 @@ class _DetalhesState extends State<Detalhes> {
       _url = url;
     });
   }
-
-
-
 
 
   @override

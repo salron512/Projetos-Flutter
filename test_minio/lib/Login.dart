@@ -1,9 +1,7 @@
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'Cadastro.dart';
-import 'Home.dart';
 import 'Usuario.dart';
 
 class Login extends StatefulWidget {
@@ -68,8 +66,9 @@ class _LoginState extends State<Login> {
     var usuariologado = await auth.currentUser;
 
     if (usuariologado != null) {
-      print("usuario logado");
-      Navigator.popAndPushNamed(context, "/home");
+      var user = await auth.currentUser.getIdToken();
+      print("usuario logado: " + user );
+     Navigator.popAndPushNamed(context, "/home");
     }
   }
   @override
