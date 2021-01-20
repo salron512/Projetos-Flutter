@@ -45,15 +45,9 @@ class _GridState extends State<Grid> {
         // listaRecuperada.add(url);
         listaRecuperada.add(url);
       }
+
     });
-    if (listaRecuperada.isNotEmpty) {
       return listaRecuperada;
-    } else {
-      setState(() {
-        listaRecuperada = null;
-      });
-      return listaRecuperada;
-    }
   }
 
   _recuperaImagem() async {
@@ -77,7 +71,6 @@ class _GridState extends State<Grid> {
         setState(() {
         });
       }).whenComplete((){
-        // _recuperaGrid();
         print("Carregamento da imagens completo");
       }).catchError((erro){
         setState(() {
@@ -123,8 +116,9 @@ class _GridState extends State<Grid> {
                 break;
               case ConnectionState.active:
               case ConnectionState.done:
-                if (snapshot.hasData) {
-                  List<String> item = snapshot.data;
+              List<String> item = snapshot.data;
+                if (item.isNotEmpty) {
+
                   return Container(
                       decoration: BoxDecoration(color: Colors.blue),
                       padding: EdgeInsets.all(8),
@@ -136,16 +130,23 @@ class _GridState extends State<Grid> {
                             // ignore: missing_return
                             item.length, (indice) {
                           return Image.network(
-                            item[indice],
-                            width: 100,
-                            height: 100,
-                          );
+                                item[indice],
+                                width: 100,
+                                height: 100,
+                              );
                         }),
-                      ));
+                      )
+                  );
                 } else {
-                  return Center(
-                    child: Text(_mensagem),
-
+                  return Container(
+                    color: Colors.blue,
+                    child: Center(
+                      child: Text(_mensagem,
+                      style: TextStyle(
+                        color: Colors.white
+                      ),
+                      ),
+                    )
                   );
                 }
                 break;
@@ -158,7 +159,6 @@ class _GridState extends State<Grid> {
           child: Icon(Icons.add),
           onPressed: () async{
             await _recuperaImagem();
-          // await _recuperaGrid();
           },
         ),
     );

@@ -28,8 +28,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       resultado = jsonDecode(response.body);
     });
     print("Status: " + response.statusCode.toString());
+    print("retorno API: " + resultado);
   }
-
+  
   @override
   void initState() {
     // TODO: implement initState
@@ -44,7 +45,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           title: Text("Lista Albuns"),
           actions: [
             GestureDetector(
-              child: Icon(Icons.exit_to_app),
+              child: Padding(
+                padding: EdgeInsets.only(right: 6),
+                child: Icon(Icons.exit_to_app),
+              ),
               onTap: () {
                 _auth.signOut();
                 Navigator.popAndPushNamed(context, "/login");
@@ -467,6 +471,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                     ],
                   ),
                 ),
-              ));
+              )
+    );
+
   }
 }

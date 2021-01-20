@@ -27,6 +27,13 @@ class _DetalhesState extends State<Detalhes> {
   _consultaImagens() async {
     String bucket = "imagens-albuns";
 
+    if (!await minio.bucketExists(bucket)) {
+      await minio.makeBucket(bucket);
+      print('bucket $bucket created');
+    } else {
+      print('bucket $bucket already exists');
+    }
+
     String url = await minio.presignedGetObject(bucket, widget.dados.object);
 
     setState(() {
