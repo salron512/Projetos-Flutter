@@ -83,7 +83,7 @@ class _HomeState extends State<Home> {
                           dados.album = albuns["titulo"];
                           dados.ano = albuns["ano"].toString();
                           dados.duracao = albuns["duracao"].toString();
-                          dados.totalFaixas = albuns["total-faixas"].toString();
+                          dados.totalFaixas = albuns["total_faixas"].toString();
                           dados.nome = albuns["artista"].toString();
                           dados.object = albuns["imagemCapa"];
                           dados.objectUpload = albuns["pasta"];
