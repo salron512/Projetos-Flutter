@@ -1,4 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'Mapas.dart';
 
 
 class Home extends StatefulWidget {
@@ -7,11 +10,18 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+
   _adicionarLocal(){
-    
+    Navigator.push(context, MaterialPageRoute(
+        builder: (_) => Mapas()
+
+    )
+    );
   }
 
   _abrirMapa(){
+
+
 
   }
   _excluirViagem(){
@@ -77,6 +87,7 @@ class _HomeState extends State<Home> {
           ),
         ],
       )
+
     );
   }
 }
