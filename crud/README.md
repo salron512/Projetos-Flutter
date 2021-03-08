@@ -15,5 +15,10 @@ For help getting started with Flutter, view our
 [online documentation](https://flutter.dev/docs), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
+<<<<<<< HEAD
 esse app deve ser executado em dispositivos android
 ele utiliza um banco de dados do tipo sql
+=======
+esse app dever executado em dispositivos android
+ele utiliza um banco de dados do tipo sql.
+>>>>>>> 56a88fd825ab9f5337cc229f2071a36df0a063fe
