@@ -11,12 +11,14 @@ class RouteGenerator {
     switch (settings.name) {
       case "/":
         return MaterialPageRoute(builder: (_) => Home());
-      case "/Cadastro":
+      case "/Home":
         return MaterialPageRoute(builder: (_) => Cadastro());
       case "/PainelMotorista":
         return MaterialPageRoute(builder: (_) => PainelMotorista());
       case "/PainelPassageiro":
         return MaterialPageRoute(builder: (_) => PainelPassageiro());
+      case "/Cadastro":
+        return MaterialPageRoute(builder: (_) => Cadastro());
       default:
         _erroRota();
     }
