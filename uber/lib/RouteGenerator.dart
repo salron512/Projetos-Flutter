@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uber/telas/Cadastro.dart';
+import 'package:uber/telas/Corrida.dart';
 import 'package:uber/telas/Home.dart';
 import 'package:uber/telas/PainelMotorista.dart';
 import 'package:uber/telas/PainelPassageiro.dart';
@@ -19,6 +20,10 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => PainelPassageiro());
       case "/Cadastro":
         return MaterialPageRoute(builder: (_) => Cadastro());
+      case "/Corrida":
+        return MaterialPageRoute(builder: (_) => Corrida(
+          args
+        ));
       default:
         _erroRota();
     }
