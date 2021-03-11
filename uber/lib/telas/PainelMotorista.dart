@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:uber/util/StatusRequisicao.dart';
+import 'package:uber/util/UsuarioFirebase.dart';
 
 class PainelMotorista extends StatefulWidget {
   @override
@@ -39,12 +40,27 @@ class _PainelMotoristaState extends State<PainelMotorista> {
       _controller.add(dados);
     });
   }
+  _recuperarRequisicaoAtivaMotorias() async{
+    FirebaseUser firebaseUser = await UsuarioFirebase.getUsuarioAtual();
+    DocumentSnapshot documentSnapshot = await _db.
+    collection("requisicao_ativa_motorista").document(firebaseUser.uid).get();
+
+    var dadosRequisicao = documentSnapshot.data;
+    if(dadosRequisicao == null){
+      _adicionarListenerRequisicoes();
+    }else{
+      String idRequisicao = dadosRequisicao["id_requisicao"];
+      print("id requisicao: " + idRequisicao);
+      Navigator.pushReplacementNamed(context, "/Corrida", arguments: idRequisicao);
+    }
+  }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _adicionarListenerRequisicoes();
+    _recuperarRequisicaoAtivaMotorias();
+
   }
 
   @override
@@ -81,7 +97,7 @@ class _PainelMotoristaState extends State<PainelMotorista> {
                        padding: EdgeInsets.all(8),
                          child: CircularProgressIndicator(),
                   ),
-                  Text("Carregando requisições!")
+                   Text("Carregando requisições!")
                 ],
               ));
               break;
