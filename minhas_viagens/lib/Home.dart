@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'Mapas.dart';t
+import 'Mapas.dart';
 
 class Home extends StatefulWidget {
   @override

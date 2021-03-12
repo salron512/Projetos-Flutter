@@ -1,3 +1,4 @@
+
 class Destino {
 
   String _rua;
@@ -7,9 +8,15 @@ class Destino {
   String _cep;
 
   double _latitude;
-  double _longetude;
+  double _longitude;
 
   Destino();
+
+  double get longitude => _longitude;
+
+  set longitude(double value) {
+    _longitude = value;
+  }
 
   double get latitude => _latitude;
 
@@ -47,9 +54,5 @@ class Destino {
     _rua = value;
   }
 
-  double get longetude => _longetude;
 
-  set longetude(double value) {
-    _longetude = value;
-  }
 }

@@ -32,7 +32,7 @@ class Requisicao{
      "bairro": this.destino.bairro,
      "cep": this.destino.cep,
       "latitude": this.destino.latitude,
-      "longetude": this.destino.longetude
+      "longetude": this.destino.longitude
     };
     Map<String, dynamic> dadosRequisicao = {
       "id": this.id,
