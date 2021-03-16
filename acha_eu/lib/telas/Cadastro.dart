@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class Cadastro extends StatefulWidget {
   @override
@@ -47,7 +49,7 @@ class _CadastroState extends State<Cadastro> {
             usuario.telefone = telefone;
             usuario.estado = estado;
             usuario.cidade = cidade;
-            usuario.tipoUsuario = "cliente";
+            usuario.categoriaUsuario = "cliente";
             _cadastrarUsuairo(usuario);
           } else {
             setState(() {
@@ -89,6 +91,7 @@ class _CadastroState extends State<Cadastro> {
     });
   }
 
+
   _cadastrarUsuairo(Usuario usuario) {
     FirebaseAuth auth = FirebaseAuth.instance;
     auth
@@ -110,6 +113,7 @@ class _CadastroState extends State<Cadastro> {
       });
     });
   }
+
 
   _mostraListaEstado() {
     var item;
@@ -318,7 +322,8 @@ class _CadastroState extends State<Cadastro> {
                         onTap: () {
                           _mostraListaEstado();
                         },
-                      )),
+                      )
+                  ),
                   Padding(
                     padding: EdgeInsets.all(8),
                     child: GestureDetector(

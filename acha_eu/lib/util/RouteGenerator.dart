@@ -1,6 +1,9 @@
 import 'package:acha_eu/telas/Cadastro.dart';
+import 'package:acha_eu/telas/Configuracao.dart';
+import 'package:acha_eu/telas/DetalhesContado.dart';
 import 'package:acha_eu/telas/Home.dart';
 import 'package:acha_eu/telas/ListaCategorias.dart';
+import 'package:acha_eu/telas/ListaServicos.dart';
 import 'package:acha_eu/telas/RecuperaSenha.dart';
 import 'package:flutter/material.dart';
 
@@ -26,6 +29,18 @@ class RouteGenerator{
       case "/recupearasenha" :
         return MaterialPageRoute(
             builder: (_) => RecuperaSenha()
+        );
+      case "/config" :
+        return MaterialPageRoute(
+            builder: (_) => Configuracao()
+        );
+      case "/listaservicos" :
+        return MaterialPageRoute(
+            builder: (_) => ListaSericos(args)
+        );
+      case "/detalhescontado" :
+        return MaterialPageRoute(
+            builder: (_) => DetalhesContado(args)
         );
       
       default:

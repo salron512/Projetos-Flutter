@@ -1,5 +1,6 @@
 import 'package:acha_eu/model/Categorias.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ class ListaCategorias extends StatefulWidget {
 }
 
 class _ListaCategoriasState extends State<ListaCategorias> {
+  List<String> itensMenu = ["Configurações", "Deslogar"];
   Future _recuperaCategorias() async {
     // ignore: deprecated_member_use
     List<Categorias> listacategoria = List<Categorias>();
@@ -20,8 +22,11 @@ class _ListaCategoriasState extends State<ListaCategorias> {
         .orderBy("categoria", descending: false)
         .get();
     for (var item in snapshot.docs) {
-      Categorias categorias = Categorias();
+
       Map<String, dynamic> dados = item.data();
+      if(dados["categoria"] == "cliente" ) continue;
+
+      Categorias categorias = Categorias();
       categorias.nome = dados["categoria"];
       categorias.idImagem = dados["idImagem"];
       var imagem = await storage.ref("imagensCategoria/" + categorias.idImagem);
@@ -33,12 +38,42 @@ class _ListaCategoriasState extends State<ListaCategorias> {
     }
     return listacategoria;
   }
+  _escolhaMenuItem(String itemEscolhido) {
+    switch (itemEscolhido) {
+      case "Configurações":
+        Navigator.pushNamed(context, "/config");
+        break;
+      case "Deslogar":
+       _deslogarUsuario();
+        break;
+    }
+  }
+
+  _deslogarUsuario() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+     await auth.signOut();
+    Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Lista de categorias"),
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: _escolhaMenuItem,
+            // ignore: missing_return
+            itemBuilder: (context) {
+              return itensMenu.map((String item) {
+                return PopupMenuItem<String>(
+                  value: item,
+                  child: Text(item),
+                );
+              }).toList();
+            },
+          )
+        ],
       ),
       body: Container(
         // ignore: missing_return
@@ -72,6 +107,10 @@ class _ListaCategoriasState extends State<ListaCategorias> {
                             width: 100,
                             height: 100,
                             child: GestureDetector(
+                              onTap: (){
+                                Navigator.pushNamed(context, "/listaservicos",
+                                    arguments: dados);
+                              },
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -87,7 +126,8 @@ class _ListaCategoriasState extends State<ListaCategorias> {
                                       child: Text(dados.nome),
                                     )
                                   ],
-                                )
+                                ),
+
                             ),
                           );
                         }),

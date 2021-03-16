@@ -9,6 +9,7 @@ class Usuario {
   String _cidade;
   String _estado;
   String _tipoUsuario;
+  String _categoriaUsuario;
 
 
   String get tipoUsuario => _tipoUsuario;
@@ -25,15 +26,23 @@ class Usuario {
       "email": this.email,
       "telefone": this.telefone,
       "estado": this.estado,
-      "cidadade": this.cidade,
-      "tipoUsuario": this.tipoUsuario
+      "cidade": this.cidade,
+      "tipoUsuario": this.tipoUsuario,
+      "cpf": this.cpf,
+      "categoria": this.categoriaUsuario,
     };
 
     return map;
   }
 
 
- String get cpf => this._cpf;
+  String get categoriaUsuario => _categoriaUsuario;
+
+  set categoriaUsuario(String value) {
+    _categoriaUsuario = value;
+  }
+
+  String get cpf => this._cpf;
 
  set cpf(String value) => this._cpf = value;
   
