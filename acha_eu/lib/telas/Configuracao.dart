@@ -23,6 +23,12 @@ class _ConfiguracaoState extends State<Configuracao> {
   String _scolhaEstado = "";
   List<String> _listaCidades;
   List<String> _listaCadegorias;
+  bool _dinheiro = false;
+  bool _cartaoDebito = false;
+  bool _cartaoCredito = false;
+  bool _cheque = false;
+  bool _pix = false;
+  bool _mostraPagamento = true;
   var cond;
   List<String> _listaEstado = ["MT", "MS"];
   Future _recuperaImagem(bool daCamera) async {
@@ -88,6 +94,12 @@ class _ConfiguracaoState extends State<Configuracao> {
     String estado = _scolhaEstado;
     String cidade = _escolhaCidade;
     String categoria = _escolhaCategoria;
+    bool dinheiro = _dinheiro;
+    bool cartaoCredito = _cartaoCredito;
+    bool cartaoDebito = _cartaoDebito;
+    bool cheque = _cheque;
+    bool pix = _pix;
+
     Map<String, dynamic> dadosAtualizar = {
       "nome": nome,
       "telefone": telefone,
@@ -95,13 +107,18 @@ class _ConfiguracaoState extends State<Configuracao> {
       "estado": estado,
       "cidade": cidade,
       "categoria": categoria,
-
+      "dinheiro": dinheiro,
+      "cartaoCredito": cartaoCredito,
+      "cartaoDebito": cartaoDebito,
+      "cheque": cheque,
+      "pix": pix,
     };
 
     FirebaseFirestore db = FirebaseFirestore.instance;
     db.collection("usuarios").doc(_idUsuarioLogado).update(dadosAtualizar);
 
-    Navigator.pushNamed(context, "/listacategorias");
+    Navigator.pushNamedAndRemoveUntil(
+        context, "/listacategorias", (route) => false);
   }
 
   _atualizarUrlIamgemFirestore(String url) {
@@ -150,6 +167,18 @@ class _ConfiguracaoState extends State<Configuracao> {
       });
     }
     _recuperaListaCidades();
+    _verificaFormaPagamento(snapshot);
+  }
+
+  _verificaFormaPagamento(DocumentSnapshot snapshot) {
+    Map<String, dynamic> dados = snapshot.data();
+    setState(() {
+      _dinheiro = dados["dinheiro"];
+      _cheque = dados["cheque"];
+      _cartaoDebito = dados["cartaoDebito"];
+      _cartaoCredito = dados["cartaoCredito"];
+      _pix = dados["pix"];
+    });
   }
 
   _mostraListaEstado() {
@@ -247,6 +276,17 @@ class _ConfiguracaoState extends State<Configuracao> {
           });
     } else {}
   }
+  _mostraOpcoesPagamento() {
+    if (_escolhaCategoria == "cliente") {
+      setState(() {
+        _mostraPagamento = false;
+      });
+    }else{
+      setState(() {
+        _mostraPagamento = true;
+      });
+    }
+  }
 
   _mostraListaCategorias() {
     if (_listaCidades.isNotEmpty) {
@@ -270,8 +310,9 @@ class _ConfiguracaoState extends State<Configuracao> {
                     onTap: () {
                       setState(() {
                         _escolhaCategoria = item;
-                        Navigator.pop(context);
                       });
+                      Navigator.pop(context);
+                      _mostraOpcoesPagamento();
                     },
                   );
                 },
@@ -293,6 +334,7 @@ class _ConfiguracaoState extends State<Configuracao> {
     super.initState();
     _recuperaDadosUsuario();
     _recuperaCategorias();
+    _mostraOpcoesPagamento();
   }
 
   @override
@@ -306,179 +348,341 @@ class _ConfiguracaoState extends State<Configuracao> {
               child: CircularProgressIndicator(),
             )
           : Container(
+              decoration: BoxDecoration(color: Color(0xffDCDCDC)),
               child: SingleChildScrollView(
+                  padding: EdgeInsets.all(12),
                   child: Column(
-                children: [
-                  Container(
-                    padding: EdgeInsets.only(bottom: 8),
-                    child: _subindoImagem
-                        ? CircularProgressIndicator()
-                        : Container(),
-                  ),
-                  CircleAvatar(
-                      backgroundImage:
-                          _urlImagem != null ? NetworkImage(_urlImagem) : null,
-                      maxRadius: 100,
-                      backgroundColor: Colors.grey),
-                  Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        FlatButton(
-                          child: Text(
-                            "Câmera",
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black),
-                          ),
-                          onPressed: () {
-                            _recuperaImagem(true);
-                          },
-                        ),
-                        FlatButton(
-                          child: Text(
-                            "Galeria",
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black),
-                          ),
-                          onPressed: () {
-                            _recuperaImagem(false);
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                    child: TextField(
-                      autofocus: true,
-                      keyboardType: TextInputType.text,
-                      style: TextStyle(
-                        fontSize: 20,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(bottom: 8),
+                        child: _subindoImagem
+                            ? CircularProgressIndicator()
+                            : Container(),
                       ),
-                      decoration: InputDecoration(
-                        labelText: "Nome",
-                          contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(32))),
-                      controller: _controllerNome,
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                    child: TextField(
-                      keyboardType: TextInputType.phone,
-                      style: TextStyle(
-                        fontSize: 20,
-                      ),
-                      decoration: InputDecoration(
-                          labelText: "Telefone",
-                          contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(32))),
-                      controller: _controllerTelefone,
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                    child: TextField(
-                      keyboardType: TextInputType.phone,
-                      style: TextStyle(
-                        fontSize: 20,
-                      ),
-                      decoration: InputDecoration(
-                          labelText: "Whatsapp",
-                          contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(32))),
-                      controller: _controllerWhatsapp,
-                    ),
-                  ),
-                  Padding(
-                      padding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                      child: GestureDetector(
+                      CircleAvatar(
+                          backgroundImage: _urlImagem != null
+                              ? NetworkImage(_urlImagem)
+                              : null,
+                          maxRadius: 100,
+                          backgroundColor: Colors.grey),
+                      Padding(
+                        padding: EdgeInsets.all(16),
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              Icons.add_location_outlined,
+                            FlatButton(
+                              child: Text(
+                                "Câmera",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black),
+                              ),
+                              onPressed: () {
+                                _recuperaImagem(true);
+                              },
                             ),
-                            Text(
-                              "Seu estado: " + _scolhaEstado,
-                              style: TextStyle(fontSize: 12),
+                            FlatButton(
+                              child: Text(
+                                "Galeria",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black),
+                              ),
+                              onPressed: () {
+                                _recuperaImagem(false);
+                              },
                             ),
                           ],
                         ),
-                        onTap: () {
-                          _mostraListaEstado();
-                        },
-                      )),
-                  Padding(
-                    padding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                    child: GestureDetector(
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.add_location_outlined,
-                          ),
-                          Text(
-                            "Sua cidade: " + _escolhaCidade,
-                            style: TextStyle(fontSize: 12),
-                          ),
-                        ],
                       ),
-                      onTap: () {
-                        _mostraListaCidade();
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                    child: GestureDetector(
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.work,
+                      Padding(
+                        padding:
+                            EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                        child: TextField(
+                          autofocus: true,
+                          keyboardType: TextInputType.text,
+                          style: TextStyle(
+                            fontSize: 20,
                           ),
-                          Text(
-                            "Sua gategoria de serviço: " + _escolhaCategoria,
-                            style: TextStyle(fontSize: 12),
-                          ),
-                        ],
+                          decoration: InputDecoration(
+                              labelText: "Nome",
+                              contentPadding:
+                                  EdgeInsets.fromLTRB(32, 16, 32, 16),
+                              filled: true,
+                              fillColor: Color(0xffDCDCDC),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(32))),
+                          controller: _controllerNome,
+                        ),
                       ),
-                      onTap: () {
-                        _recuperaCategorias();
-                        _mostraListaCategorias();
-                      },
-                    ),
-                  ),
-                 Padding(padding: EdgeInsets.only(bottom: 8),
-                 child:  RaisedButton(
-                   child: Text(
-                     "Salvar",
-                     style: TextStyle(color: Colors.white, fontSize: 20),
-                   ),
-                   color: Colors.green,
-                   padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                   shape: RoundedRectangleBorder(
-                       borderRadius: BorderRadius.circular(32)),
-                   onPressed: () {
-                     _atualizarNomeFirestore();
-                   },
-                 ),
-                 ),
-                ],
-              )
-              ),
+                      Padding(
+                        padding:
+                            EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                        child: TextField(
+                          keyboardType: TextInputType.phone,
+                          style: TextStyle(
+                            fontSize: 20,
+                          ),
+                          decoration: InputDecoration(
+                              labelText: "Telefone",
+                              contentPadding:
+                                  EdgeInsets.fromLTRB(32, 16, 32, 16),
+                              filled: true,
+                              fillColor: Color(0xffDCDCDC),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(32))),
+                          controller: _controllerTelefone,
+                        ),
+                      ),
+                      Padding(
+                        padding:
+                            EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                        child: TextField(
+                          keyboardType: TextInputType.phone,
+                          style: TextStyle(
+                            fontSize: 20,
+                          ),
+                          decoration: InputDecoration(
+                              labelText: "Whatsapp",
+                              contentPadding:
+                                  EdgeInsets.fromLTRB(32, 16, 32, 16),
+                              filled: true,
+                              fillColor: Color(0xffDCDCDC),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(32))),
+                          controller: _controllerWhatsapp,
+                        ),
+                      ),
+                      Padding(
+                          padding:
+                              EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                          child: GestureDetector(
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.add_location_outlined,
+                                ),
+                                Text(
+                                  "Seu estado: " + _scolhaEstado,
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                              ],
+                            ),
+                            onTap: () {
+                              _mostraListaEstado();
+                            },
+                          )),
+                      Padding(
+                        padding:
+                            EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                        child: GestureDetector(
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.add_location_outlined,
+                              ),
+                              Text(
+                                "Sua cidade: " + _escolhaCidade,
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ],
+                          ),
+                          onTap: () {
+                            _mostraListaCidade();
+                          },
+                        ),
+                      ),
+                      Padding(
+                        padding:
+                            EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                        child: GestureDetector(
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.work,
+                              ),
+                              Text(
+                                "Sua gategoria de serviço: " +
+                                    _escolhaCategoria,
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ],
+                          ),
+                          onTap: () {
+                            _recuperaCategorias();
+                            _mostraListaCategorias();
+                          },
+                        ),
+                      ),
+                      Visibility(
+                        visible: _mostraPagamento,
+                        child: Container(
+                            alignment: Alignment.center,
+                            height: 310,
+                            decoration: BoxDecoration(
+                                color: Color(0xffDCDCDC),
+                                borderRadius: BorderRadius.circular(32),
+                                border: Border.all(color: Colors.black)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.all(15),
+                                  child: Text(
+                                    "Formas de pagamento:",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15),
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Checkbox(
+                                        activeColor: Colors.green,
+                                        value: _dinheiro,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _dinheiro = value;
+                                          });
+                                        }),
+                                    Padding(
+                                        padding:
+                                            EdgeInsets.only(left: 15, right: 5),
+                                        child: Icon(
+                                          Icons.payments_outlined,
+                                          color: Colors.green,
+                                        )),
+                                    Text(
+                                      "Dinheiro",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Checkbox(
+                                        activeColor: Colors.green,
+                                        value: _cartaoCredito,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _cartaoCredito = value;
+                                          });
+                                        }),
+                                    Padding(
+                                        padding:
+                                            EdgeInsets.only(left: 15, right: 5),
+                                        child: Icon(
+                                          Icons.credit_card,
+                                          color: Colors.blue,
+                                        )),
+                                    Text(
+                                      "Cartão de credito",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Checkbox(
+                                        activeColor: Colors.green,
+                                        value: _cartaoDebito,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _cartaoDebito = value;
+                                          });
+                                        }),
+                                    Padding(
+                                        padding:
+                                            EdgeInsets.only(left: 15, right: 5),
+                                        child: Icon(
+                                          Icons.credit_card,
+                                          color: Colors.red,
+                                        )),
+                                    Text(
+                                      "Cartão de debito",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Checkbox(
+                                        activeColor: Colors.green,
+                                        value: _cheque,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _cheque = value;
+                                          });
+                                        }),
+                                    Padding(
+                                        padding:
+                                            EdgeInsets.only(left: 15, right: 5),
+                                        child: Icon(
+                                          Icons.account_balance_outlined,
+                                          color: Colors.orange,
+                                        )),
+                                    Text(
+                                      "Cheque",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Checkbox(
+                                        activeColor: Colors.green,
+                                        value: _pix,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _pix = value;
+                                          });
+                                        }),
+                                    Padding(
+                                        padding:
+                                            EdgeInsets.only(left: 15, right: 5),
+                                        child: Icon(
+                                          Icons.payment_outlined,
+                                          color: Colors.purple,
+                                        )),
+                                    Text(
+                                      "Pix",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ],
+                            )),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 8, bottom: 8),
+                        child: RaisedButton(
+                          child: Text(
+                            "Salvar",
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                          color: Colors.green,
+                          padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(32)),
+                          onPressed: () {
+                            _atualizarNomeFirestore();
+                          },
+                        ),
+                      ),
+                    ],
+                  )),
             ),
     );
   }

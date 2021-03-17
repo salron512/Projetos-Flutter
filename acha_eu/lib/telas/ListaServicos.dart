@@ -37,12 +37,21 @@ List<Usuario> _listaContados = List();
       Usuario usuario = Usuario();
       usuario.nome = dados["nome"];
       usuario.telefone = dados["telefone"];
+      usuario.whatsapp = dados["whatsapp"];
       usuario.email = dados["email"];
       usuario.cidade = dados["cidade"];
       usuario.estado = dados["estado"];
       usuario.urlImagem = dados["urlImagem"];
+
+      usuario.dinheiro = dados["dinheiro"];
+      usuario.cheque = dados["cheque"];
+      usuario.cartaoCredito = dados["cartaoCredito"];
+      usuario.cartaoDebito = dados["cartaoDebito"];
+      usuario.pix = dados["pix"];
+
       _listaContados.add(usuario);
       print("for: " + usuario.nome);
+      print("dinheiro: " + usuario.dinheiro.toString());
     }
     return _listaContados;
   }
@@ -80,11 +89,12 @@ List<Usuario> _listaContados = List();
                     );
                   }else {
                     return Container(
-                        padding: EdgeInsets.all(16),
+                      decoration: BoxDecoration(color: Color(0xffDCDCDC)),
+                        padding: EdgeInsets.all(10),
                         child:ListView.separated(
                           itemCount: item.length,
                           separatorBuilder: (context, indice) => Divider(
-                            height: 3,
+                            height: 30,
                             color: Colors.grey,
                           ),
                           // ignore: missing_return

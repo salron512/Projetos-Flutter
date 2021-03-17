@@ -10,6 +10,11 @@ class Usuario {
   String _cidade;
   String _estado;
   String _categoriaUsuario;
+  bool _dinheiro;
+  bool _cartaoCredito;
+  bool _cartaoDebito;
+  bool _cheque;
+  bool _pix;
 
 
   Usuario();
@@ -29,6 +34,12 @@ class Usuario {
     return map;
   }
 
+
+  bool get dinheiro => _dinheiro;
+
+  set dinheiro(bool value) {
+    _dinheiro = value;
+  }
 
   String get whatsapp => _whatsapp;
 
@@ -88,5 +99,29 @@ class Usuario {
 
   set nome(String value) {
     _nome = value;
+  }
+
+  bool get cartaoCredito => _cartaoCredito;
+
+  bool get pix => _pix;
+
+  set pix(bool value) {
+    _pix = value;
+  }
+
+  bool get cheque => _cheque;
+
+  set cheque(bool value) {
+    _cheque = value;
+  }
+
+  bool get cartaoDebito => _cartaoDebito;
+
+  set cartaoDebito(bool value) {
+    _cartaoDebito = value;
+  }
+
+  set cartaoCredito(bool value) {
+    _cartaoCredito = value;
   }
 }

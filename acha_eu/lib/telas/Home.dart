@@ -85,7 +85,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(color: Color(0xff546e7a)),
+        decoration: BoxDecoration(color: Color(0xffDCDCDC)),
         padding: EdgeInsets.all(16),
         child: Center(
           child: SingleChildScrollView(
@@ -93,12 +93,24 @@ class _HomeState extends State<Home> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   Padding(
-                    padding: EdgeInsets.only(bottom: 32),
+                    padding: EdgeInsets.only(bottom: 10),
                     child: Image.asset(
                       "images/logo.png",
                       width: 200,
                       height: 150,
                     ),
+                  ),
+                  Padding(
+                      padding: EdgeInsets.only(bottom: 8),
+                      child: Center(
+                          child: Text(
+                            _mensagemErro,
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 20,
+                            ),
+                          )
+                      )
                   ),
                   Padding(
                     padding: EdgeInsets.only(bottom: 8),
@@ -165,7 +177,7 @@ class _HomeState extends State<Home> {
                     padding: EdgeInsets.only(bottom: 10),
                     child: RaisedButton(
                       child: Text(
-                        "Recupepar senha",
+                        "Cadastrar",
                         style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
                       color: Colors.green,
@@ -173,33 +185,23 @@ class _HomeState extends State<Home> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(32)),
                       onPressed: () {
-                        Navigator.pushNamed(context, "/recupearasenha");
+                        Navigator.pushNamed(context, "/cadastro");
                       },
                     ),
                   ),
                   Center(
                     child: GestureDetector(
                       child: Text(
-                        "Não Tem conta? cadastre-se!",
+                        "Recuperar senha",
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Colors.black,
                         ),
                       ),
                       onTap: () {
-                        Navigator.pushNamed(context, "/cadastro");
+                        Navigator.pushNamed(context, "/recuperasenha");
                       },
                     ),
                   ),
-                  Padding(
-                      padding: EdgeInsets.only(top: 16),
-                      child: Center(
-                          child: Text(
-                        _mensagemErro,
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 20,
-                        ),
-                      )))
                 ]),
           ),
         ),

@@ -26,7 +26,7 @@ class RouteGenerator{
         return MaterialPageRoute(
             builder: (_) => ListaCategorias()
         );
-      case "/recupearasenha" :
+      case "/recuperasenha" :
         return MaterialPageRoute(
             builder: (_) => RecuperaSenha()
         );

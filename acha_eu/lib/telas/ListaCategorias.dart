@@ -75,6 +75,7 @@ class _ListaCategoriasState extends State<ListaCategorias> {
         ],
       ),
       body: Container(
+        decoration: BoxDecoration(color: Color(0xffDCDCDC)),
         // ignore: missing_return
         child: FutureBuilder(
             future: _recuperaCategorias(),
