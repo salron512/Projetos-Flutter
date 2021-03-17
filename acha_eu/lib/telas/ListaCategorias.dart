@@ -93,7 +93,6 @@ class _ListaCategoriasState extends State<ListaCategorias> {
                 case ConnectionState.done:
                   List<Categorias> item = snapshot.data;
                   return Container(
-                      decoration: BoxDecoration(color: Colors.blue),
                       padding: EdgeInsets.all(8),
                       child: GridView.count(
                         crossAxisCount: 3,
@@ -135,13 +134,6 @@ class _ListaCategoriasState extends State<ListaCategorias> {
                   break;
               }
             }),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: (){
-
-        },
-        backgroundColor: Colors.green,
-        label: Text("SEJA PROFISSIONAL"),
       ),
     );
   }

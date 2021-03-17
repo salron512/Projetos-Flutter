@@ -72,6 +72,7 @@ class _HomeState extends State<Home> {
       //Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
     }
   }
+  bool _motrarSenha = false;
 
   @override
   void initState() {
@@ -84,7 +85,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(color: Color(0xff075E54)),
+        decoration: BoxDecoration(color: Color(0xff546e7a)),
         padding: EdgeInsets.all(16),
         child: Center(
           child: SingleChildScrollView(
@@ -118,12 +119,24 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                   TextField(
-                    obscureText: true,
+                    obscureText: !_motrarSenha,
                     keyboardType: TextInputType.text,
                     style: TextStyle(
                       fontSize: 20,
                     ),
                     decoration: InputDecoration(
+                      //prefix:Icon(Icons.security),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            Icons.remove_red_eye,
+                            color: _motrarSenha ? Colors.blue : Colors.grey,
+                          ),
+                          onPressed: (){
+                          setState(() {
+                            _motrarSenha = !_motrarSenha;
+                          });
+                          },
+                        ),
                         contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                         hintText: "Senha",
                         filled: true,
@@ -133,7 +146,7 @@ class _HomeState extends State<Home> {
                     controller: _controllerSenha,
                   ),
                   Padding(
-                    padding: EdgeInsets.only(top: 16, bottom: 10),
+                    padding: EdgeInsets.only(top: 8, bottom: 10),
                     child: RaisedButton(
                       child: Text(
                         "Entrar",

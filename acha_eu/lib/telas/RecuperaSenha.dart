@@ -31,8 +31,10 @@ class _RecuperaSenhaState extends State<RecuperaSenha> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Recuperar senha"),
+      ),
       body: Container(
-        decoration: BoxDecoration(color: Color(0xff075E54)),
         padding: EdgeInsets.all(16),
         child: Center(
           child: SingleChildScrollView(

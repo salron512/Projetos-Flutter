@@ -1,10 +1,7 @@
 import 'package:acha_eu/model/Usuario.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
@@ -19,20 +16,24 @@ class _CadastroState extends State<Cadastro> {
   TextEditingController _controllerSenha = TextEditingController();
   TextEditingController _controllerConfirmaSenha = TextEditingController();
   TextEditingController _controllerTelefone = TextEditingController();
+  TextEditingController _controllerWhatsapp = TextEditingController();
   List<String> _listaEstado = ["MT", "MS"];
   List<String> _listaCidades;
+  List<dynamic> _listarecuperada;
   String _scolhaEstado = "";
   String _mensagemErro = "";
   String _escolhaCidade = "";
-
+  bool _motrarSenha = false;
+  bool _motrarSenhaConfirma = false;
   _validarCampos() {
     String nome = _controllerNome.text;
     String email = _controllerEmail.text;
     String senha = _controllerSenha.text;
     String confirmaSenha = _controllerConfirmaSenha.text;
     String telefone = _controllerTelefone.text;
-    String estado = _scolhaEstado;
+    String estado = _scolhaEstado = "MT";
     String cidade = _escolhaCidade;
+    String whatsapp = _controllerWhatsapp.text;
 
     if (nome.isNotEmpty) {
       if (email.isNotEmpty && email.contains("@")) {
@@ -50,6 +51,7 @@ class _CadastroState extends State<Cadastro> {
             usuario.estado = estado;
             usuario.cidade = cidade;
             usuario.categoriaUsuario = "cliente";
+            usuario.whatsapp = whatsapp;
             _cadastrarUsuairo(usuario);
           } else {
             setState(() {
@@ -71,24 +73,6 @@ class _CadastroState extends State<Cadastro> {
         _mensagemErro = "Preencha o Nome";
       });
     }
-  }
-
-  _recuperaListaCidades() async {
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    var dados = await db
-        .collection("cidades")
-        .where("estado", isEqualTo: _scolhaEstado)
-        .get();
-
-    List<String> listaCidadesRecuperadas = List();
-    for (var item in dados.docs) {
-      var dados = item.data();
-      print("teste for: " + dados["cidade"].toString());
-      listaCidadesRecuperadas.add(dados["cidade"]);
-    }
-    setState(() {
-      _listaCidades = listaCidadesRecuperadas;
-    });
   }
 
 
@@ -134,7 +118,7 @@ class _CadastroState extends State<Cadastro> {
                 return ListTile(
                   title: Text(item),
                   onTap: () {
-                    _recuperaListaCidades();
+                    _recuperaListaCidade(item);
                     setState(() {
                       _scolhaEstado = item;
                       Navigator.pop(context);
@@ -152,6 +136,25 @@ class _CadastroState extends State<Cadastro> {
           );
         });
   }
+  _recuperaListaCidade(String estado) async{
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    var dados = await db
+        .collection("cidades")
+        .where("estado", isEqualTo: estado)
+        .get();
+
+    List<String> listaCidadesRecuperadas = List();
+    for (var item in dados.docs) {
+      var dados = item.data();
+      print("teste for: " + dados["cidade"].toString());
+      listaCidadesRecuperadas.add(dados["cidade"]);
+    }
+    setState(() {
+      _listaCidades = listaCidadesRecuperadas;
+    });
+    _mostraListaCidade();
+
+  }
 
   _mostraListaCidade() {
     if (_listaCidades.isNotEmpty) {
@@ -160,7 +163,7 @@ class _CadastroState extends State<Cadastro> {
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: Text("Escolha seu estado"),
+              title: Text("Escolha sua cidade"),
               content: ListView.separated(
                 itemCount: _listaCidades.length,
                 separatorBuilder: (context, indice) => Divider(
@@ -173,7 +176,6 @@ class _CadastroState extends State<Cadastro> {
                   return ListTile(
                     title: Text(item),
                     onTap: () {
-                      _recuperaListaCidades();
                       setState(() {
                         _escolhaCidade = item;
                         Navigator.pop(context);
@@ -204,6 +206,7 @@ class _CadastroState extends State<Cadastro> {
   void initState() {
     // TODO: implement initState
     super.initState();
+   // _recuperaListaApi();
   }
 
   @override
@@ -213,7 +216,6 @@ class _CadastroState extends State<Cadastro> {
         title: Text("Cadastro"),
       ),
       body: Container(
-        decoration: BoxDecoration(color: Color(0xff075E54)),
         padding: EdgeInsets.all(16),
         child: Center(
           child: SingleChildScrollView(
@@ -257,6 +259,23 @@ class _CadastroState extends State<Cadastro> {
                   ),
                   Padding(
                     padding: EdgeInsets.only(bottom: 8),
+                    child: TextField(
+                      keyboardType: TextInputType.phone,
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                      decoration: InputDecoration(
+                          contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                          hintText: "Whatsapp",
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(32))),
+                      controller: _controllerWhatsapp,
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 8),
                     child: TextFormField(
                       keyboardType: TextInputType.phone,
                       style: TextStyle(
@@ -273,13 +292,24 @@ class _CadastroState extends State<Cadastro> {
                     ),
                   ),
                   TextField(
-                    obscureText: true,
+                    obscureText: !_motrarSenha,
                     keyboardType: TextInputType.text,
                     style: TextStyle(
                       fontSize: 20,
                     ),
                     decoration: InputDecoration(
                         contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            Icons.remove_red_eye,
+                            color: _motrarSenha ? Colors.blue : Colors.grey,
+                          ),
+                          onPressed: (){
+                            setState(() {
+                              _motrarSenha = !_motrarSenha;
+                            });
+                          },
+                        ),
                         hintText: "Senha",
                         filled: true,
                         fillColor: Colors.white,
@@ -290,13 +320,24 @@ class _CadastroState extends State<Cadastro> {
                   Padding(
                     padding: EdgeInsets.only(top: 8),
                     child: TextField(
-                      obscureText: true,
+                      obscureText: !_motrarSenhaConfirma,
                       keyboardType: TextInputType.text,
                       style: TextStyle(
                         fontSize: 20,
                       ),
                       decoration: InputDecoration(
                           contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              Icons.remove_red_eye,
+                              color: _motrarSenhaConfirma ? Colors.blue : Colors.grey,
+                            ),
+                            onPressed: (){
+                              setState(() {
+                                _motrarSenhaConfirma = !_motrarSenhaConfirma;
+                              });
+                            },
+                          ),
                           hintText: "Digite novamente a senha",
                           filled: true,
                           fillColor: Colors.white,
@@ -338,9 +379,6 @@ class _CadastroState extends State<Cadastro> {
                           ),
                         ],
                       ),
-                      onTap: () {
-                        _mostraListaCidade();
-                      },
                     ),
                   ),
                   Padding(

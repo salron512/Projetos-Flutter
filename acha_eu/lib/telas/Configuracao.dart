@@ -14,6 +14,7 @@ class Configuracao extends StatefulWidget {
 class _ConfiguracaoState extends State<Configuracao> {
   TextEditingController _controllerNome = TextEditingController(text: "");
   TextEditingController _controllerTelefone = TextEditingController(text: "");
+  TextEditingController _controllerWhatsapp = TextEditingController();
   File _imagem;
   String _idUsuarioLogado = "";
   bool _subindoImagem = false;
@@ -84,15 +85,18 @@ class _ConfiguracaoState extends State<Configuracao> {
   _atualizarNomeFirestore() {
     String nome = _controllerNome.text;
     String telefone = _controllerTelefone.text;
+    String whatsapp = _controllerWhatsapp.text;
     String estado = _scolhaEstado;
     String cidade = _escolhaCidade;
     String categoria = _escolhaCategoria;
     Map<String, dynamic> dadosAtualizar = {
       "nome": nome,
       "telefone": telefone,
+      "whatsapp": whatsapp,
       "estado": estado,
       "cidade": cidade,
       "categoria": categoria,
+
     };
 
     FirebaseFirestore db = FirebaseFirestore.instance;
@@ -138,6 +142,7 @@ class _ConfiguracaoState extends State<Configuracao> {
     _controllerTelefone.text = dados["telefone"];
     _scolhaEstado = dados["estado"];
     _escolhaCategoria = dados["categoria"];
+    _controllerWhatsapp.text = dados["whatsapp"];
     print("estado: " + _scolhaEstado);
     _escolhaCidade = dados["cidade"];
     if (dados["urlImagem"] != null) {
@@ -301,7 +306,7 @@ class _ConfiguracaoState extends State<Configuracao> {
           ? Center(
               child: CircularProgressIndicator(),
             )
-          : Center(
+          : Container(
               child: SingleChildScrollView(
                   child: Column(
                 children: [
@@ -357,8 +362,8 @@ class _ConfiguracaoState extends State<Configuracao> {
                         fontSize: 20,
                       ),
                       decoration: InputDecoration(
+                        labelText: "Nome",
                           contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                          hintText: "",
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(
@@ -374,13 +379,30 @@ class _ConfiguracaoState extends State<Configuracao> {
                         fontSize: 20,
                       ),
                       decoration: InputDecoration(
+                          labelText: "Telefone",
                           contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                          hintText: "",
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(32))),
                       controller: _controllerTelefone,
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                    child: TextField(
+                      keyboardType: TextInputType.phone,
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                      decoration: InputDecoration(
+                          labelText: "Whatsapp",
+                          contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(32))),
+                      controller: _controllerWhatsapp,
                     ),
                   ),
                   Padding(
@@ -440,21 +462,24 @@ class _ConfiguracaoState extends State<Configuracao> {
                       },
                     ),
                   ),
-                  RaisedButton(
-                    child: Text(
-                      "Salvar",
-                      style: TextStyle(color: Colors.white, fontSize: 20),
-                    ),
-                    color: Colors.green,
-                    padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(32)),
-                    onPressed: () {
-                      _atualizarNomeFirestore();
-                    },
-                  ),
+                 Padding(padding: EdgeInsets.only(bottom: 8),
+                 child:  RaisedButton(
+                   child: Text(
+                     "Salvar",
+                     style: TextStyle(color: Colors.white, fontSize: 20),
+                   ),
+                   color: Colors.green,
+                   padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                   shape: RoundedRectangleBorder(
+                       borderRadius: BorderRadius.circular(32)),
+                   onPressed: () {
+                     _atualizarNomeFirestore();
+                   },
+                 ),
+                 ),
                 ],
-              )),
+              )
+              ),
             ),
     );
   }

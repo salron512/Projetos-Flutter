@@ -81,12 +81,11 @@ List<Usuario> _listaContados = List();
                     );
                   }else {
                     return Container(
-                        decoration: BoxDecoration(color: Colors.blue),
                         padding: EdgeInsets.all(16),
                         child:ListView.separated(
                           itemCount: item.length,
                           separatorBuilder: (context, indice) => Divider(
-                            height: 2,
+                            height: 3,
                             color: Colors.grey,
                           ),
                           // ignore: missing_return

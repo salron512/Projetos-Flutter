@@ -6,17 +6,11 @@ class Usuario {
   String _urlImagem;
   String _cpf;
   String _telefone;
+  String _whatsapp;
   String _cidade;
   String _estado;
-  String _tipoUsuario;
   String _categoriaUsuario;
 
-
-  String get tipoUsuario => _tipoUsuario;
-
-  set tipoUsuario(String value) {
-    _tipoUsuario = value;
-  }
 
   Usuario();
 
@@ -26,8 +20,8 @@ class Usuario {
       "email": this.email,
       "telefone": this.telefone,
       "estado": this.estado,
+      "whatsapp": this.whatsapp,
       "cidade": this.cidade,
-      "tipoUsuario": this.tipoUsuario,
       "cpf": this.cpf,
       "categoria": this.categoriaUsuario,
     };
@@ -35,6 +29,12 @@ class Usuario {
     return map;
   }
 
+
+  String get whatsapp => _whatsapp;
+
+  set whatsapp(String value) {
+    _whatsapp = value;
+  }
 
   String get categoriaUsuario => _categoriaUsuario;
 
