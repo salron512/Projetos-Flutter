@@ -14,6 +14,7 @@ void main() async {
     // debugShowCheckedModeBanner: false,
     title: "acha eu",
     theme:temaPadrao ,
+    debugShowCheckedModeBanner: false,
     home: Home(),
     initialRoute: "/",
     // ignore: missing_return

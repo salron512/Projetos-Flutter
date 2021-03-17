@@ -2,8 +2,6 @@ import 'package:acha_eu/model/Usuario.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 
 class Cadastro extends StatefulWidget {
   @override
