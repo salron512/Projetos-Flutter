@@ -106,7 +106,7 @@ List<Usuario> _listaContados = List();
                                         : null),
                                 title: Text(dados.nome,
                                 style: TextStyle(
-                                  color: Colors.white),),
+                                  color: Color(0xffDCDCDC)),),
                                 subtitle: Text(dados.descricao,
                                   style: TextStyle(
                                       color: Colors.white),),

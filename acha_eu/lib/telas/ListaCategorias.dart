@@ -23,7 +23,7 @@ class _ListaCategoriasState extends State<ListaCategorias> {
     for (var item in snapshot.docs) {
 
       Map<String, dynamic> dados = item.data();
-      if(dados["categoria"] == "cliente" ) continue;
+      if(dados["categoria"] == "Cliente" ) continue;
 
       Categorias categorias = Categorias();
       categorias.nome = dados["categoria"];

@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.acha_eu">
    <application
-        android:label="acha_eu"
-        android:icon="@mipmap/ic_launcher">
+        android:label="Acha Eu"
+        android:icon="@mipmap/icone">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

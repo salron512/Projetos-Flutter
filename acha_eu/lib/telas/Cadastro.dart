@@ -2,6 +2,9 @@ import 'package:acha_eu/model/Usuario.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+
 
 class Cadastro extends StatefulWidget {
   @override
@@ -9,6 +12,8 @@ class Cadastro extends StatefulWidget {
 }
 
 class _CadastroState extends State<Cadastro> {
+  var _mascaraTelefone = new
+  MaskTextInputFormatter(mask: '(##) #####-####', filter: { "#": RegExp(r'[0-9]') });
   TextEditingController _controllerNome = TextEditingController();
   TextEditingController _controllerEmail = TextEditingController();
   TextEditingController _controllerSenha = TextEditingController();
@@ -17,19 +22,22 @@ class _CadastroState extends State<Cadastro> {
   TextEditingController _controllerWhatsapp = TextEditingController();
   List<String> _listaEstado = ["MT", "MS"];
   List<String> _listaCidades;
-  List<dynamic> _listarecuperada;
   String _scolhaEstado = "";
   String _mensagemErro = "";
   String _escolhaCidade = "";
   bool _motrarSenha = false;
   bool _motrarSenhaConfirma = false;
+
+_formataTelefone(){
+}
+
   _validarCampos() {
     String nome = _controllerNome.text;
     String email = _controllerEmail.text;
     String senha = _controllerSenha.text;
     String confirmaSenha = _controllerConfirmaSenha.text;
     String telefone = _controllerTelefone.text;
-    String estado = _scolhaEstado = "MT";
+    String estado = _scolhaEstado;
     String cidade = _escolhaCidade;
     String whatsapp = _controllerWhatsapp.text;
 
@@ -37,20 +45,38 @@ class _CadastroState extends State<Cadastro> {
       if (email.isNotEmpty && email.contains("@")) {
         if (senha.isNotEmpty && senha.length > 6) {
           if (senha == confirmaSenha) {
-            setState(() {
-              _mensagemErro = "";
-            });
+            if(telefone.isNotEmpty){
+             if(_scolhaEstado.isNotEmpty){
+              if(_escolhaCidade.isNotEmpty){
+                Usuario usuario = Usuario();
+                usuario.nome = nome;
+                usuario.email = email;
+                usuario.senha = senha;
+                usuario.telefone = telefone;
+                usuario.estado = estado;
+                usuario.cidade = cidade;
+                usuario.categoriaUsuario = "cliente";
+                usuario.whatsapp = whatsapp;
+                setState(() {
+                  _mensagemErro = "";
+                });
+                _cadastrarUsuairo(usuario);
+              }else{
+                setState(() {
+                  _mensagemErro = "Escolha sua cidade";
+                });
+              }
+             }else{
+               setState(() {
+                 _mensagemErro = "Escolha seu estado";
+               });
+             }
+            }else{
+              setState(() {
+                _mensagemErro = "Preencha o campo telefone";
+              });
+            }
 
-            Usuario usuario = Usuario();
-            usuario.nome = nome;
-            usuario.email = email;
-            usuario.senha = senha;
-            usuario.telefone = telefone;
-            usuario.estado = estado;
-            usuario.cidade = cidade;
-            usuario.categoriaUsuario = "cliente";
-            usuario.whatsapp = whatsapp;
-            _cadastrarUsuairo(usuario);
           } else {
             setState(() {
               _mensagemErro = "Senha não conferer";
@@ -182,12 +208,6 @@ class _CadastroState extends State<Cadastro> {
                   );
                 },
               ),
-              actions: [
-                FlatButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text("Cancelar"),
-                ),
-              ],
             );
           });
       setState(() {
@@ -214,9 +234,10 @@ class _CadastroState extends State<Cadastro> {
         title: Text("Cadastro"),
       ),
       body: Container(
-        padding: EdgeInsets.all(16),
+
         child: Center(
           child: SingleChildScrollView(
+            padding: EdgeInsets.all(16),
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
@@ -259,11 +280,24 @@ class _CadastroState extends State<Cadastro> {
                     padding: EdgeInsets.only(bottom: 8),
                     child: TextField(
                       keyboardType: TextInputType.phone,
+                      inputFormatters: <TextInputFormatter>[
+                        _mascaraTelefone
+                      ],
                       style: TextStyle(
                         fontSize: 20,
                       ),
                       decoration: InputDecoration(
                           contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                          suffixIcon:IconButton(
+                            icon: Icon(
+                              Icons.clear,
+                            ),
+                            onPressed: (){
+                              setState(() {
+                                _controllerWhatsapp.clear();
+                              });
+                            },
+                          ),
                           hintText: "Whatsapp",
                           filled: true,
                           fillColor: Colors.white,
@@ -276,11 +310,24 @@ class _CadastroState extends State<Cadastro> {
                     padding: EdgeInsets.only(bottom: 8),
                     child: TextFormField(
                       keyboardType: TextInputType.phone,
+                      inputFormatters: <TextInputFormatter>[
+                        _mascaraTelefone
+                      ],
                       style: TextStyle(
                         fontSize: 20,
                       ),
                       decoration: InputDecoration(
                           contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                          suffixIcon:IconButton(
+                            icon: Icon(
+                              Icons.clear,
+                            ),
+                            onPressed: (){
+                              setState(() {
+                                _controllerTelefone.clear();
+                              });
+                            },
+                          ),
                           hintText: "Telefone",
                           filled: true,
                           fillColor: Colors.white,

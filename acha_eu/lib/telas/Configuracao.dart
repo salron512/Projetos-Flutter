@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class Configuracao extends StatefulWidget {
   @override
@@ -11,6 +12,10 @@ class Configuracao extends StatefulWidget {
 }
 
 class _ConfiguracaoState extends State<Configuracao> {
+  var _mascaraTelefone = new
+  MaskTextInputFormatter(
+
+      mask: '(##) #####-####', filter: {"#": RegExp(r'[0-9]')});
   TextEditingController _controllerNome = TextEditingController(text: "");
   TextEditingController _controllerTelefone = TextEditingController(text: "");
   TextEditingController _controllerWhatsapp = TextEditingController();
@@ -23,7 +28,7 @@ class _ConfiguracaoState extends State<Configuracao> {
   String _escolhaCidade = "";
   String _escolhaCategoria = "";
   String _scolhaEstado = "";
-  String  _mensagemErro ="";
+  String _mensagemErro = "";
   List<String> _listaCidades;
   List<String> _listaCadegorias;
   bool _dinheiro = false;
@@ -31,7 +36,7 @@ class _ConfiguracaoState extends State<Configuracao> {
   bool _cartaoCredito = false;
   bool _cheque = false;
   bool _pix = false;
-  bool _mostraPagamento = true;
+  bool _mostraPagamento = false;
   var cond;
   List<String> _listaEstado = ["MT", "MS"];
   Future _recuperaImagem(bool daCamera) async {
@@ -105,63 +110,127 @@ class _ConfiguracaoState extends State<Configuracao> {
     bool cheque = _cheque;
     bool pix = _pix;
     Map<String, dynamic> dadosAtualizar;
-  if(nome.isNotEmpty){
 
-    if(telefone.isNotEmpty){
-      if(_controllerAtividade.text.length < 100){
-       if(_controllerDescricao.text.isNotEmpty){
-         if(_controllerDescricao.text.length < 31){
-           dadosAtualizar = {
-             "nome": nome,
-             "telefone": telefone,
-             "whatsapp": whatsapp,
-             "estado": estado,
-             "cidade": cidade,
-             "categoria": categoria,
-             "dinheiro": dinheiro,
-             "cartaoCredito": cartaoCredito,
-             "cartaoDebito": cartaoDebito,
-             "cheque": cheque,
-             "pix": pix,
-             "descricaoAtividade": descricaoAtividade,
-             "descricao": descricao,
-           };
-           FirebaseFirestore db = FirebaseFirestore.instance;
-           db.collection("usuarios").doc(_idUsuarioLogado).update(dadosAtualizar);
+    switch (_mostraPagamento) {
+      case true:
+        if (nome.isNotEmpty) {
+          if (telefone.isNotEmpty) {
+            if (_controllerAtividade.text.length < 100) {
+              if (_controllerDescricao.text.isNotEmpty) {
+                if (_controllerDescricao.text.length < 31) {
+                  dadosAtualizar = {
+                    "nome": nome,
+                    "telefone": telefone,
+                    "whatsapp": whatsapp,
+                    "estado": estado,
+                    "cidade": cidade,
+                    "categoria": categoria,
+                    "dinheiro": dinheiro,
+                    "cartaoCredito": cartaoCredito,
+                    "cartaoDebito": cartaoDebito,
+                    "cheque": cheque,
+                    "pix": pix,
+                    "descricaoAtividade": descricaoAtividade,
+                    "descricao": descricao,
+                  };
+                  FirebaseFirestore db = FirebaseFirestore.instance;
+                  db
+                      .collection("usuarios")
+                      .doc(_idUsuarioLogado)
+                      .update(dadosAtualizar);
 
-           Navigator.pushNamedAndRemoveUntil(
-               context, "/listacategorias", (route) => false);
-           setState(() {
-             _mensagemErro = "";
-           });
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, "/listacategorias", (route) => false);
+                  setState(() {
+                    _mensagemErro = "";
+                  });
+                } else {
+                  setState(() {
+                    _mensagemErro =
+                        "Sua descrição tem mais do que 30 caracteres";
+                  });
+                }
+              } else {
+                setState(() {
+                  _mensagemErro = "Preencha o campo descrição";
+                });
+              }
+            } else {
+              setState(() {
+                _mensagemErro = "Sua descrição tem mais do que 60 caracteres";
+              });
+            }
+          } else {
+            setState(() {
+              _mensagemErro = "Preencha o campo telefone";
+            });
+          }
+        } else {
+          setState(() {
+            _mensagemErro = "Preencha o campo nome";
+          });
+        }
+        break;
 
-         }else{
-           setState(() {
-             _mensagemErro = "Sua descrição tem mais do que 30 caracteres";
-           });
-         }
-       }else{
-         setState(() {
-           _mensagemErro = "Preencha o campo descrição";
-         });
-       }
-      }else{
-        setState(() {
-          _mensagemErro = "Sua descrição tem mais do que 60 caracteres";
-        });
-      }
-    }else{
-      setState(() {
-        _mensagemErro = "Preencha o campo telefone";
-      });
+      case false:
+        if (_controllerNome.text.isNotEmpty) {
+          if (_controllerTelefone.text.isNotEmpty) {
+            if (_controllerWhatsapp.text.isNotEmpty) {
+              if (_scolhaEstado.isNotEmpty) {
+                if (_escolhaCidade.isNotEmpty) {
+                  if (_escolhaCategoria.isNotEmpty) {
+                    dadosAtualizar = {
+                      "nome": nome,
+                      "telefone": telefone,
+                      "whatsapp": whatsapp,
+                      "estado": estado,
+                      "cidade": cidade,
+                      "categoria": categoria,
+                    };
+                    FirebaseFirestore db = FirebaseFirestore.instance;
+                    db
+                        .collection("usuarios")
+                        .doc(_idUsuarioLogado)
+                        .update(dadosAtualizar);
+
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, "/listacategorias", (route) => false);
+                    setState(() {
+                      _mensagemErro = "";
+                    });
+                  } else {
+                    setState(() {
+                      _mensagemErro = "Escolha sua categoria";
+                    });
+                  }
+                } else {
+                  setState(() {
+                    _mensagemErro = "Escolha sua cidade";
+                  });
+                }
+              } else {
+                setState(() {
+                  _mensagemErro = "Escolha seu estado";
+                });
+              }
+            } else {
+              setState(() {
+                _mensagemErro = "Preencha o campo whatsapp";
+              });
+            }
+          } else {
+            setState(() {
+              _mensagemErro = "Preencha o campo telefone";
+            });
+          }
+        } else {
+          setState(() {
+            _mensagemErro = "Preencha o campo nome";
+          });
+        }
+
+        break;
     }
-
-  }else{
-    setState(() {
-      _mensagemErro = "Preencha o campo nome";
-    });
-  }
-
   }
 
   _atualizarUrlIamgemFirestore(String url) {
@@ -212,6 +281,7 @@ class _ConfiguracaoState extends State<Configuracao> {
       });
     }
     _recuperaListaCidades();
+    _mostraOpcoesPagamento();
     _verificaFormaPagamento(snapshot);
   }
 
@@ -321,12 +391,13 @@ class _ConfiguracaoState extends State<Configuracao> {
           });
     } else {}
   }
+
   _mostraOpcoesPagamento() {
-    if (_escolhaCategoria == "cliente") {
+    if (_escolhaCategoria == "Ciente") {
       setState(() {
         _mostraPagamento = false;
       });
-    }else{
+    } else {
       setState(() {
         _mostraPagamento = true;
       });
@@ -379,7 +450,6 @@ class _ConfiguracaoState extends State<Configuracao> {
     super.initState();
     _recuperaDadosUsuario();
     _recuperaCategorias();
-    _mostraOpcoesPagamento();
   }
 
   @override
@@ -455,6 +525,7 @@ class _ConfiguracaoState extends State<Configuracao> {
                               labelText: "Nome",
                               contentPadding:
                                   EdgeInsets.fromLTRB(32, 16, 32, 16),
+
                               filled: true,
                               fillColor: Color(0xffDCDCDC),
                               border: OutlineInputBorder(
@@ -467,6 +538,9 @@ class _ConfiguracaoState extends State<Configuracao> {
                             EdgeInsets.only(left: 16, right: 16, bottom: 16),
                         child: TextField(
                           keyboardType: TextInputType.phone,
+                          inputFormatters: [
+                            _mascaraTelefone
+                          ],
                           style: TextStyle(
                             fontSize: 20,
                           ),
@@ -474,6 +548,16 @@ class _ConfiguracaoState extends State<Configuracao> {
                               labelText: "Telefone",
                               contentPadding:
                                   EdgeInsets.fromLTRB(32, 16, 32, 16),
+                              suffixIcon:IconButton(
+                                icon: Icon(
+                                  Icons.clear,
+                                ),
+                                onPressed: (){
+                                  setState(() {
+                                    _controllerTelefone.clear();
+                                  });
+                                },
+                              ),
                               filled: true,
                               fillColor: Color(0xffDCDCDC),
                               border: OutlineInputBorder(
@@ -485,7 +569,14 @@ class _ConfiguracaoState extends State<Configuracao> {
                         padding:
                             EdgeInsets.only(left: 16, right: 16, bottom: 16),
                         child: TextField(
+                          onEditingComplete: (){
+                            setState(() {
+                              _controllerWhatsapp.value = _mascaraTelefone
+                                  .updateMask(mask: "(##) #####-####");
+                            });
+                          },
                           keyboardType: TextInputType.phone,
+                          inputFormatters: [_mascaraTelefone],
                           style: TextStyle(
                             fontSize: 20,
                           ),
@@ -493,6 +584,16 @@ class _ConfiguracaoState extends State<Configuracao> {
                               labelText: "Whatsapp",
                               contentPadding:
                                   EdgeInsets.fromLTRB(32, 16, 32, 16),
+                              suffixIcon:IconButton(
+                                icon: Icon(
+                                  Icons.clear,
+                                ),
+                                onPressed: (){
+                                  setState(() {
+                                    _controllerWhatsapp.clear();
+                                  });
+                                },
+                              ),
                               filled: true,
                               fillColor: Color(0xffDCDCDC),
                               border: OutlineInputBorder(
@@ -563,28 +664,28 @@ class _ConfiguracaoState extends State<Configuracao> {
                       ),
                       Visibility(
                           visible: _mostraPagamento,
-                          child: Padding( padding: EdgeInsets.only(bottom: 5),
+                          child: Padding(
+                            padding: EdgeInsets.only(bottom: 5),
                             child: TextField(
                               keyboardType: TextInputType.text,
                               style: TextStyle(
                                 fontSize: 20,
                               ),
                               decoration: InputDecoration(
-                                  labelText:
-                                  "Descrição Ex: Prof de inglês",
+                                  labelText: "Descrição Ex: Prof de inglês",
                                   contentPadding:
-                                  EdgeInsets.fromLTRB(32, 16, 32, 16),
+                                      EdgeInsets.fromLTRB(32, 16, 32, 16),
                                   filled: true,
                                   fillColor: Color(0xffDCDCDC),
                                   border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(32))),
                               controller: _controllerDescricao,
                             ),
-                          )
-                      ),
+                          )),
                       Visibility(
                           visible: _mostraPagamento,
-                          child: Padding( padding: EdgeInsets.only(bottom: 8,top: 5),
+                          child: Padding(
+                            padding: EdgeInsets.only(bottom: 8, top: 5),
                             child: TextField(
                               maxLines: 5,
                               keyboardType: TextInputType.text,
@@ -592,19 +693,16 @@ class _ConfiguracaoState extends State<Configuracao> {
                                 fontSize: 20,
                               ),
                               decoration: InputDecoration(
-                                  labelText:
-                                  "Descrição Completa",
+                                  labelText: "Descrição Completa",
                                   contentPadding:
-                                  EdgeInsets.fromLTRB(32, 16, 32, 16),
+                                      EdgeInsets.fromLTRB(32, 16, 32, 16),
                                   filled: true,
                                   fillColor: Color(0xffDCDCDC),
                                   border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(32))),
                               controller: _controllerAtividade,
                             ),
-                            )
-                      ),
-
+                          )),
                       Visibility(
                         visible: _mostraPagamento,
                         child: Container(
@@ -758,14 +856,12 @@ class _ConfiguracaoState extends State<Configuracao> {
                           padding: EdgeInsets.only(bottom: 8),
                           child: Center(
                               child: Text(
-                                _mensagemErro,
-                                style: TextStyle(
-                                  color: Colors.red,
-                                  fontSize: 20,
-                                ),
-                              )
-                          )
-                      ),
+                            _mensagemErro,
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 20,
+                            ),
+                          ))),
                       Padding(
                         padding: EdgeInsets.only(top: 8, bottom: 8),
                         child: RaisedButton(
