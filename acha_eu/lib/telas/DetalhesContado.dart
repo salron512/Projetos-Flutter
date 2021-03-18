@@ -17,6 +17,7 @@ class _DetalhesContadoState extends State<DetalhesContado> {
   bool _cartaoCredito = false;
   bool _cheque = false;
   bool _pix = false;
+  String _descricao = "Sem descição";
 
   _abrirWhatsApp() async {
     String telefone = widget.usuario.whatsapp;
@@ -48,6 +49,13 @@ class _DetalhesContadoState extends State<DetalhesContado> {
      }
    }
   }
+  _veirificaDescricao(){
+    if(widget.usuario.descricaoAtividade != null && widget.usuario.descricaoAtividade.isNotEmpty ){
+      setState(() {
+        _descricao = widget.usuario.descricaoAtividade;
+      });
+    }
+  }
 
   _abrirTelefone() async {
     String telefone = widget.usuario.telefone;
@@ -65,6 +73,7 @@ class _DetalhesContadoState extends State<DetalhesContado> {
     // TODO: implement initState
     super.initState();
     _recuperaFormaPagamento();
+    _veirificaDescricao();
   }
 
   @override
@@ -234,7 +243,41 @@ class _DetalhesContadoState extends State<DetalhesContado> {
                               ],
                             )),
                       ],
-                    ))
+                    )
+                ),
+                Padding(padding: EdgeInsets.only(top: 10),
+                child: Container(
+                    alignment: Alignment.center,
+                    height: 250,
+
+                    decoration: BoxDecoration(
+                        color: Color(0xffDCDCDC),
+                        borderRadius: BorderRadius.circular(32),
+                        border: Border.all(color: Colors.black)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(15),
+                          child: Text(
+                            "Descrição :",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 15),
+                          ),
+                        ),
+                        Padding(padding: EdgeInsets.only(left: 15),
+                        child: Text(
+                          _descricao,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ) ,
+
+                        )
+                      ],
+                    )
+                ),
+                )
               ],
             )),
       ),

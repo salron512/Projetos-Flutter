@@ -135,6 +135,11 @@ class _ListaCategoriasState extends State<ListaCategorias> {
               }
             }),
       ),
+      floatingActionButton: FloatingActionButton.extended(
+          onPressed: (){
+            Navigator.pushNamed(context, "/config");
+          }
+          , label: Text("SEJA PROFISSIONAL")),
     );
   }
 }

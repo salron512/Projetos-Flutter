@@ -194,6 +194,7 @@ class _HomeState extends State<Home> {
                       child: Text(
                         "Recuperar senha",
                         style: TextStyle(
+                          fontSize: 20,
                           color: Colors.black,
                         ),
                       ),

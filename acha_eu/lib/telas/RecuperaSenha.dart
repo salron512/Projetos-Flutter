@@ -85,7 +85,7 @@ class _RecuperaSenhaState extends State<RecuperaSenha> {
                       "Recuperar senha",
                       style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
-                    color: Colors.green,
+                    color: Color(0xff37474f),
                     padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(32)),

@@ -38,6 +38,7 @@ List<Usuario> _listaContados = List();
       usuario.descricaoAtividade = dados["descricaoAtividade"];
       usuario.telefone = dados["telefone"];
       usuario.whatsapp = dados["whatsapp"];
+      usuario.descricao = dados["descricao"];
       usuario.email = dados["email"];
       usuario.cidade = dados["cidade"];
       usuario.estado = dados["estado"];
@@ -106,7 +107,7 @@ List<Usuario> _listaContados = List();
                                 title: Text(dados.nome,
                                 style: TextStyle(
                                   color: Colors.white),),
-                                subtitle: Text(dados.descricaoAtividade,
+                                subtitle: Text(dados.descricao,
                                   style: TextStyle(
                                       color: Colors.white),),
                                 onTap: () {

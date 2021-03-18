@@ -15,6 +15,7 @@ class _ConfiguracaoState extends State<Configuracao> {
   TextEditingController _controllerTelefone = TextEditingController(text: "");
   TextEditingController _controllerWhatsapp = TextEditingController();
   TextEditingController _controllerAtividade = TextEditingController();
+  TextEditingController _controllerDescricao = TextEditingController();
   File _imagem;
   String _idUsuarioLogado = "";
   bool _subindoImagem = false;
@@ -94,6 +95,7 @@ class _ConfiguracaoState extends State<Configuracao> {
     String telefone = _controllerTelefone.text;
     String whatsapp = _controllerWhatsapp.text;
     String descricaoAtividade = _controllerAtividade.text;
+    String descricao = _controllerDescricao.text;
     String estado = _scolhaEstado;
     String cidade = _escolhaCidade;
     String categoria = _escolhaCategoria;
@@ -106,38 +108,57 @@ class _ConfiguracaoState extends State<Configuracao> {
   if(nome.isNotEmpty){
 
     if(telefone.isNotEmpty){
+      if(_controllerAtividade.text.length < 100){
+       if(_controllerDescricao.text.isNotEmpty){
+         if(_controllerDescricao.text.length < 31){
+           dadosAtualizar = {
+             "nome": nome,
+             "telefone": telefone,
+             "whatsapp": whatsapp,
+             "estado": estado,
+             "cidade": cidade,
+             "categoria": categoria,
+             "dinheiro": dinheiro,
+             "cartaoCredito": cartaoCredito,
+             "cartaoDebito": cartaoDebito,
+             "cheque": cheque,
+             "pix": pix,
+             "descricaoAtividade": descricaoAtividade,
+             "descricao": descricao,
+           };
+           FirebaseFirestore db = FirebaseFirestore.instance;
+           db.collection("usuarios").doc(_idUsuarioLogado).update(dadosAtualizar);
 
-      dadosAtualizar = {
-        "nome": nome,
-        "telefone": telefone,
-        "whatsapp": whatsapp,
-        "estado": estado,
-        "cidade": cidade,
-        "categoria": categoria,
-        "dinheiro": dinheiro,
-        "cartaoCredito": cartaoCredito,
-        "cartaoDebito": cartaoDebito,
-        "cheque": cheque,
-        "pix": pix,
-        "descricaoAtividade": descricaoAtividade,
-      };
-      FirebaseFirestore db = FirebaseFirestore.instance;
-      db.collection("usuarios").doc(_idUsuarioLogado).update(dadosAtualizar);
+           Navigator.pushNamedAndRemoveUntil(
+               context, "/listacategorias", (route) => false);
+           setState(() {
+             _mensagemErro = "";
+           });
 
-      Navigator.pushNamedAndRemoveUntil(
-          context, "/listacategorias", (route) => false);
-      setState(() {
-        _mensagemErro = "";
-      });
+         }else{
+           setState(() {
+             _mensagemErro = "Sua descrição tem mais do que 30 caracteres";
+           });
+         }
+       }else{
+         setState(() {
+           _mensagemErro = "Preencha o campo descrição";
+         });
+       }
+      }else{
+        setState(() {
+          _mensagemErro = "Sua descrição tem mais do que 60 caracteres";
+        });
+      }
     }else{
       setState(() {
-        _mensagemErro = "Preencha o seu telefone";
+        _mensagemErro = "Preencha o campo telefone";
       });
     }
 
   }else{
     setState(() {
-      _mensagemErro = "Preencha o seu nome";
+      _mensagemErro = "Preencha o campo nome";
     });
   }
 
@@ -179,6 +200,7 @@ class _ConfiguracaoState extends State<Configuracao> {
     _controllerNome.text = dados["nome"];
     _controllerTelefone.text = dados["telefone"];
     _controllerAtividade.text = dados["descricaoAtividade"];
+    _controllerDescricao.text = dados["descricao"];
     _scolhaEstado = dados["estado"];
     _escolhaCategoria = dados["categoria"];
     _controllerWhatsapp.text = dados["whatsapp"];
@@ -541,7 +563,7 @@ class _ConfiguracaoState extends State<Configuracao> {
                       ),
                       Visibility(
                           visible: _mostraPagamento,
-                          child: Padding( padding: EdgeInsets.all(8),
+                          child: Padding( padding: EdgeInsets.only(bottom: 5),
                             child: TextField(
                               keyboardType: TextInputType.text,
                               style: TextStyle(
@@ -549,7 +571,29 @@ class _ConfiguracaoState extends State<Configuracao> {
                               ),
                               decoration: InputDecoration(
                                   labelText:
-                                  "Descrição Ex: Prof de matemática",
+                                  "Descrição Ex: Prof de inglês",
+                                  contentPadding:
+                                  EdgeInsets.fromLTRB(32, 16, 32, 16),
+                                  filled: true,
+                                  fillColor: Color(0xffDCDCDC),
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(32))),
+                              controller: _controllerDescricao,
+                            ),
+                          )
+                      ),
+                      Visibility(
+                          visible: _mostraPagamento,
+                          child: Padding( padding: EdgeInsets.only(bottom: 8,top: 5),
+                            child: TextField(
+                              maxLines: 5,
+                              keyboardType: TextInputType.text,
+                              style: TextStyle(
+                                fontSize: 20,
+                              ),
+                              decoration: InputDecoration(
+                                  labelText:
+                                  "Descrição Completa",
                                   contentPadding:
                                   EdgeInsets.fromLTRB(32, 16, 32, 16),
                                   filled: true,
