@@ -2,6 +2,7 @@ import 'package:acha_eu/model/Categorias.dart';
 import 'package:acha_eu/model/Usuario.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ListaSericos extends StatefulWidget {
@@ -26,8 +27,6 @@ List<Usuario> _listaContados = List();
     var dadosUsuario = await db.collection("usuarios").doc(idusuario).get();
     Map<String, dynamic> dados = dadosUsuario.data();
     cidadeUsuario = dados["cidade"];
-    print("dados usuario: " + cidadeUsuario);
-    print("dados usuario: " + widget.categoria.nome);
     var snapshot = await db.collection("usuarios")
         .where("cidade", isEqualTo: cidadeUsuario )
         .where("categoria", isEqualTo: widget.categoria.nome)
@@ -36,13 +35,14 @@ List<Usuario> _listaContados = List();
       Map<String, dynamic> dados = item.data();
       Usuario usuario = Usuario();
       usuario.nome = dados["nome"];
+      usuario.descricaoAtividade = dados["descricaoAtividade"];
       usuario.telefone = dados["telefone"];
       usuario.whatsapp = dados["whatsapp"];
       usuario.email = dados["email"];
       usuario.cidade = dados["cidade"];
       usuario.estado = dados["estado"];
       usuario.urlImagem = dados["urlImagem"];
-
+      usuario.descricaoAtividade = dados["descricaoAtividade"];
       usuario.dinheiro = dados["dinheiro"];
       usuario.cheque = dados["cheque"];
       usuario.cartaoCredito = dados["cartaoCredito"];
@@ -50,8 +50,6 @@ List<Usuario> _listaContados = List();
       usuario.pix = dados["pix"];
 
       _listaContados.add(usuario);
-      print("for: " + usuario.nome);
-      print("dinheiro: " + usuario.dinheiro.toString());
     }
     return _listaContados;
   }
@@ -91,26 +89,30 @@ List<Usuario> _listaContados = List();
                     return Container(
                       decoration: BoxDecoration(color: Color(0xffDCDCDC)),
                         padding: EdgeInsets.all(10),
-                        child:ListView.separated(
+                        child:ListView.builder(
                           itemCount: item.length,
-                          separatorBuilder: (context, indice) => Divider(
-                            height: 30,
-                            color: Colors.grey,
-                          ),
                           // ignore: missing_return
                           itemBuilder: (context, indice) {
                             Usuario dados = item[indice];
-                            return ListTile(
-                              leading:  CircleAvatar(
-                                  maxRadius: 40,
-                                  backgroundColor: Colors.grey,
-                                  backgroundImage: dados.urlImagem != null
-                                      ? NetworkImage(dados.urlImagem)
-                                      : null),
-                              title: Text(dados.nome),
-                              onTap: () {
-                                Navigator.pushNamed(context, "/detalhescontado", arguments: dados);
-                              },
+                            return Card(
+                              color: Color(0xff37474f),
+                              child:  ListTile(
+                                leading:  CircleAvatar(
+                                    maxRadius: 40,
+                                    backgroundColor: Colors.grey,
+                                    backgroundImage: dados.urlImagem != null
+                                        ? NetworkImage(dados.urlImagem)
+                                        : null),
+                                title: Text(dados.nome,
+                                style: TextStyle(
+                                  color: Colors.white),),
+                                subtitle: Text(dados.descricaoAtividade,
+                                  style: TextStyle(
+                                      color: Colors.white),),
+                                onTap: () {
+                                  Navigator.pushNamed(context, "/detalhescontado", arguments: dados);
+                                },
+                              ),
                             );
                           },
                         ),

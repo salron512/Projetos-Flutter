@@ -10,6 +10,7 @@ class Usuario {
   String _cidade;
   String _estado;
   String _categoriaUsuario;
+  String _descricaoAtividade;
   bool _dinheiro;
   bool _cartaoCredito;
   bool _cartaoDebito;
@@ -34,6 +35,12 @@ class Usuario {
     return map;
   }
 
+
+  String get descricaoAtividade => _descricaoAtividade;
+
+  set descricaoAtividade(String value) {
+    _descricaoAtividade = value;
+  }
 
   bool get dinheiro => _dinheiro;
 

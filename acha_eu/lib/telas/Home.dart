@@ -86,9 +86,9 @@ class _HomeState extends State<Home> {
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(color: Color(0xffDCDCDC)),
-        padding: EdgeInsets.all(16),
         child: Center(
           child: SingleChildScrollView(
+            padding: EdgeInsets.all(16),
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
@@ -180,7 +180,7 @@ class _HomeState extends State<Home> {
                         "Cadastrar",
                         style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
-                      color: Colors.green,
+                      color: Color(0xff37474f),
                       padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(32)),

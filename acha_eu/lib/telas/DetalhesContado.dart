@@ -30,13 +30,23 @@ class _DetalhesContadoState extends State<DetalhesContado> {
   }
 
   _recuperaFormaPagamento() {
-    setState(() {
-      _dinheiro = widget.usuario.dinheiro;
-      _cartaoDebito = widget.usuario.cartaoDebito;
-      _cartaoCredito = widget.usuario.cartaoCredito;
-      _cheque = widget.usuario.cheque;
-      _pix = widget.usuario.pix;
-    });
+   if(widget.usuario.dinheiro != null){
+     if( widget.usuario.cartaoDebito != null ){
+       if( widget.usuario.cartaoCredito != null ){
+         if( widget.usuario.cheque != null ){
+           if( widget.usuario.pix != null ){
+             setState(() {
+               _dinheiro = widget.usuario.dinheiro;
+               _cartaoDebito = widget.usuario.cartaoDebito;
+               _cartaoCredito = widget.usuario.cartaoCredito;
+               _cheque = widget.usuario.cheque;
+               _pix = widget.usuario.pix;
+             });
+           }
+         }
+       }
+     }
+   }
   }
 
   _abrirTelefone() async {
@@ -101,7 +111,7 @@ class _DetalhesContadoState extends State<DetalhesContado> {
                       "Telefone",
                       style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
-                    color: Colors.green,
+                    color:Color(0xff37474f),
                     padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(32)),

@@ -14,6 +14,7 @@ class _ConfiguracaoState extends State<Configuracao> {
   TextEditingController _controllerNome = TextEditingController(text: "");
   TextEditingController _controllerTelefone = TextEditingController(text: "");
   TextEditingController _controllerWhatsapp = TextEditingController();
+  TextEditingController _controllerAtividade = TextEditingController();
   File _imagem;
   String _idUsuarioLogado = "";
   bool _subindoImagem = false;
@@ -21,6 +22,7 @@ class _ConfiguracaoState extends State<Configuracao> {
   String _escolhaCidade = "";
   String _escolhaCategoria = "";
   String _scolhaEstado = "";
+  String  _mensagemErro ="";
   List<String> _listaCidades;
   List<String> _listaCadegorias;
   bool _dinheiro = false;
@@ -91,6 +93,7 @@ class _ConfiguracaoState extends State<Configuracao> {
     String nome = _controllerNome.text;
     String telefone = _controllerTelefone.text;
     String whatsapp = _controllerWhatsapp.text;
+    String descricaoAtividade = _controllerAtividade.text;
     String estado = _scolhaEstado;
     String cidade = _escolhaCidade;
     String categoria = _escolhaCategoria;
@@ -99,26 +102,45 @@ class _ConfiguracaoState extends State<Configuracao> {
     bool cartaoDebito = _cartaoDebito;
     bool cheque = _cheque;
     bool pix = _pix;
+    Map<String, dynamic> dadosAtualizar;
+  if(nome.isNotEmpty){
 
-    Map<String, dynamic> dadosAtualizar = {
-      "nome": nome,
-      "telefone": telefone,
-      "whatsapp": whatsapp,
-      "estado": estado,
-      "cidade": cidade,
-      "categoria": categoria,
-      "dinheiro": dinheiro,
-      "cartaoCredito": cartaoCredito,
-      "cartaoDebito": cartaoDebito,
-      "cheque": cheque,
-      "pix": pix,
-    };
+    if(telefone.isNotEmpty){
 
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    db.collection("usuarios").doc(_idUsuarioLogado).update(dadosAtualizar);
+      dadosAtualizar = {
+        "nome": nome,
+        "telefone": telefone,
+        "whatsapp": whatsapp,
+        "estado": estado,
+        "cidade": cidade,
+        "categoria": categoria,
+        "dinheiro": dinheiro,
+        "cartaoCredito": cartaoCredito,
+        "cartaoDebito": cartaoDebito,
+        "cheque": cheque,
+        "pix": pix,
+        "descricaoAtividade": descricaoAtividade,
+      };
+      FirebaseFirestore db = FirebaseFirestore.instance;
+      db.collection("usuarios").doc(_idUsuarioLogado).update(dadosAtualizar);
 
-    Navigator.pushNamedAndRemoveUntil(
-        context, "/listacategorias", (route) => false);
+      Navigator.pushNamedAndRemoveUntil(
+          context, "/listacategorias", (route) => false);
+      setState(() {
+        _mensagemErro = "";
+      });
+    }else{
+      setState(() {
+        _mensagemErro = "Preencha o seu telefone";
+      });
+    }
+
+  }else{
+    setState(() {
+      _mensagemErro = "Preencha o seu nome";
+    });
+  }
+
   }
 
   _atualizarUrlIamgemFirestore(String url) {
@@ -156,6 +178,7 @@ class _ConfiguracaoState extends State<Configuracao> {
     cond = dados;
     _controllerNome.text = dados["nome"];
     _controllerTelefone.text = dados["telefone"];
+    _controllerAtividade.text = dados["descricaoAtividade"];
     _scolhaEstado = dados["estado"];
     _escolhaCategoria = dados["categoria"];
     _controllerWhatsapp.text = dados["whatsapp"];
@@ -517,6 +540,28 @@ class _ConfiguracaoState extends State<Configuracao> {
                         ),
                       ),
                       Visibility(
+                          visible: _mostraPagamento,
+                          child: Padding( padding: EdgeInsets.all(8),
+                            child: TextField(
+                              keyboardType: TextInputType.text,
+                              style: TextStyle(
+                                fontSize: 20,
+                              ),
+                              decoration: InputDecoration(
+                                  labelText:
+                                  "Descrição Ex: Prof de matemática",
+                                  contentPadding:
+                                  EdgeInsets.fromLTRB(32, 16, 32, 16),
+                                  filled: true,
+                                  fillColor: Color(0xffDCDCDC),
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(32))),
+                              controller: _controllerAtividade,
+                            ),
+                            )
+                      ),
+
+                      Visibility(
                         visible: _mostraPagamento,
                         child: Container(
                             alignment: Alignment.center,
@@ -531,7 +576,7 @@ class _ConfiguracaoState extends State<Configuracao> {
                                 Padding(
                                   padding: EdgeInsets.all(15),
                                   child: Text(
-                                    "Formas de pagamento:",
+                                    "Formas de recebimento:",
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 15),
@@ -666,13 +711,25 @@ class _ConfiguracaoState extends State<Configuracao> {
                             )),
                       ),
                       Padding(
+                          padding: EdgeInsets.only(bottom: 8),
+                          child: Center(
+                              child: Text(
+                                _mensagemErro,
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 20,
+                                ),
+                              )
+                          )
+                      ),
+                      Padding(
                         padding: EdgeInsets.only(top: 8, bottom: 8),
                         child: RaisedButton(
                           child: Text(
                             "Salvar",
                             style: TextStyle(color: Colors.white, fontSize: 20),
                           ),
-                          color: Colors.green,
+                          color: Color(0xff37474f),
                           padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(32)),
