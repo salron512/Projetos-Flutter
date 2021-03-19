@@ -115,7 +115,7 @@ class _ConfiguracaoState extends State<Configuracao> {
       case true:
         if (nome.isNotEmpty) {
           if (telefone.isNotEmpty) {
-            if (_controllerAtividade.text.length < 100) {
+            if (_controllerAtividade.text.length < 200) {
               if (_controllerDescricao.text.isNotEmpty) {
                 if (_controllerDescricao.text.length < 31) {
                   dadosAtualizar = {
@@ -157,7 +157,7 @@ class _ConfiguracaoState extends State<Configuracao> {
               }
             } else {
               setState(() {
-                _mensagemErro = "Sua descrição tem mais do que 60 caracteres";
+                _mensagemErro = "Sua descrição ultrapassou o tamanho máximo";
               });
             }
           } else {

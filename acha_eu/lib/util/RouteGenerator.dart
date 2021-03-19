@@ -1,5 +1,6 @@
 import 'package:acha_eu/telas/Cadastro.dart';
 import 'package:acha_eu/telas/Configuracao.dart';
+import 'package:acha_eu/telas/Contato.dart';
 import 'package:acha_eu/telas/DetalhesContado.dart';
 import 'package:acha_eu/telas/Home.dart';
 import 'package:acha_eu/telas/ListaCategorias.dart';
@@ -16,11 +17,11 @@ class RouteGenerator{
 
       case "/" :
         return MaterialPageRoute(
-          builder: (_) => Home()
+            builder: (_) => Home()
         );
-        case "/cadastro" :
+      case "/cadastro" :
         return MaterialPageRoute(
-          builder: (_) => Cadastro()
+            builder: (_) => Cadastro()
         );
       case "/listacategorias" :
         return MaterialPageRoute(
@@ -42,23 +43,29 @@ class RouteGenerator{
         return MaterialPageRoute(
             builder: (_) => DetalhesContado(args)
         );
-      
+      case "/contado" :
+        return MaterialPageRoute(
+            builder: (_) => Contato()
+        );
+
+
       default:
         _erroRota();
     }
   }
-    static Route<dynamic> _erroRota(){
+  static Route<dynamic> _erroRota(){
     return MaterialPageRoute(
-      builder: (_){
-        return Scaffold(
-          appBar: AppBar(
-            title: Text("Tela não Encontrada"),
-          ),
-          body: Center(
-            child: Text("Tela não Encontrada"),
-          ),
-        );
-      }
+        builder: (_){
+          return Scaffold(
+            appBar: AppBar(
+              title: Text("Tela não Encontrada"),
+            ),
+            body: Center(
+              child: Text("Tela não Encontrada"),
+            ),
+          );
+        }
     );
-    }
+  }
 }
+

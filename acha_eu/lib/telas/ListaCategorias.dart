@@ -10,7 +10,7 @@ class ListaCategorias extends StatefulWidget {
 }
 
 class _ListaCategoriasState extends State<ListaCategorias> {
-  List<String> itensMenu = ["Configurações", "Deslogar"];
+  List<String> itensMenu = ["Configurações", "Deslogar","Seja Profissional"];
   Future _recuperaCategorias() async {
     // ignore: deprecated_member_use
     List<Categorias> listacategoria = List<Categorias>();
@@ -45,6 +45,9 @@ class _ListaCategoriasState extends State<ListaCategorias> {
       case "Deslogar":
        _deslogarUsuario();
         break;
+      case "Seja Profissional":
+        Navigator.pushNamed(context, "/contado");
+        break;
     }
   }
 
@@ -58,16 +61,21 @@ class _ListaCategoriasState extends State<ListaCategorias> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Lista de categorias"),
+        title: Text("Categorias"),
         actions: [
           PopupMenuButton<String>(
+            color: Color(0xff37474f),
             onSelected: _escolhaMenuItem,
             // ignore: missing_return
             itemBuilder: (context) {
               return itensMenu.map((String item) {
                 return PopupMenuItem<String>(
                   value: item,
-                  child: Text(item),
+                  child: Text(item,
+                  style: TextStyle(
+                    color: Colors.white
+                  )
+                  ),
                 );
               }).toList();
             },
@@ -93,7 +101,7 @@ class _ListaCategoriasState extends State<ListaCategorias> {
                 case ConnectionState.done:
                   List<Categorias> item = snapshot.data;
                   return Container(
-                      padding: EdgeInsets.all(8),
+                      //padding: EdgeInsets.all(8),
                       child: GridView.count(
                         crossAxisCount: 3,
                         mainAxisSpacing: 2,
@@ -130,16 +138,20 @@ class _ListaCategoriasState extends State<ListaCategorias> {
                             ),
                           );
                         }),
-                      ));
+                      )
+                  );
                   break;
               }
             }),
       ),
+      /*
       floatingActionButton: FloatingActionButton.extended(
           onPressed: (){
             Navigator.pushNamed(context, "/config");
           }
-          , label: Text("SEJA PROFISSIONAL")),
+          , label: Text("SEJA PROFISSIONAL")
+      ),
+      */
     );
   }
 }

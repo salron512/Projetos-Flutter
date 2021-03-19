@@ -19,16 +19,7 @@ class _DetalhesContadoState extends State<DetalhesContado> {
   bool _pix = false;
   String _descricao = "Sem descição";
 
-  _abrirWhatsApp() async {
-    String telefone = widget.usuario.whatsapp;
-    var whatsappUrl = "whatsapp://send?phone=+55$telefone=Olá,tudo bem ?";
 
-    if (await canLaunch(whatsappUrl)) {
-      await launch(whatsappUrl);
-    } else {
-      throw 'Could not launch $whatsappUrl';
-    }
-  }
 
   _recuperaFormaPagamento() {
    if(widget.usuario.dinheiro != null){
@@ -54,6 +45,16 @@ class _DetalhesContadoState extends State<DetalhesContado> {
       setState(() {
         _descricao = widget.usuario.descricaoAtividade;
       });
+    }
+  }
+  _abrirWhatsApp() async {
+    String telefone = widget.usuario.whatsapp;
+    var whatsappUrl = "whatsapp://send?phone=+55$telefone=Olá,tudo bem ?";
+
+    if (await canLaunch(whatsappUrl)) {
+      await launch(whatsappUrl);
+    } else {
+      throw 'Could not launch $whatsappUrl';
     }
   }
 
