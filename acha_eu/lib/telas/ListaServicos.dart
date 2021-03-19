@@ -107,7 +107,7 @@ List<Usuario> _listaContados = List();
                                 title: Text(dados.nome,
                                 style: TextStyle(
                                   color: Color(0xffDCDCDC)),),
-                                subtitle: Text(dados.descricao,
+                                subtitle: dados.descricao == null ? Text(" ") : Text(dados.descricao,
                                   style: TextStyle(
                                       color: Colors.white),),
                                 onTap: () {

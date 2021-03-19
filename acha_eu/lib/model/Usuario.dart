@@ -12,6 +12,7 @@ class Usuario {
   String _categoriaUsuario;
   String _descricao;
   String _descricaoAtividade;
+  bool _mostraPagamento;
   bool _dinheiro;
   bool _cartaoCredito;
   bool _cartaoDebito;
@@ -31,10 +32,19 @@ class Usuario {
       "cidade": this.cidade,
       "cpf": this.cpf,
       "categoria": this.categoriaUsuario,
+      "mostraPagamento": this.mostraPagamento,
     };
 
     return map;
   }
+
+
+  bool get mostraPagamento => _mostraPagamento;
+
+  set mostraPagamento(bool value) {
+    _mostraPagamento = value;
+  }
+
 
 
   String get descricao => _descricao;

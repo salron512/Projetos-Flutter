@@ -28,8 +28,8 @@ class _CadastroState extends State<Cadastro> {
   bool _motrarSenha = false;
   bool _motrarSenhaConfirma = false;
 
-_formataTelefone(){
-}
+  _formataTelefone(){
+  }
 
   _validarCampos() {
     String nome = _controllerNome.text;
@@ -46,31 +46,32 @@ _formataTelefone(){
         if (senha.isNotEmpty && senha.length > 6) {
           if (senha == confirmaSenha) {
             if(telefone.isNotEmpty){
-             if(_scolhaEstado.isNotEmpty){
-              if(_escolhaCidade.isNotEmpty){
-                Usuario usuario = Usuario();
-                usuario.nome = nome;
-                usuario.email = email;
-                usuario.senha = senha;
-                usuario.telefone = telefone;
-                usuario.estado = estado;
-                usuario.cidade = cidade;
-                usuario.categoriaUsuario = "cliente";
-                usuario.whatsapp = whatsapp;
-                setState(() {
-                  _mensagemErro = "";
-                });
-                _cadastrarUsuairo(usuario);
+              if(_scolhaEstado.isNotEmpty){
+                if(_escolhaCidade.isNotEmpty){
+                  Usuario usuario = Usuario();
+                  usuario.nome = nome;
+                  usuario.email = email;
+                  usuario.senha = senha;
+                  usuario.telefone = telefone;
+                  usuario.estado = estado;
+                  usuario.cidade = cidade;
+                  usuario.categoriaUsuario = "Cliente";
+                  usuario.whatsapp = whatsapp;
+                  usuario.mostraPagamento = false;
+                  setState(() {
+                    _mensagemErro = "";
+                  });
+                  _cadastrarUsuairo(usuario);
+                }else{
+                  setState(() {
+                    _mensagemErro = "Escolha sua cidade";
+                  });
+                }
               }else{
                 setState(() {
-                  _mensagemErro = "Escolha sua cidade";
+                  _mensagemErro = "Escolha seu estado";
                 });
               }
-             }else{
-               setState(() {
-                 _mensagemErro = "Escolha seu estado";
-               });
-             }
             }else{
               setState(() {
                 _mensagemErro = "Preencha o campo telefone";
@@ -104,11 +105,13 @@ _formataTelefone(){
     FirebaseAuth auth = FirebaseAuth.instance;
     auth
         .createUserWithEmailAndPassword(
-            email: usuario.email, password: usuario.senha)
+        email: usuario.email, password: usuario.senha)
         .then((firebase) {
       FirebaseFirestore db = FirebaseFirestore.instance;
 
       db.collection("usuarios").doc(firebase.user.uid).set(usuario.toMap());
+      db.collection("usuarios").doc(firebase.user.uid).update({
+        "idUsuario": firebase.user.uid});
 
       Navigator.pushNamedAndRemoveUntil(
           context, "/listacategorias", (_) => false);
@@ -117,7 +120,7 @@ _formataTelefone(){
     }).catchError((error) {
       setState(() {
         _mensagemErro =
-            "Erro ao cadastrar o usuário, verificar os campos novamente!";
+        "Erro ao cadastrar o usuário, verificar os campos novamente!";
       });
     });
   }
@@ -224,7 +227,7 @@ _formataTelefone(){
   void initState() {
     // TODO: implement initState
     super.initState();
-   // _recuperaListaApi();
+    // _recuperaListaApi();
   }
 
   @override
@@ -444,12 +447,12 @@ _formataTelefone(){
                   ),
                   Center(
                       child: Text(
-                    _mensagemErro,
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 20,
-                    ),
-                  ))
+                        _mensagemErro,
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 20,
+                        ),
+                      ))
                 ]),
           ),
         ),

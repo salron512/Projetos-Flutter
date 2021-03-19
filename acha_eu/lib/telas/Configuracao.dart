@@ -37,8 +37,9 @@ class _ConfiguracaoState extends State<Configuracao> {
   bool _cheque = false;
   bool _pix = false;
   bool _mostraPagamento = false;
+  bool _mostraCategoria = false;
   var cond;
-  List<String> _listaEstado = ["MT", "MS"];
+  List<String> _listaEstado = ["MT","MS"];
   Future _recuperaImagem(bool daCamera) async {
     var picker = ImagePicker();
     PickedFile imagemSelecionada;
@@ -46,12 +47,12 @@ class _ConfiguracaoState extends State<Configuracao> {
     if (daCamera) {
       // ignore: deprecated_member_use
       imagemSelecionada =
-          await picker.getImage(source: ImageSource.camera, imageQuality: 50);
+      await picker.getImage(source: ImageSource.camera, imageQuality: 50);
       imagem = File(imagemSelecionada.path);
     } else {
       // ignore: deprecated_member_use
       imagemSelecionada =
-          await picker.getImage(source: ImageSource.gallery, imageQuality: 50);
+      await picker.getImage(source: ImageSource.gallery, imageQuality: 50);
       imagem = File(imagemSelecionada.path);
     }
     setState(() {
@@ -147,7 +148,7 @@ class _ConfiguracaoState extends State<Configuracao> {
                 } else {
                   setState(() {
                     _mensagemErro =
-                        "Sua descrição tem mais do que 30 caracteres";
+                    "Sua descrição tem mais do que 30 caracteres";
                   });
                 }
               } else {
@@ -275,25 +276,39 @@ class _ConfiguracaoState extends State<Configuracao> {
     _controllerWhatsapp.text = dados["whatsapp"];
     print("estado: " + _scolhaEstado);
     _escolhaCidade = dados["cidade"];
+    _mostraCategoria = dados["mostraPagamento"];
     if (dados["urlImagem"] != null) {
       setState(() {
         _urlImagem = dados["urlImagem"];
       });
     }
-    _recuperaListaCidades();
-    _mostraOpcoesPagamento();
-    _verificaFormaPagamento(snapshot);
-  }
-
-  _verificaFormaPagamento(DocumentSnapshot snapshot) {
-    Map<String, dynamic> dados = snapshot.data();
-    setState(() {
+    if(_escolhaCategoria != "Cliente"){
+      FirebaseFirestore db = FirebaseFirestore.instance;
+      var snapshot = await db.collection("usuarios").doc(_idUsuarioLogado).get();
+      Map<String, dynamic> dados = snapshot.data();
       _dinheiro = dados["dinheiro"];
-      _cheque = dados["cheque"];
       _cartaoDebito = dados["cartaoDebito"];
       _cartaoCredito = dados["cartaoCredito"];
       _pix = dados["pix"];
-    });
+      _cheque = dados["cheque"];
+    }
+
+    _recuperaListaCidades();
+    _mostraOpcoesPagamento();
+    _verificaFormaPagamento();
+  }
+
+  _verificaFormaPagamento() async {
+
+    if (_escolhaCategoria == "Cliente"){
+      setState(() {
+        _mostraPagamento = false;
+      });
+    } else {
+      setState(() {
+        _mostraPagamento = true;
+      });
+    }
   }
 
   _mostraListaEstado() {
@@ -428,6 +443,7 @@ class _ConfiguracaoState extends State<Configuracao> {
                         _escolhaCategoria = item;
                       });
                       Navigator.pop(context);
+                      _verificaFormaPagamento();
                       _mostraOpcoesPagamento();
                     },
                   );
@@ -460,421 +476,424 @@ class _ConfiguracaoState extends State<Configuracao> {
       ),
       body: cond == null
           ? Center(
-              child: CircularProgressIndicator(),
-            )
+        child: CircularProgressIndicator(),
+      )
           : Container(
-              decoration: BoxDecoration(color: Color(0xffDCDCDC)),
-              child: SingleChildScrollView(
-                  padding: EdgeInsets.all(12),
-                  child: Column(
+        decoration: BoxDecoration(color: Color(0xffDCDCDC)),
+        child: SingleChildScrollView(
+            padding: EdgeInsets.all(12),
+            child: Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.only(bottom: 8),
+                  child: _subindoImagem
+                      ? CircularProgressIndicator()
+                      : Container(),
+                ),
+                CircleAvatar(
+                    backgroundImage: _urlImagem != null
+                        ? NetworkImage(_urlImagem)
+                        : null,
+                    maxRadius: 100,
+                    backgroundColor: Colors.grey),
+                Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
-                        padding: EdgeInsets.only(bottom: 8),
-                        child: _subindoImagem
-                            ? CircularProgressIndicator()
-                            : Container(),
-                      ),
-                      CircleAvatar(
-                          backgroundImage: _urlImagem != null
-                              ? NetworkImage(_urlImagem)
-                              : null,
-                          maxRadius: 100,
-                          backgroundColor: Colors.grey),
-                      Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            FlatButton(
-                              child: Text(
-                                "Câmera",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black),
-                              ),
-                              onPressed: () {
-                                _recuperaImagem(true);
-                              },
-                            ),
-                            FlatButton(
-                              child: Text(
-                                "Galeria",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black),
-                              ),
-                              onPressed: () {
-                                _recuperaImagem(false);
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding:
-                            EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                        child: TextField(
-                          autofocus: true,
-                          keyboardType: TextInputType.text,
+                      FlatButton(
+                        child: Text(
+                          "Câmera",
                           style: TextStyle(
-                            fontSize: 20,
-                          ),
-                          decoration: InputDecoration(
-                              labelText: "Nome",
-                              contentPadding:
-                                  EdgeInsets.fromLTRB(32, 16, 32, 16),
-
-                              filled: true,
-                              fillColor: Color(0xffDCDCDC),
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(32))),
-                          controller: _controllerNome,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
                         ),
+                        onPressed: () {
+                          _recuperaImagem(true);
+                        },
                       ),
-                      Padding(
-                        padding:
-                            EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                        child: TextField(
-                          keyboardType: TextInputType.phone,
-                          inputFormatters: [
-                            _mascaraTelefone
-                          ],
+                      FlatButton(
+                        child: Text(
+                          "Galeria",
                           style: TextStyle(
-                            fontSize: 20,
-                          ),
-                          decoration: InputDecoration(
-                              labelText: "Telefone",
-                              contentPadding:
-                                  EdgeInsets.fromLTRB(32, 16, 32, 16),
-                              suffixIcon:IconButton(
-                                icon: Icon(
-                                  Icons.clear,
-                                ),
-                                onPressed: (){
-                                  setState(() {
-                                    _controllerTelefone.clear();
-                                  });
-                                },
-                              ),
-                              filled: true,
-                              fillColor: Color(0xffDCDCDC),
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(32))),
-                          controller: _controllerTelefone,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
                         ),
-                      ),
-                      Padding(
-                        padding:
-                            EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                        child: TextField(
-                          keyboardType: TextInputType.phone,
-                          inputFormatters: [_mascaraTelefone],
-                          style: TextStyle(
-                            fontSize: 20,
-                          ),
-                          decoration: InputDecoration(
-                              labelText: "Whatsapp",
-                              contentPadding:
-                                  EdgeInsets.fromLTRB(32, 16, 32, 16),
-                              suffixIcon:IconButton(
-                                icon: Icon(
-                                  Icons.clear,
-                                ),
-                                onPressed: (){
-                                  setState(() {
-                                    _controllerWhatsapp.clear();
-                                  });
-                                },
-                              ),
-                              filled: true,
-                              fillColor: Color(0xffDCDCDC),
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(32))),
-                          controller: _controllerWhatsapp,
-                        ),
-                      ),
-                      Padding(
-                          padding:
-                              EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                          child: GestureDetector(
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.add_location_outlined,
-                                ),
-                                Text(
-                                  "Seu estado: " + _scolhaEstado,
-                                  style: TextStyle(fontSize: 12),
-                                ),
-                              ],
-                            ),
-                            onTap: () {
-                              _mostraListaEstado();
-                            },
-                          )),
-                      Padding(
-                        padding:
-                            EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                        child: GestureDetector(
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.add_location_outlined,
-                              ),
-                              Text(
-                                "Sua cidade: " + _escolhaCidade,
-                                style: TextStyle(fontSize: 12),
-                              ),
-                            ],
-                          ),
-                          onTap: () {
-                            _mostraListaCidade();
-                          },
-                        ),
-                      ),
-                      Padding(
-                        padding:
-                            EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                        child: GestureDetector(
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.work,
-                              ),
-                              Text(
-                                "Sua gategoria de serviço: " +
-                                    _escolhaCategoria,
-                                style: TextStyle(fontSize: 12),
-                              ),
-                            ],
-                          ),
-                          onTap: () {
-                            _recuperaCategorias();
-                            _mostraListaCategorias();
-                          },
-                        ),
-                      ),
-                      Visibility(
-                          visible: _mostraPagamento,
-                          child: Padding(
-                            padding: EdgeInsets.only(bottom: 5),
-                            child: TextField(
-                              keyboardType: TextInputType.text,
-                              style: TextStyle(
-                                fontSize: 20,
-                              ),
-                              decoration: InputDecoration(
-                                  labelText: "Descrição Ex: Prof de inglês",
-                                  contentPadding:
-                                      EdgeInsets.fromLTRB(32, 16, 32, 16),
-                                  filled: true,
-                                  fillColor: Color(0xffDCDCDC),
-                                  border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(32))),
-                              controller: _controllerDescricao,
-                            ),
-                          )),
-                      Visibility(
-                          visible: _mostraPagamento,
-                          child: Padding(
-                            padding: EdgeInsets.only(bottom: 8, top: 5),
-                            child: TextField(
-                              maxLines: 5,
-                              keyboardType: TextInputType.text,
-                              style: TextStyle(
-                                fontSize: 20,
-                              ),
-                              decoration: InputDecoration(
-                                  labelText: "Descrição Completa",
-                                  contentPadding:
-                                      EdgeInsets.fromLTRB(32, 16, 32, 16),
-                                  filled: true,
-                                  fillColor: Color(0xffDCDCDC),
-                                  border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(32))),
-                              controller: _controllerAtividade,
-                            ),
-                          )),
-                      Visibility(
-                        visible: _mostraPagamento,
-                        child: Container(
-                            alignment: Alignment.center,
-                            height: 310,
-                            decoration: BoxDecoration(
-                                color: Color(0xffDCDCDC),
-                                borderRadius: BorderRadius.circular(32),
-                                border: Border.all(color: Colors.black)),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.all(15),
-                                  child: Text(
-                                    "Formas de recebimento:",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15),
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Checkbox(
-                                        activeColor: Colors.green,
-                                        value: _dinheiro,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            _dinheiro = value;
-                                          });
-                                        }),
-                                    Padding(
-                                        padding:
-                                            EdgeInsets.only(left: 15, right: 5),
-                                        child: Icon(
-                                          Icons.payments_outlined,
-                                          color: Colors.green,
-                                        )),
-                                    Text(
-                                      "Dinheiro",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Checkbox(
-                                        activeColor: Colors.green,
-                                        value: _cartaoCredito,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            _cartaoCredito = value;
-                                          });
-                                        }),
-                                    Padding(
-                                        padding:
-                                            EdgeInsets.only(left: 15, right: 5),
-                                        child: Icon(
-                                          Icons.credit_card,
-                                          color: Colors.blue,
-                                        )),
-                                    Text(
-                                      "Cartão de credito",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Checkbox(
-                                        activeColor: Colors.green,
-                                        value: _cartaoDebito,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            _cartaoDebito = value;
-                                          });
-                                        }),
-                                    Padding(
-                                        padding:
-                                            EdgeInsets.only(left: 15, right: 5),
-                                        child: Icon(
-                                          Icons.credit_card,
-                                          color: Colors.red,
-                                        )),
-                                    Text(
-                                      "Cartão de debito",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Checkbox(
-                                        activeColor: Colors.green,
-                                        value: _cheque,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            _cheque = value;
-                                          });
-                                        }),
-                                    Padding(
-                                        padding:
-                                            EdgeInsets.only(left: 15, right: 5),
-                                        child: Icon(
-                                          Icons.account_balance_outlined,
-                                          color: Colors.orange,
-                                        )),
-                                    Text(
-                                      "Cheque",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Checkbox(
-                                        activeColor: Colors.green,
-                                        value: _pix,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            _pix = value;
-                                          });
-                                        }),
-                                    Padding(
-                                        padding:
-                                            EdgeInsets.only(left: 15, right: 5),
-                                        child: Icon(
-                                          Icons.payment_outlined,
-                                          color: Colors.purple,
-                                        )),
-                                    Text(
-                                      "Pix",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ],
-                            )),
-                      ),
-                      Padding(
-                          padding: EdgeInsets.only(bottom: 8),
-                          child: Center(
-                              child: Text(
-                            _mensagemErro,
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 20,
-                            ),
-                          ))),
-                      Padding(
-                        padding: EdgeInsets.only(top: 8, bottom: 8),
-                        child: RaisedButton(
-                          child: Text(
-                            "Salvar",
-                            style: TextStyle(color: Colors.white, fontSize: 20),
-                          ),
-                          color: Color(0xff37474f),
-                          padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(32)),
-                          onPressed: () {
-                            _atualizarNomeFirestore();
-                          },
-                        ),
+                        onPressed: () {
+                          _recuperaImagem(false);
+                        },
                       ),
                     ],
-                  )),
-            ),
+                  ),
+                ),
+                Padding(
+                  padding:
+                  EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                  child: TextField(
+                    autofocus: true,
+                    keyboardType: TextInputType.text,
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                    decoration: InputDecoration(
+                        labelText: "Nome",
+                        contentPadding:
+                        EdgeInsets.fromLTRB(32, 16, 32, 16),
+
+                        filled: true,
+                        fillColor: Color(0xffDCDCDC),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(32))),
+                    controller: _controllerNome,
+                  ),
+                ),
+                Padding(
+                  padding:
+                  EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                  child: TextField(
+                    keyboardType: TextInputType.phone,
+                    inputFormatters: [
+                      _mascaraTelefone
+                    ],
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                    decoration: InputDecoration(
+                        labelText: "Telefone",
+                        contentPadding:
+                        EdgeInsets.fromLTRB(32, 16, 32, 16),
+                        suffixIcon:IconButton(
+                          icon: Icon(
+                            Icons.clear,
+                          ),
+                          onPressed: (){
+                            setState(() {
+                              _controllerTelefone.clear();
+                            });
+                          },
+                        ),
+                        filled: true,
+                        fillColor: Color(0xffDCDCDC),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(32))),
+                    controller: _controllerTelefone,
+                  ),
+                ),
+                Padding(
+                  padding:
+                  EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                  child: TextField(
+                    keyboardType: TextInputType.phone,
+                    inputFormatters: [_mascaraTelefone],
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                    decoration: InputDecoration(
+                        labelText: "Whatsapp",
+                        contentPadding:
+                        EdgeInsets.fromLTRB(32, 16, 32, 16),
+                        suffixIcon:IconButton(
+                          icon: Icon(
+                            Icons.clear,
+                          ),
+                          onPressed: (){
+                            setState(() {
+                              _controllerWhatsapp.clear();
+                            });
+                          },
+                        ),
+                        filled: true,
+                        fillColor: Color(0xffDCDCDC),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(32))),
+                    controller: _controllerWhatsapp,
+                  ),
+                ),
+                Padding(
+                    padding:
+                    EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                    child: GestureDetector(
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.add_location_outlined,
+                          ),
+                          Text(
+                            "Seu estado: " + _scolhaEstado,
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ],
+                      ),
+                      onTap: () {
+                        _mostraListaEstado();
+                      },
+                    )),
+                Padding(
+                  padding:
+                  EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                  child: GestureDetector(
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.add_location_outlined,
+                        ),
+                        Text(
+                          "Sua cidade: " + _escolhaCidade,
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
+                    onTap: () {
+                      _mostraListaCidade();
+                    },
+                  ),
+                ),
+               Visibility(
+                 visible: _mostraCategoria,
+                   child:  Padding(
+                     padding:
+                     EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                     child: GestureDetector(
+                       child: Row(
+                         children: [
+                           Icon(
+                             Icons.work,
+                           ),
+                           Text(
+                             "Sua gategoria de serviço: " +
+                                 _escolhaCategoria,
+                             style: TextStyle(fontSize: 12),
+                           ),
+                         ],
+                       ),
+                       onTap: () {
+                         _recuperaCategorias();
+                         _mostraListaCategorias();
+                       },
+                     ),
+                   ),
+               ),
+                Visibility(
+                    visible: _mostraPagamento,
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 5),
+                      child: TextField(
+                        keyboardType: TextInputType.text,
+                        style: TextStyle(
+                          fontSize: 20,
+                        ),
+                        decoration: InputDecoration(
+                            labelText: "Descrição Ex: Prof de inglês",
+                            contentPadding:
+                            EdgeInsets.fromLTRB(32, 16, 32, 16),
+                            filled: true,
+                            fillColor: Color(0xffDCDCDC),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(32))),
+                        controller: _controllerDescricao,
+                      ),
+                    )),
+                Visibility(
+                    visible: _mostraPagamento,
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 8, top: 5),
+                      child: TextField(
+                        maxLines: 5,
+                        keyboardType: TextInputType.text,
+                        style: TextStyle(
+                          fontSize: 20,
+                        ),
+                        decoration: InputDecoration(
+                            labelText: "Descrição Completa",
+                            contentPadding:
+                            EdgeInsets.fromLTRB(32, 16, 32, 16),
+                            filled: true,
+                            fillColor: Color(0xffDCDCDC),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(32))),
+                        controller: _controllerAtividade,
+                      ),
+                    )),
+                Visibility(
+                  visible: _mostraPagamento,
+                  child: Container(
+                      alignment: Alignment.center,
+                      height: 310,
+                      decoration: BoxDecoration(
+                          color: Color(0xffDCDCDC),
+                          borderRadius: BorderRadius.circular(32),
+                          border: Border.all(color: Colors.black)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.all(15),
+                            child: Text(
+                              "Formas de recebimento:",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15),
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Checkbox(
+                                  activeColor: Colors.green,
+                                  value: _dinheiro,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _dinheiro = value;
+                                    });
+                                  }),
+                              Padding(
+                                  padding:
+                                  EdgeInsets.only(left: 15, right: 5),
+                                  child: Icon(
+                                    Icons.payments_outlined,
+                                    color: Colors.green,
+                                  )),
+                              Text(
+                                "Dinheiro",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Checkbox(
+                                  activeColor: Colors.green,
+                                  value: _cartaoCredito,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _cartaoCredito = value;
+                                    });
+                                  }),
+                              Padding(
+                                  padding:
+                                  EdgeInsets.only(left: 15, right: 5),
+                                  child: Icon(
+                                    Icons.credit_card,
+                                    color: Colors.blue,
+                                  )),
+                              Text(
+                                "Cartão de credito",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Checkbox(
+                                  activeColor: Colors.green,
+                                  value: _cartaoDebito,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _cartaoDebito = value;
+                                    });
+                                  }),
+                              Padding(
+                                  padding:
+                                  EdgeInsets.only(left: 15, right: 5),
+                                  child: Icon(
+                                    Icons.credit_card,
+                                    color: Colors.red,
+                                  )),
+                              Text(
+                                "Cartão de debito",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Checkbox(
+                                  activeColor: Colors.green,
+                                  value: _cheque,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _cheque = value;
+                                    });
+                                  }),
+                              Padding(
+                                  padding:
+                                  EdgeInsets.only(left: 15, right: 5),
+                                  child: Icon(
+                                    Icons.account_balance_outlined,
+                                    color: Colors.orange,
+                                  )),
+                              Text(
+                                "Cheque",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Checkbox(
+                                  activeColor: Colors.green,
+                                  value: _pix,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _pix = value;
+                                    });
+                                  }),
+                              Padding(
+                                  padding:
+                                  EdgeInsets.only(left: 15, right: 5),
+                                  child: Icon(
+                                    Icons.payment_outlined,
+                                    color: Colors.purple,
+                                  )),
+                              Text(
+                                "Pix",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            ],
+                          ),
+                        ],
+                      )),
+                ),
+                Padding(
+                    padding: EdgeInsets.only(bottom: 8),
+                    child: Center(
+                        child: Text(
+                          _mensagemErro,
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 20,
+                          ),
+                        ))),
+                Padding(
+                  padding: EdgeInsets.only(top: 8, bottom: 8),
+                  child: RaisedButton(
+                    child: Text(
+                      "Salvar",
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                    color: Color(0xff37474f),
+                    padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(32)),
+                    onPressed: () {
+                      _atualizarNomeFirestore();
+                    },
+                  ),
+                ),
+              ],
+            )),
+      ),
     );
   }
 }
