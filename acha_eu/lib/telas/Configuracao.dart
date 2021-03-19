@@ -393,7 +393,7 @@ class _ConfiguracaoState extends State<Configuracao> {
   }
 
   _mostraOpcoesPagamento() {
-    if (_escolhaCategoria == "Ciente") {
+    if (_escolhaCategoria == "Cliente") {
       setState(() {
         _mostraPagamento = false;
       });
@@ -569,12 +569,6 @@ class _ConfiguracaoState extends State<Configuracao> {
                         padding:
                             EdgeInsets.only(left: 16, right: 16, bottom: 16),
                         child: TextField(
-                          onEditingComplete: (){
-                            setState(() {
-                              _controllerWhatsapp.value = _mascaraTelefone
-                                  .updateMask(mask: "(##) #####-####");
-                            });
-                          },
                           keyboardType: TextInputType.phone,
                           inputFormatters: [_mascaraTelefone],
                           style: TextStyle(
