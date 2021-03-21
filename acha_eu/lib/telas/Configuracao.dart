@@ -662,7 +662,7 @@ class _ConfiguracaoState extends State<Configuracao> {
                              Icons.work,
                            ),
                            Text(
-                             "Sua gategoria de serviço: " +
+                             "Sua categoria de serviço: " +
                                  _escolhaCategoria,
                              style: TextStyle(fontSize: 12),
                            ),

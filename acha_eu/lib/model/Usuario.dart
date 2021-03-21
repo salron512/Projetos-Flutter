@@ -13,6 +13,7 @@ class Usuario {
   String _descricao;
   String _descricaoAtividade;
   bool _mostraPagamento;
+  bool _adm;
   bool _dinheiro;
   bool _cartaoCredito;
   bool _cartaoDebito;
@@ -38,6 +39,12 @@ class Usuario {
     return map;
   }
 
+
+  bool get adm => _adm;
+
+  set adm(bool value) {
+    _adm = value;
+  }
 
   bool get mostraPagamento => _mostraPagamento;
 

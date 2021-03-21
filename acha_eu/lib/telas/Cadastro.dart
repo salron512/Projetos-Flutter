@@ -58,6 +58,7 @@ class _CadastroState extends State<Cadastro> {
                   usuario.categoriaUsuario = "Cliente";
                   usuario.whatsapp = whatsapp;
                   usuario.mostraPagamento = false;
+                  usuario.adm = false;
                   setState(() {
                     _mensagemErro = "";
                   });
