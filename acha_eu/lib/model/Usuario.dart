@@ -4,7 +4,7 @@ class Usuario {
   String _email;
   String _senha;
   String _urlImagem;
-  String _cpf;
+  String _ref;
   String _telefone;
   String _whatsapp;
   String _cidade;
@@ -31,7 +31,6 @@ class Usuario {
       "estado": this.estado,
       "whatsapp": this.whatsapp,
       "cidade": this.cidade,
-      "cpf": this.cpf,
       "categoria": this.categoriaUsuario,
       "mostraPagamento": this.mostraPagamento,
       "adm": this.adm,
@@ -85,9 +84,9 @@ class Usuario {
     _categoriaUsuario = value;
   }
 
-  String get cpf => this._cpf;
+  String get ref => this._ref;
 
- set cpf(String value) => this._cpf = value;
+ set ref(String value) => this._ref = value;
   
   String get telefone => this._telefone;
 

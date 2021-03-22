@@ -238,7 +238,6 @@ class _CadastroState extends State<Cadastro> {
         title: Text("Cadastro"),
       ),
       body: Container(
-
         child: Center(
           child: SingleChildScrollView(
             padding: EdgeInsets.all(16),

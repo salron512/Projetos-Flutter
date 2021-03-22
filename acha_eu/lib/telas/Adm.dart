@@ -8,6 +8,10 @@ class Adm extends StatefulWidget {
 }
 
 class _AdmState extends State<Adm> {
+  List<String> itensMenu = ["Sugestões"];
+
+
+
   Future _recuperaDadosUsuario() async {
     FirebaseFirestore db = FirebaseFirestore.instance;
 
@@ -31,12 +35,38 @@ class _AdmState extends State<Adm> {
     }
     return listaDados;
   }
+  _escolhaMenuItem(String itemEscolhido) {
+    switch (itemEscolhido) {
+      case "Sugestões":
+        Navigator.pushNamed(context, "/listaSugestao");
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Lista de usuarios"),
+        actions: [
+          PopupMenuButton<String>(
+            color: Color(0xff37474f),
+            onSelected: _escolhaMenuItem,
+            // ignore: missing_return
+            itemBuilder: (context) {
+              return itensMenu.map((String item) {
+                return PopupMenuItem<String>(
+                  value: item,
+                  child: Text(item,
+                      style: TextStyle(
+                          color: Colors.white
+                      )
+                  ),
+                );
+              }).toList();
+            },
+          )
+        ],
       ),
       body: FutureBuilder(
           future: _recuperaDadosUsuario(),

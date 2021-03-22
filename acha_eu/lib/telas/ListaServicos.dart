@@ -18,8 +18,10 @@ class ListaSericos extends StatefulWidget {
 
 class _ListaSericosState extends State<ListaSericos> {
 List<Usuario> _listaContados = List();
+String _categoria;
 
   Future _recuperaContatos() async{
+    _categoria = widget.categoria.nome;
     FirebaseFirestore db = FirebaseFirestore.instance;
     FirebaseAuth auth = FirebaseAuth.instance;
     String idusuario = await auth.currentUser.uid;
@@ -85,8 +87,27 @@ List<Usuario> _listaContados = List();
                   if(item.isEmpty){
                     return Center(
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text("Sem contado para essa categoria :("),
+                          Padding(padding: EdgeInsets.all(10),
+                            child:Padding(
+                              padding: EdgeInsets.only(bottom: 16),
+                              child: RaisedButton(
+                                child: Text(
+                                  "Indique alguém",
+                                  style: TextStyle(color: Colors.white, fontSize: 20),
+                                ),
+                                color:Color(0xff37474f),
+                                padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(32)),
+                                onPressed: () {
+                                  Navigator.pushNamed(context, "/sugestaoUsuario", arguments: _categoria );
+                                },
+                              ),
+                            ),
+                          )
                         ],
                       )
                     );
