@@ -89,7 +89,12 @@ String _categoria;
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("Sem contado para essa categoria :("),
+                          Text("Sem contado para essa categoria :(",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold
+                          ),
+                          ),
                           Padding(padding: EdgeInsets.all(10),
                             child:Padding(
                               padding: EdgeInsets.only(bottom: 16),

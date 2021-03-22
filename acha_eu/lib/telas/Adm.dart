@@ -26,6 +26,7 @@ class _AdmState extends State<Adm> {
       usuario.nome = dados["nome"];
       usuario.idUsuario = dados["idUsuario"];
       usuario.telefone = dados["telefone"];
+      usuario.whatsapp = dados["whatsapp"];
       usuario.adm = dados["adm"];
       usuario.categoriaUsuario = dados["categoria"];
       usuario.mostraPagamento = dados["mostraPagamento"];

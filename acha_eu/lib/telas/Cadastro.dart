@@ -5,15 +5,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
-
 class Cadastro extends StatefulWidget {
   @override
   _CadastroState createState() => _CadastroState();
 }
 
 class _CadastroState extends State<Cadastro> {
-  var _mascaraTelefone = new
-  MaskTextInputFormatter(mask: '(##) #####-####', filter: { "#": RegExp(r'[0-9]') });
+  var _mascaraTelefone = new MaskTextInputFormatter(
+      mask: '(##) #####-####', filter: {"#": RegExp(r'[0-9]')});
+
   TextEditingController _controllerNome = TextEditingController();
   TextEditingController _controllerEmail = TextEditingController();
   TextEditingController _controllerSenha = TextEditingController();
@@ -28,8 +28,6 @@ class _CadastroState extends State<Cadastro> {
   bool _motrarSenha = false;
   bool _motrarSenhaConfirma = false;
 
-  _formataTelefone(){
-  }
 
   _validarCampos() {
     String nome = _controllerNome.text;
@@ -45,9 +43,9 @@ class _CadastroState extends State<Cadastro> {
       if (email.isNotEmpty && email.contains("@")) {
         if (senha.isNotEmpty && senha.length > 6) {
           if (senha == confirmaSenha) {
-            if(telefone.isNotEmpty){
-              if(_scolhaEstado.isNotEmpty){
-                if(_escolhaCidade.isNotEmpty){
+            if (telefone.isNotEmpty) {
+              if (_scolhaEstado.isNotEmpty) {
+                if (_escolhaCidade.isNotEmpty) {
                   Usuario usuario = Usuario();
                   usuario.nome = nome;
                   usuario.email = email;
@@ -63,22 +61,21 @@ class _CadastroState extends State<Cadastro> {
                     _mensagemErro = "";
                   });
                   _cadastrarUsuairo(usuario);
-                }else{
+                } else {
                   setState(() {
                     _mensagemErro = "Escolha sua cidade";
                   });
                 }
-              }else{
+              } else {
                 setState(() {
                   _mensagemErro = "Escolha seu estado";
                 });
               }
-            }else{
+            } else {
               setState(() {
                 _mensagemErro = "Preencha o campo telefone";
               });
             }
-
           } else {
             setState(() {
               _mensagemErro = "Senha não conferer";
@@ -101,18 +98,22 @@ class _CadastroState extends State<Cadastro> {
     }
   }
 
-
   _cadastrarUsuairo(Usuario usuario) {
     FirebaseAuth auth = FirebaseAuth.instance;
     auth
         .createUserWithEmailAndPassword(
-        email: usuario.email, password: usuario.senha)
+            email: usuario.email, password: usuario.senha)
         .then((firebase) async {
       FirebaseFirestore db = FirebaseFirestore.instance;
 
-     await db.collection("usuarios").doc(firebase.user.uid).set(usuario.toMap());
-      await db.collection("usuarios").doc(firebase.user.uid).update({
-        "idUsuario": firebase.user.uid});
+      await db
+          .collection("usuarios")
+          .doc(firebase.user.uid)
+          .set(usuario.toMap());
+      await db
+          .collection("usuarios")
+          .doc(firebase.user.uid)
+          .update({"idUsuario": firebase.user.uid});
 
       Navigator.pushNamedAndRemoveUntil(
           context, "/listacategorias", (_) => false);
@@ -121,11 +122,10 @@ class _CadastroState extends State<Cadastro> {
     }).catchError((error) {
       setState(() {
         _mensagemErro =
-        "Erro ao cadastrar o usuário, verificar os campos novamente!";
+            "Erro ao cadastrar o usuário, verificar os campos novamente!";
       });
     });
   }
-
 
   _mostraListaEstado() {
     var item;
@@ -164,12 +164,11 @@ class _CadastroState extends State<Cadastro> {
           );
         });
   }
-  _recuperaListaCidade(String estado) async{
+
+  _recuperaListaCidade(String estado) async {
     FirebaseFirestore db = FirebaseFirestore.instance;
-    var dados = await db
-        .collection("cidades")
-        .where("estado", isEqualTo: estado)
-        .get();
+    var dados =
+        await db.collection("cidades").where("estado", isEqualTo: estado).get();
 
     List<String> listaCidadesRecuperadas = List();
     for (var item in dados.docs) {
@@ -181,7 +180,6 @@ class _CadastroState extends State<Cadastro> {
       _listaCidades = listaCidadesRecuperadas;
     });
     _mostraListaCidade();
-
   }
 
   _mostraListaCidade() {
@@ -254,7 +252,7 @@ class _CadastroState extends State<Cadastro> {
                       ),
                       decoration: InputDecoration(
                           contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                          hintText: "Nome",
+                          hintText: "Nome completo",
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(
@@ -283,19 +281,17 @@ class _CadastroState extends State<Cadastro> {
                     padding: EdgeInsets.only(bottom: 8),
                     child: TextField(
                       keyboardType: TextInputType.phone,
-                      inputFormatters: <TextInputFormatter>[
-                        _mascaraTelefone
-                      ],
+                      inputFormatters: <TextInputFormatter>[_mascaraTelefone],
                       style: TextStyle(
                         fontSize: 20,
                       ),
                       decoration: InputDecoration(
                           contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                          suffixIcon:IconButton(
+                          suffixIcon: IconButton(
                             icon: Icon(
                               Icons.clear,
                             ),
-                            onPressed: (){
+                            onPressed: () {
                               setState(() {
                                 _controllerWhatsapp.clear();
                               });
@@ -313,19 +309,17 @@ class _CadastroState extends State<Cadastro> {
                     padding: EdgeInsets.only(bottom: 8),
                     child: TextFormField(
                       keyboardType: TextInputType.phone,
-                      inputFormatters: <TextInputFormatter>[
-                        _mascaraTelefone
-                      ],
+                      inputFormatters: <TextInputFormatter>[_mascaraTelefone],
                       style: TextStyle(
                         fontSize: 20,
                       ),
                       decoration: InputDecoration(
                           contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                          suffixIcon:IconButton(
+                          suffixIcon: IconButton(
                             icon: Icon(
                               Icons.clear,
                             ),
-                            onPressed: (){
+                            onPressed: () {
                               setState(() {
                                 _controllerTelefone.clear();
                               });
@@ -352,7 +346,7 @@ class _CadastroState extends State<Cadastro> {
                             Icons.remove_red_eye,
                             color: _motrarSenha ? Colors.blue : Colors.grey,
                           ),
-                          onPressed: (){
+                          onPressed: () {
                             setState(() {
                               _motrarSenha = !_motrarSenha;
                             });
@@ -378,9 +372,11 @@ class _CadastroState extends State<Cadastro> {
                           suffixIcon: IconButton(
                             icon: Icon(
                               Icons.remove_red_eye,
-                              color: _motrarSenhaConfirma ? Colors.blue : Colors.grey,
+                              color: _motrarSenhaConfirma
+                                  ? Colors.blue
+                                  : Colors.grey,
                             ),
-                            onPressed: (){
+                            onPressed: () {
                               setState(() {
                                 _motrarSenhaConfirma = !_motrarSenhaConfirma;
                               });
@@ -411,8 +407,7 @@ class _CadastroState extends State<Cadastro> {
                         onTap: () {
                           _mostraListaEstado();
                         },
-                      )
-                  ),
+                      )),
                   Padding(
                     padding: EdgeInsets.all(8),
                     child: GestureDetector(
@@ -447,12 +442,12 @@ class _CadastroState extends State<Cadastro> {
                   ),
                   Center(
                       child: Text(
-                        _mensagemErro,
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 20,
-                        ),
-                      ))
+                    _mensagemErro,
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 20,
+                    ),
+                  ))
                 ]),
           ),
         ),

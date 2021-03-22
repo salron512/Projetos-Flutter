@@ -53,7 +53,12 @@ class _ListaSugestaoState extends State<ListaSugestao> {
                   List<Usuario> item = snapshot.data;
                   if (item.isEmpty) {
                     return Center(
-                      child: Text("Sem Sugestões no momento :("),
+                      child: Text("Sem Sugestões no momento :(",
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold
+                        ),
+                      ),
                     );
                   } else {
                     return ListView.builder(
