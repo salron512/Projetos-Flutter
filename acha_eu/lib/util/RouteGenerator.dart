@@ -1,6 +1,8 @@
+import 'package:acha_eu/telas/Adm.dart';
 import 'package:acha_eu/telas/Cadastro.dart';
 import 'package:acha_eu/telas/Configuracao.dart';
 import 'package:acha_eu/telas/Contato.dart';
+import 'package:acha_eu/telas/DetalhesAdm.dart';
 import 'package:acha_eu/telas/DetalhesContado.dart';
 import 'package:acha_eu/telas/Home.dart';
 import 'package:acha_eu/telas/ListaCategorias.dart';
@@ -46,6 +48,14 @@ class RouteGenerator{
       case "/contado" :
         return MaterialPageRoute(
             builder: (_) => Contato()
+        );
+      case "/adm" :
+        return MaterialPageRoute(
+            builder: (_) => Adm()
+        );
+      case "/detalhesAdm" :
+        return MaterialPageRoute(
+            builder: (_) => DetalhesAdm(args)
         );
 
 

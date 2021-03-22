@@ -37,6 +37,7 @@ class _ConfiguracaoState extends State<Configuracao> {
   bool _cheque = false;
   bool _pix = false;
   bool _mostraPagamento = false;
+  bool _adm = false;
   bool _mostraCategoria = false;
   var cond;
   List<String> _listaEstado = ["MT","MS"];
@@ -274,8 +275,8 @@ class _ConfiguracaoState extends State<Configuracao> {
     _scolhaEstado = dados["estado"];
     _escolhaCategoria = dados["categoria"];
     _controllerWhatsapp.text = dados["whatsapp"];
-    print("estado: " + _scolhaEstado);
     _escolhaCidade = dados["cidade"];
+    _adm = dados["adm"];
     _mostraCategoria = dados["mostraPagamento"];
     if (dados["urlImagem"] != null) {
       setState(() {
@@ -496,7 +497,9 @@ class _ConfiguracaoState extends State<Configuracao> {
                         : null,
                     maxRadius: 100,
                     backgroundColor: Colors.grey),
-                Padding(
+                Visibility(
+                  visible: _mostraPagamento,
+                  child:Padding(
                   padding: EdgeInsets.all(16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -528,11 +531,13 @@ class _ConfiguracaoState extends State<Configuracao> {
                     ],
                   ),
                 ),
+                ),
                 Padding(
                   padding:
-                  EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                  EdgeInsets.only(top:10, left: 16, right: 16, bottom: 16),
                   child: TextField(
                     autofocus: true,
+
                     keyboardType: TextInputType.text,
                     style: TextStyle(
                       fontSize: 20,
@@ -891,6 +896,26 @@ class _ConfiguracaoState extends State<Configuracao> {
                     },
                   ),
                 ),
+                Visibility(
+                  visible: _adm,
+                  child: Padding(
+                  padding: EdgeInsets.only(top: 8, bottom: 8),
+                  child: RaisedButton(
+                    child: Text(
+                      "Lista Usuarios",
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                    color: Color(0xff37474f),
+                    padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(32)),
+                    onPressed: () {
+                     Navigator.pushNamed(context, "/adm");
+                    },
+                  ),
+                ),
+                ),
+
               ],
             )),
       ),

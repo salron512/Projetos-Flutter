@@ -10,7 +10,7 @@ class ListaCategorias extends StatefulWidget {
 }
 
 class _ListaCategoriasState extends State<ListaCategorias> {
-  List<String> itensMenu = ["Configurações", "Deslogar","Seja Profissional"];
+  List<String> itensMenu = ["Perfil", "Deslogar","Anuncie"];
   Future _recuperaCategorias() async {
     // ignore: deprecated_member_use
     List<Categorias> listacategoria = List<Categorias>();
@@ -39,13 +39,13 @@ class _ListaCategoriasState extends State<ListaCategorias> {
   }
   _escolhaMenuItem(String itemEscolhido) {
     switch (itemEscolhido) {
-      case "Configurações":
+      case "Perfil":
         Navigator.pushNamed(context, "/config");
         break;
       case "Deslogar":
        _deslogarUsuario();
         break;
-      case "Seja Profissional":
+      case "Anuncie":
         Navigator.pushNamed(context, "/contado");
         break;
     }

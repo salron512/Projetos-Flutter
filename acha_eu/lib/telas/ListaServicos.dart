@@ -84,7 +84,11 @@ List<Usuario> _listaContados = List();
                 List<Usuario> item = snapshot.data;
                   if(item.isEmpty){
                     return Center(
-                      child: Text("Sem contado para essa categoria :("),
+                      child: Column(
+                        children: [
+                          Text("Sem contado para essa categoria :("),
+                        ],
+                      )
                     );
                   }else {
                     return Container(

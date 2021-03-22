@@ -107,11 +107,11 @@ class _CadastroState extends State<Cadastro> {
     auth
         .createUserWithEmailAndPassword(
         email: usuario.email, password: usuario.senha)
-        .then((firebase) {
+        .then((firebase) async {
       FirebaseFirestore db = FirebaseFirestore.instance;
 
-      db.collection("usuarios").doc(firebase.user.uid).set(usuario.toMap());
-      db.collection("usuarios").doc(firebase.user.uid).update({
+     await db.collection("usuarios").doc(firebase.user.uid).set(usuario.toMap());
+      await db.collection("usuarios").doc(firebase.user.uid).update({
         "idUsuario": firebase.user.uid});
 
       Navigator.pushNamedAndRemoveUntil(

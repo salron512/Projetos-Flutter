@@ -34,6 +34,7 @@ class Usuario {
       "cpf": this.cpf,
       "categoria": this.categoriaUsuario,
       "mostraPagamento": this.mostraPagamento,
+      "adm": this.adm,
     };
 
     return map;
