@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
 
+//firebase
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -183,18 +184,17 @@ class _HomeState extends State<Home> {
       }
     });
 
-    task.onComplete.then((snapshot){
+    task.onComplete.then((snapshot) {
       _recuperaUrlImagem(snapshot);
     });
   }
-  Future _recuperaUrlImagem(StorageTaskSnapshot snapshot) async {
 
+  Future _recuperaUrlImagem(StorageTaskSnapshot snapshot) async {
     String url = await snapshot.ref.getDownloadURL();
 
     setState(() {
       _urlImagemRecuperada = url;
     });
-
   }
 
   @override
@@ -220,13 +220,16 @@ class _HomeState extends State<Home> {
                 },
               ),
               _imagem == null ? Container() : Image.file(_imagem),
-              _imagem == null ? Container() : RaisedButton(
-                child: Text("Upload Storage"),
-                onPressed: () {
-                  _upLoadImagem();
-                },
-              ),
-              _urlImagemRecuperada == null ? Container()
+              _imagem == null
+                  ? Container()
+                  : RaisedButton(
+                      child: Text("Upload Storage"),
+                      onPressed: () {
+                        _upLoadImagem();
+                      },
+                    ),
+              _urlImagemRecuperada == null
+                  ? Container()
                   : Image.network(_urlImagemRecuperada),
             ],
           ),
