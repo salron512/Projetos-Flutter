@@ -6,21 +6,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ListaSericos extends StatefulWidget {
-
-
   Categorias categoria;
   ListaSericos(this.categoria);
   @override
   _ListaSericosState createState() => _ListaSericosState();
 }
 
-
-
 class _ListaSericosState extends State<ListaSericos> {
-List<Usuario> _listaContados = List();
-String _categoria;
+  List<Usuario> _listaContados = List();
+  String _categoria;
 
-  Future _recuperaContatos() async{
+  Future _recuperaContatos() async {
+    //recupera a lista de pofissionais pela categoria e cidade
     _categoria = widget.categoria.nome;
     FirebaseFirestore db = FirebaseFirestore.instance;
     FirebaseAuth auth = FirebaseAuth.instance;
@@ -29,11 +26,12 @@ String _categoria;
     var dadosUsuario = await db.collection("usuarios").doc(idusuario).get();
     Map<String, dynamic> dados = dadosUsuario.data();
     cidadeUsuario = dados["cidade"];
-    var snapshot = await db.collection("usuarios")
-        .where("cidade", isEqualTo: cidadeUsuario )
+    var snapshot = await db
+        .collection("usuarios")
+        .where("cidade", isEqualTo: cidadeUsuario)
         .where("categoria", isEqualTo: widget.categoria.nome)
         .get();
-    for(var item in snapshot.docs){
+    for (var item in snapshot.docs) {
       Map<String, dynamic> dados = item.data();
       Usuario usuario = Usuario();
       usuario.nome = dados["nome"];
@@ -63,95 +61,102 @@ String _categoria;
     super.dispose();
     _listaContados.clear();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.categoria.nome),
       ),
-        body: FutureBuilder(
-            future: _recuperaContatos(),
-            // ignore: missing_return
-            builder: (context, snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.none:
-                case ConnectionState.active:
-                case ConnectionState.waiting:
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                  break;
-                case ConnectionState.active:
-                case ConnectionState.done:
+      body: FutureBuilder(
+          future: _recuperaContatos(),
+          // ignore: missing_return
+          builder: (context, snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.none:
+              case ConnectionState.active:
+              case ConnectionState.waiting:
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+                break;
+              case ConnectionState.active:
+              case ConnectionState.done:
                 List<Usuario> item = snapshot.data;
-                  if(item.isEmpty){
-                    return Center(
+                if (item.isEmpty) {
+                  return Center(
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text("Sem contado para essa categoria :(",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold
-                          ),
-                          ),
-                          Padding(padding: EdgeInsets.all(10),
-                            child:Padding(
-                              padding: EdgeInsets.only(bottom: 16),
-                              child: RaisedButton(
-                                child: Text(
-                                  "Indique alguém",
-                                  style: TextStyle(color: Colors.white, fontSize: 20),
-                                ),
-                                color:Color(0xff37474f),
-                                padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(32)),
-                                onPressed: () {
-                                  Navigator.pushNamed(context, "/sugestaoUsuario", arguments: _categoria );
-                                },
-                              ),
-                            ),
-                          )
-                        ],
-                      )
-                    );
-                  }else {
-                    return Container(
-                      decoration: BoxDecoration(color: Color(0xffDCDCDC)),
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Sem contado para essa categoria :(",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      Padding(
                         padding: EdgeInsets.all(10),
-                        child:ListView.builder(
-                          itemCount: item.length,
-                          // ignore: missing_return
-                          itemBuilder: (context, indice) {
-                            Usuario dados = item[indice];
-                            return Card(
-                              color: Color(0xff37474f),
-                              child:  ListTile(
-                                leading:  CircleAvatar(
-                                    maxRadius: 40,
-                                    backgroundColor: Colors.grey,
-                                    backgroundImage: dados.urlImagem != null
-                                        ? NetworkImage(dados.urlImagem)
-                                        : null),
-                                title: Text(dados.nome,
-                                style: TextStyle(
-                                  color: Color(0xffDCDCDC)),),
-                                subtitle: dados.descricao == null ? Text(" ") : Text(dados.descricao,
-                                  style: TextStyle(
-                                      color: Colors.white),),
-                                onTap: () {
-                                  Navigator.pushNamed(context, "/detalhescontado", arguments: dados);
-                                },
-                              ),
-                            );
-                          },
+                        child: Padding(
+                          padding: EdgeInsets.only(bottom: 16),
+                          child: RaisedButton(
+                            child: Text(
+                              "Indique alguém",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 20),
+                            ),
+                            color: Color(0xff37474f),
+                            padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(32)),
+                            onPressed: () {
+                              Navigator.pushNamed(context, "/sugestaoUsuario",
+                                  arguments: _categoria);
+                            },
+                          ),
                         ),
-                    );
-                  }
-                  break;
-              }
-            }),
+                      )
+                    ],
+                  ));
+                } else {
+                  return Container(
+                    decoration: BoxDecoration(color: Color(0xffDCDCDC)),
+                    padding: EdgeInsets.all(10),
+                    child: ListView.builder(
+                      itemCount: item.length,
+                      // ignore: missing_return
+                      itemBuilder: (context, indice) {
+                        Usuario dados = item[indice];
+                        return Card(
+                          color: Color(0xff37474f),
+                          child: ListTile(
+                            leading: CircleAvatar(
+                                maxRadius: 40,
+                                backgroundColor: Colors.grey,
+                                backgroundImage: dados.urlImagem != null
+                                    ? NetworkImage(dados.urlImagem)
+                                    : null),
+                            title: Text(
+                              dados.nome,
+                              style: TextStyle(color: Color(0xffDCDCDC)),
+                            ),
+                            subtitle: dados.descricao == null
+                                ? Text(" ")
+                                : Text(
+                                    dados.descricao,
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                            onTap: () {
+                              Navigator.pushNamed(context, "/detalhescontado",
+                                  arguments: dados);
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }
+                break;
+            }
+          }),
     );
   }
 }

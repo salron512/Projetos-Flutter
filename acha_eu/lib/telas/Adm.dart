@@ -30,6 +30,8 @@ class _AdmState extends State<Adm> {
       usuario.adm = dados["adm"];
       usuario.categoriaUsuario = dados["categoria"];
       usuario.mostraPagamento = dados["mostraPagamento"];
+      usuario.estado = dados["estado"];
+      usuario.cidade = dados["cidade"];
       usuario.idUsuario = dados["idUsuario"];
       usuario.email = dados["email"];
       listaDados.add(usuario);

@@ -69,9 +69,9 @@ class _HomeState extends State<Home> {
 
     if (usuariologado != null) {
       Navigator.popAndPushNamed(context, "/listacategorias");
-      //Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
     }
   }
+
   bool _motrarSenha = false;
 
   @override
@@ -104,14 +104,12 @@ class _HomeState extends State<Home> {
                       padding: EdgeInsets.only(bottom: 8),
                       child: Center(
                           child: Text(
-                            _mensagemErro,
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 20,
-                            ),
-                          )
-                      )
-                  ),
+                        _mensagemErro,
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 20,
+                        ),
+                      ))),
                   Padding(
                     padding: EdgeInsets.only(bottom: 8),
                     child: TextField(
@@ -137,16 +135,16 @@ class _HomeState extends State<Home> {
                       fontSize: 20,
                     ),
                     decoration: InputDecoration(
-                      //prefix:Icon(Icons.security),
+                        //prefix:Icon(Icons.security),
                         suffixIcon: IconButton(
                           icon: Icon(
                             Icons.remove_red_eye,
                             color: _motrarSenha ? Colors.blue : Colors.grey,
                           ),
-                          onPressed: (){
-                          setState(() {
-                            _motrarSenha = !_motrarSenha;
-                          });
+                          onPressed: () {
+                            setState(() {
+                              _motrarSenha = !_motrarSenha;
+                            });
                           },
                         ),
                         contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),

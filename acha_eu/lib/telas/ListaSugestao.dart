@@ -12,7 +12,6 @@ class _ListaSugestaoState extends State<ListaSugestao> {
     FirebaseFirestore db = FirebaseFirestore.instance;
 
     var snapshots = await db.collection("sugestao").get();
-    var ref = await db.collection("sugestao").doc().id;
     List<Usuario> listaRecuperada = List();
     for (var item in snapshots.docs) {
       Map<String, dynamic> dados = item.data();

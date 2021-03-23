@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+//datalhes do usuario
 class DetalhesAdm extends StatefulWidget {
   Usuario usuario;
 
@@ -37,18 +37,21 @@ class _DetalhesAdmState extends State<DetalhesAdm> {
   }
 
   _AtualizadDados() async{
+    //habilita o campo mostraPagamento do usuario
+    // caso widget.usuario.mostraPagamento seja true
     FirebaseFirestore db =  FirebaseFirestore.instance;
     if(widget.usuario.mostraPagamento){
       await db.collection("usuarios").doc(widget.usuario.idUsuario).update({
         "mostraPagamento": widget.usuario.mostraPagamento,
       });
+       //habilita o campo mostraPagamento do usuario
+       // caso widget.usuario.mostraPagamento seja false
     }else{
       await db.collection("usuarios").doc(widget.usuario.idUsuario).update({
         "mostraPagamento": widget.usuario.mostraPagamento,
         "categoria": "Cliente"
       });
     }
-
   }
 
   @override
@@ -102,6 +105,22 @@ class _DetalhesAdmState extends State<DetalhesAdm> {
               ),
               Padding(padding: EdgeInsets.only(top: 10),
                 child: Text("Categoria: " + widget.usuario.categoriaUsuario,
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20
+                  ),
+                ),
+              ),
+              Padding(padding: EdgeInsets.only(top: 10),
+                child: Text("Cidade: " + widget.usuario.cidade,
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20
+                  ),
+                ),
+              ),
+              Padding(padding: EdgeInsets.only(top: 10),
+                child: Text("Estado: " + widget.usuario.estado,
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 20

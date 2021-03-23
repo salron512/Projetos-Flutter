@@ -1,4 +1,3 @@
-import 'package:acha_eu/model/Categorias.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
@@ -18,37 +17,34 @@ class _SugestaoUsuarioState extends State<SugestaoUsuario> {
   TextEditingController _controllerWhatsapp = TextEditingController();
   String _mensagemErro = "";
 
-
-  _validarCampos(){
+  _validarCampos() {
     String nome = _controllerNome.text;
     String telefone = _controllerTelefone.text;
     String whatsapp = _controllerWhatsapp.text;
     String categoria = widget.categorias;
-    if(nome.isNotEmpty){
-      if(telefone.isNotEmpty){
-        if(whatsapp.isNotEmpty){
+    if (nome.isNotEmpty) {
+      if (telefone.isNotEmpty) {
+        if (whatsapp.isNotEmpty) {
           _salvaSugestao(nome, telefone, whatsapp, categoria);
-
-        }else{
+        } else {
           setState(() {
             _mensagemErro = "Preencha o campo whatsapp";
           });
         }
-
-      }else{
+      } else {
         setState(() {
           _mensagemErro = "Preencha o campo telefone";
         });
       }
-
-    }else{
+    } else {
       setState(() {
         _mensagemErro = "Preencha o campo nome";
       });
     }
   }
 
-  _salvaSugestao(String nome,String telefone,String whatsapp, String categoria) async{
+  _salvaSugestao(
+      String nome, String telefone, String whatsapp, String categoria) async {
     FirebaseFirestore db = FirebaseFirestore.instance;
 
     await db.collection("sugestao").doc().set({
@@ -56,16 +52,12 @@ class _SugestaoUsuarioState extends State<SugestaoUsuario> {
       "telefone": telefone,
       "whatsapp": whatsapp,
       "categoria": categoria,
-    }).then((value){
+    }).then((value) {
       setState(() {
         _mensagemErro = "Sugestão enviado com sucesso!";
       });
     });
-
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -126,11 +118,11 @@ class _SugestaoUsuarioState extends State<SugestaoUsuario> {
                       hintText: "Telefone",
                       filled: true,
                       fillColor: Colors.white,
-                      suffixIcon:IconButton(
+                      suffixIcon: IconButton(
                         icon: Icon(
                           Icons.clear,
                         ),
-                        onPressed: (){
+                        onPressed: () {
                           setState(() {
                             _controllerTelefone.clear();
                           });
@@ -155,11 +147,11 @@ class _SugestaoUsuarioState extends State<SugestaoUsuario> {
                       hintText: "Whatsapp",
                       filled: true,
                       fillColor: Colors.white,
-                      suffixIcon:IconButton(
+                      suffixIcon: IconButton(
                         icon: Icon(
                           Icons.clear,
                         ),
-                        onPressed: (){
+                        onPressed: () {
                           setState(() {
                             _controllerWhatsapp.clear();
                           });

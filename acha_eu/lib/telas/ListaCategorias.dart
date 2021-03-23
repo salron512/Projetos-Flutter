@@ -43,7 +43,7 @@ class _ListaCategoriasState extends State<ListaCategorias> {
         Navigator.pushNamed(context, "/config");
         break;
       case "Deslogar":
-       _deslogarUsuario();
+        _deslogarUsuario();
         break;
       case "Anuncie":
         Navigator.pushNamed(context, "/contado");
@@ -53,7 +53,7 @@ class _ListaCategoriasState extends State<ListaCategorias> {
 
   _deslogarUsuario() async {
     FirebaseAuth auth = FirebaseAuth.instance;
-     await auth.signOut();
+    await auth.signOut();
     Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
   }
 
@@ -72,9 +72,9 @@ class _ListaCategoriasState extends State<ListaCategorias> {
                 return PopupMenuItem<String>(
                   value: item,
                   child: Text(item,
-                  style: TextStyle(
-                    color: Colors.white
-                  )
+                      style: TextStyle(
+                          color: Colors.white
+                      )
                   ),
                 );
               }).toList();
@@ -101,13 +101,12 @@ class _ListaCategoriasState extends State<ListaCategorias> {
                 case ConnectionState.done:
                   List<Categorias> item = snapshot.data;
                   return Container(
-                      //padding: EdgeInsets.all(8),
                       child: GridView.count(
                         crossAxisCount: 3,
                         mainAxisSpacing: 2,
                         crossAxisSpacing: 2,
                         children: List.generate(
-                            // ignore: missing_return
+                          // ignore: missing_return
                             item.length, (index) {
                           var dados = item[index];
                           return Container(
@@ -118,22 +117,26 @@ class _ListaCategoriasState extends State<ListaCategorias> {
                                 Navigator.pushNamed(context, "/listaservicos",
                                     arguments: dados);
                               },
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    CircleAvatar(
-                                        maxRadius: 40,
-                                        backgroundColor: Colors.grey,
-                                        backgroundImage: dados.urlImagem != null
-                                            ? NetworkImage(dados.urlImagem)
-                                            : null),
-                                    Padding(
-                                      padding: EdgeInsets.only(top: 8),
-                                      child: Text(dados.nome),
-                                    )
-                                  ],
-                                ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  CircleAvatar(
+                                      maxRadius: 40,
+                                      backgroundColor: Colors.grey,
+                                      backgroundImage: dados.urlImagem != null
+                                          ? NetworkImage(dados.urlImagem)
+                                          : null),
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 8),
+                                    child: Text(dados.nome,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold
+                                    ),
+                                    ),
+                                  )
+                                ],
+                              ),
 
                             ),
                           );

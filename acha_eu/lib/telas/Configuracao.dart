@@ -46,12 +46,12 @@ class _ConfiguracaoState extends State<Configuracao> {
     PickedFile imagemSelecionada;
     File imagem;
     if (daCamera) {
-      // ignore: deprecated_member_use
+      //recupera imagem da camera 
       imagemSelecionada =
       await picker.getImage(source: ImageSource.camera, imageQuality: 50);
       imagem = File(imagemSelecionada.path);
     } else {
-      // ignore: deprecated_member_use
+      //recupera imagem da galeria
       imagemSelecionada =
       await picker.getImage(source: ImageSource.gallery, imageQuality: 50);
       imagem = File(imagemSelecionada.path);
@@ -81,13 +81,12 @@ class _ConfiguracaoState extends State<Configuracao> {
         });
       }
     });
-
     //recupera a url da imagem
     task.whenComplete(() {}).then((snapshot) {
       _recuperarUrlImagem(snapshot);
     });
   }
-
+  //faz download da imagem
   Future _recuperarUrlImagem(TaskSnapshot snapshot) async {
     String url = await snapshot.ref.getDownloadURL();
     _atualizarUrlIamgemFirestore(url);
@@ -98,6 +97,7 @@ class _ConfiguracaoState extends State<Configuracao> {
   }
 
   _atualizarNomeFirestore() {
+    //atualiza dados do usuario
     String nome = _controllerNome.text;
     String telefone = _controllerTelefone.text;
     String whatsapp = _controllerWhatsapp.text;
@@ -114,6 +114,7 @@ class _ConfiguracaoState extends State<Configuracao> {
     Map<String, dynamic> dadosAtualizar;
 
     switch (_mostraPagamento) {
+      //atualiza dados se o usuario não for da categoria cliente
       case true:
         if (nome.isNotEmpty) {
           if (telefone.isNotEmpty) {
@@ -175,6 +176,7 @@ class _ConfiguracaoState extends State<Configuracao> {
         break;
 
       case false:
+       //atualiza dados se o usuario for da categoria cliente
         if (_controllerNome.text.isNotEmpty) {
           if (_controllerTelefone.text.isNotEmpty) {
             if (_controllerWhatsapp.text.isNotEmpty) {
@@ -284,6 +286,7 @@ class _ConfiguracaoState extends State<Configuracao> {
       });
     }
     if(_escolhaCategoria != "Cliente"){
+      //recupera formas de pagamento caso o usuario não seja cliente
       FirebaseFirestore db = FirebaseFirestore.instance;
       var snapshot = await db.collection("usuarios").doc(_idUsuarioLogado).get();
       Map<String, dynamic> dados = snapshot.data();
@@ -370,7 +373,6 @@ class _ConfiguracaoState extends State<Configuracao> {
 
   _mostraListaCidade() {
     if (_listaCidades.isNotEmpty) {
-      var item;
       showDialog(
           context: context,
           builder: (context) {
@@ -422,7 +424,6 @@ class _ConfiguracaoState extends State<Configuracao> {
 
   _mostraListaCategorias() {
     if (_listaCidades.isNotEmpty) {
-      var item;
       showDialog(
           context: context,
           builder: (context) {

@@ -30,6 +30,7 @@ class _CadastroState extends State<Cadastro> {
 
 
   _validarCampos() {
+    //verifica campod da tela de cadastro
     String nome = _controllerNome.text;
     String email = _controllerEmail.text;
     String senha = _controllerSenha.text;
@@ -99,17 +100,19 @@ class _CadastroState extends State<Cadastro> {
   }
 
   _cadastrarUsuairo(Usuario usuario) {
+    //cadastra usuario
     FirebaseAuth auth = FirebaseAuth.instance;
     auth
         .createUserWithEmailAndPassword(
             email: usuario.email, password: usuario.senha)
         .then((firebase) async {
       FirebaseFirestore db = FirebaseFirestore.instance;
-
+      // salva dados do usuario no Firebase
       await db
           .collection("usuarios")
           .doc(firebase.user.uid)
           .set(usuario.toMap());
+          //insere o campo do id do usuario
       await db
           .collection("usuarios")
           .doc(firebase.user.uid)
@@ -117,8 +120,6 @@ class _CadastroState extends State<Cadastro> {
 
       Navigator.pushNamedAndRemoveUntil(
           context, "/listacategorias", (_) => false);
-
-      //Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Home()));
     }).catchError((error) {
       setState(() {
         _mensagemErro =
@@ -128,7 +129,6 @@ class _CadastroState extends State<Cadastro> {
   }
 
   _mostraListaEstado() {
-    var item;
     showDialog(
         context: context,
         builder: (context) {
@@ -224,7 +224,6 @@ class _CadastroState extends State<Cadastro> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     // _recuperaListaApi();
   }
