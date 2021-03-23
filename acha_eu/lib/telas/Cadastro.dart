@@ -30,7 +30,7 @@ class _CadastroState extends State<Cadastro> {
 
 
   _validarCampos() {
-    //verifica campod da tela de cadastro
+    //verifica campo da tela de cadastro
     String nome = _controllerNome.text;
     String email = _controllerEmail.text;
     String senha = _controllerSenha.text;
@@ -47,21 +47,27 @@ class _CadastroState extends State<Cadastro> {
             if (telefone.isNotEmpty) {
               if (_scolhaEstado.isNotEmpty) {
                 if (_escolhaCidade.isNotEmpty) {
-                  Usuario usuario = Usuario();
-                  usuario.nome = nome;
-                  usuario.email = email;
-                  usuario.senha = senha;
-                  usuario.telefone = telefone;
-                  usuario.estado = estado;
-                  usuario.cidade = cidade;
-                  usuario.categoriaUsuario = "Cliente";
-                  usuario.whatsapp = whatsapp;
-                  usuario.mostraPagamento = false;
-                  usuario.adm = false;
-                  setState(() {
-                    _mensagemErro = "";
-                  });
-                  _cadastrarUsuairo(usuario);
+                 if(whatsapp.isNotEmpty){
+                   Usuario usuario = Usuario();
+                   usuario.nome = nome;
+                   usuario.email = email;
+                   usuario.senha = senha;
+                   usuario.telefone = telefone;
+                   usuario.estado = estado;
+                   usuario.cidade = cidade;
+                   usuario.categoriaUsuario = "Cliente";
+                   usuario.whatsapp = whatsapp;
+                   usuario.mostraPagamento = false;
+                   usuario.adm = false;
+                   setState(() {
+                     _mensagemErro = "";
+                   });
+                   _cadastrarUsuairo(usuario);
+                 }else{
+                   setState(() {
+                     _mensagemErro = "Preencha o campo whatsapp";
+                   });
+                 }
                 } else {
                   setState(() {
                     _mensagemErro = "Escolha sua cidade";

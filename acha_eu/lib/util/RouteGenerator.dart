@@ -8,6 +8,7 @@ import 'package:acha_eu/telas/DetalhesSugestao.dart';
 import 'package:acha_eu/telas/Home.dart';
 import 'package:acha_eu/telas/ListaCategorias.dart';
 import 'package:acha_eu/telas/ListaServicos.dart';
+import 'package:acha_eu/telas/ListaSolicitacao.dart';
 import 'package:acha_eu/telas/ListaSugestao.dart';
 import 'package:acha_eu/telas/RecuperaSenha.dart';
 import 'package:acha_eu/telas/SugestaoUsuario.dart';
@@ -71,6 +72,10 @@ class RouteGenerator{
       case "/sugestaoUsuario" :
         return MaterialPageRoute(
             builder: (_) => SugestaoUsuario(args)
+        );
+      case "/listaSolicitacao" :
+        return MaterialPageRoute(
+            builder: (_) => ListaSolicitacao()
         );
 
 
