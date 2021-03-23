@@ -110,6 +110,7 @@ class _ListaCategoriasState extends State<ListaCategorias> {
                             item.length, (index) {
                           var dados = item[index];
                           return Container(
+                            padding: EdgeInsets.all(8),
                             width: 100,
                             height: 100,
                             child: GestureDetector(
@@ -118,7 +119,7 @@ class _ListaCategoriasState extends State<ListaCategorias> {
                                     arguments: dados);
                               },
                               child: Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   CircleAvatar(
@@ -131,6 +132,7 @@ class _ListaCategoriasState extends State<ListaCategorias> {
                                     padding: EdgeInsets.only(top: 8),
                                     child: Text(dados.nome,
                                     style: TextStyle(
+                                      fontSize: 12,
                                       fontWeight: FontWeight.bold
                                     ),
                                     ),
