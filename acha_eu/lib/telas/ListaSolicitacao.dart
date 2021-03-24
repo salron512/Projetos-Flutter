@@ -1,6 +1,4 @@
 import 'dart:async';
-
-import 'package:acha_eu/model/Solicitacao.dart';
 import 'package:acha_eu/model/Usuario.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -139,7 +137,8 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
   _salvaSolicitacao() async {
     String descricao = _controllerDescricao.text;
     FirebaseFirestore db = FirebaseFirestore.instance;
-    await db.collection("solicitacao").doc().set({
+    await db.collection("solicitacao")
+    .doc().set({
       "idSolicitante": _usuario.idUsuario,
       "nome": _usuario.nome,
       "telefone": _usuario.telefone,
@@ -147,6 +146,7 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
       "cidade": _usuario.cidade,
       "categoria": _escolhaCategoria,
       "descricao": descricao,
+      "data": DateTime.now(),
     });
   }
 

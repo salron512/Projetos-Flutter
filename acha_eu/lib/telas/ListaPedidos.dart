@@ -98,58 +98,33 @@ class _ListaPedidosState extends State<ListaPedidos> {
                         List<DocumentSnapshot> requisicoes =
                             querySnapshot.docs.toList();
                         DocumentSnapshot dados = requisicoes[indice];
-                        return Dismissible(
-                          onDismissed: (direcao) async {
-                            FirebaseFirestore db = FirebaseFirestore.instance;
-                            await db
-                                .collection("solicitacao")
-                                .doc(dados.reference.id)
-                                .delete();
-                          },
-                          key: Key(
-                              DateTime.now().millisecondsSinceEpoch.toString()),
-                          direction: DismissDirection.endToStart,
-                          background: Container(
-                              padding: EdgeInsets.all(8),
-                              color: Colors.red,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: <Widget>[
-                                  Icon(
-                                    Icons.delete,
-                                    color: Colors.white,
-                                  ),
-                                ],
-                              )),
-                          child: Card(
-                            color: Color(0xff37474f),
-                            child: ListTile(
-                              title: Text(
-                                dados["nome"],
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Text(
-                                    "Tipo do profissional: " +
-                                        dados["categoria"],
+                        return Card(
+                          color: Color(0xff37474f),
+                          child: ListTile(
+                            title: Text(
+                              dados["nome"],
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Text(
+                                  "Tipo do profissional: " + dados["categoria"],
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(top: 5),
+                                  child: Text(
+                                    "Descrição: " + dados["descricao"],
                                     style: TextStyle(color: Colors.white),
                                   ),
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 5),
-                                    child: Text(
-                                      "Descrição: " + dados["descricao"],
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              onTap: () {
-                                Navigator.pushNamed(context, "/detalhesPedidos",
-                                    arguments: dados);
-                              },
+                                ),
+                              ],
                             ),
+                            onTap: () {
+                              Navigator.pushNamed(context, "/detalhesPedidos",
+                                  arguments: dados);
+                            },
                           ),
                         );
                       },

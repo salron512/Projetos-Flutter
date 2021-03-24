@@ -62,7 +62,7 @@ class _DetalhesPedidoState extends State<DetalhesPedido> {
               Padding(
                 padding: EdgeInsets.only(top: 8),
                 child: Text(
-                  "Decrição: " + widget.dados["descricao"],
+                  "Descrição: " + widget.dados["descricao"],
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                 ),
               ),
