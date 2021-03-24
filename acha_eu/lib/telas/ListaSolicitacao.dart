@@ -95,13 +95,25 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
         builder: (context) {
           return AlertDialog(
             title: Text("Descrição de serviço"),
-            content: Center(
+            content: Container(
+              height: 200,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  TextFormField(
+                 Container(
+                   height: 100,
+                   width: 100,
+                   child:  Padding(padding: EdgeInsets.only(bottom: 2),
+                     child: Image.asset("images/solicitacao.png"),
+                   ),
+                 ),
+                  TextField(
                     controller: _controllerDescricao,
                     autofocus: true,
                     keyboardType: TextInputType.text,
+                    decoration: InputDecoration(
+                      labelText:"Ex: Preciso de um professor de inglês" ,
+                    ),
                   )
                 ],
               ),
@@ -114,9 +126,10 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
               FlatButton(
                 onPressed: () {
                   _salvaSolicitacao();
+                  _controllerDescricao.clear();
                   Navigator.pop(context);
                 },
-                child: Text("Salva"),
+                child: Text("Salvar"),
               ),
             ],
           );
@@ -205,33 +218,52 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
                         List<DocumentSnapshot> requisicoes =
                             querySnapshot.docs.toList();
                         DocumentSnapshot dados = requisicoes[indice];
-                        return Card(
-                          color: Color(0xff37474f),
-                          child: ListTile(
-                            title: Text(
-                              dados["nome"],
-                              style: TextStyle(color: Color(0xffDCDCDC)),
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.only(bottom: 10, top: 3),
-                                  child: Text(
-                                    "Solicitação: " + dados["categoria"],
+                        return Dismissible(
+                          onDismissed: (direcao)async{
+                            FirebaseFirestore db = FirebaseFirestore.instance;
+                            await db.collection("solicitacao").doc(dados.reference.id).delete();
+                          },
+                          key: Key(DateTime.now()
+                              .millisecondsSinceEpoch
+                              .toString()),
+                          direction: DismissDirection.endToStart,
+                          background: Container(
+                              padding: EdgeInsets.all(8),
+                              color: Colors.red,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: <Widget>[
+                                  Icon(
+                                    Icons.delete,
+                                    color: Colors.white,
+                                  ),
+                                ],
+                              )),
+                          child:  Card(
+                            color: Color(0xff37474f),
+                            child: ListTile(
+                              title: Text(
+                                dados["nome"],
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Text(
+                                    "Tipo do profissional: " + dados["categoria"],
                                     style: TextStyle(color: Colors.white),
                                   ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(bottom: 10),
-                                  child: Text(
-                                    "Decrição do pedido: " + dados["descricao"],
+                                  Padding(padding: EdgeInsets.only(top: 5),
+                                  child:  Text(
+                                    "Descrição: " + dados["descricao"],
                                     style: TextStyle(color: Colors.white),
                                   ),
-                                ),
-                              ],
+                                  ),
+                                ],
+                              )
+
+
                             ),
-                            onTap: () {},
                           ),
                         );
                       },

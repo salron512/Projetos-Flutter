@@ -4,9 +4,11 @@ import 'package:acha_eu/telas/Configuracao.dart';
 import 'package:acha_eu/telas/Contato.dart';
 import 'package:acha_eu/telas/DetalhesAdm.dart';
 import 'package:acha_eu/telas/DetalhesContado.dart';
+import 'package:acha_eu/telas/DetalhesPedido.dart';
 import 'package:acha_eu/telas/DetalhesSugestao.dart';
 import 'package:acha_eu/telas/Home.dart';
 import 'package:acha_eu/telas/ListaCategorias.dart';
+import 'package:acha_eu/telas/ListaPedidos.dart';
 import 'package:acha_eu/telas/ListaServicos.dart';
 import 'package:acha_eu/telas/ListaSolicitacao.dart';
 import 'package:acha_eu/telas/ListaSugestao.dart';
@@ -77,6 +79,15 @@ class RouteGenerator{
         return MaterialPageRoute(
             builder: (_) => ListaSolicitacao()
         );
+      case "/listaPedidos" :
+        return MaterialPageRoute(
+            builder: (_) => ListaPedidos(args)
+        );
+      case "/detalhesPedidos" :
+        return MaterialPageRoute(
+            builder: (_) => DetalhesPedido(args)
+        );
+
 
 
 

@@ -94,7 +94,6 @@ class _ListaCategoriasState extends State<ListaCategorias> {
             builder: (context, snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.none:
-                case ConnectionState.active:
                 case ConnectionState.waiting:
                   return Center(
                     child: CircularProgressIndicator(),
