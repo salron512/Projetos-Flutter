@@ -44,7 +44,7 @@ class _HomeState extends State<Home> {
 
   _logarUsuario(Usuario usuario) {
     FirebaseAuth auth = FirebaseAuth.instance;
-
+  
     auth
         .signInWithEmailAndPassword(
             email: usuario.email, password: usuario.senha)
@@ -95,7 +95,7 @@ class _HomeState extends State<Home> {
                   Padding(
                     padding: EdgeInsets.only(bottom: 10),
                     child: Image.asset(
-                      "images/logo.png",
+                      "images/icone.png",
                       width: 200,
                       height: 150,
                     ),

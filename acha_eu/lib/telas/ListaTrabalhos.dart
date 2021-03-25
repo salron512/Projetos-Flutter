@@ -7,26 +7,21 @@ import 'package:intl/date_symbol_data_custom.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
-class ListaPedidos extends StatefulWidget {
-  String categoria;
-  ListaPedidos(this.categoria);
+class ListaTrabalhos extends StatefulWidget {
   @override
-  _ListaPedidosState createState() => _ListaPedidosState();
+  _ListaTrabalhosState createState() => _ListaTrabalhosState();
 }
 
-class _ListaPedidosState extends State<ListaPedidos> {
+class _ListaTrabalhosState extends State<ListaTrabalhos> {
   final _controller = StreamController<QuerySnapshot>.broadcast();
   Usuario _usuario = Usuario();
 
   Stream _recuperaSolicitacao() {
     FirebaseFirestore db = FirebaseFirestore.instance;
-    String categoria = widget.categoria;
 
     final stream = db
         .collection("solicitacao")
-        .where("status", isEqualTo: "Não atendido")
-        .where("cidade", isEqualTo: _usuario.cidade)
-        .where("categoria", isEqualTo: categoria)
+        .where("idProfissional", isEqualTo: _usuario.idUsuario)
         .snapshots();
 
     stream.listen((event) {
@@ -35,9 +30,8 @@ class _ListaPedidosState extends State<ListaPedidos> {
     if (!_controller.hasListener) {
       final stream = db
           .collection("solicitacao")
-          .where("status", isEqualTo: "Não atendido")
-          .where("cidade", isEqualTo: _usuario.cidade)
-          .where("categoria", isEqualTo: categoria)
+          .where("status", isEqualTo: "Em atendimento")
+          .where("idProfissional", isEqualTo: _usuario.idUsuario)
           .snapshots();
       stream.listen((event) {
         _controller.add(event);
@@ -45,9 +39,8 @@ class _ListaPedidosState extends State<ListaPedidos> {
     } else {
       final stream = db
           .collection("solicitacao")
-          .where("status", isEqualTo: "Não atendido")
-          .where("cidade", isEqualTo: _usuario.cidade)
-          .where("categoria", isEqualTo: categoria)
+          .where("status", isEqualTo: "Em atendimento")
+          .where("idProfissional", isEqualTo: _usuario.idUsuario)
           .orderBy("data", descending: true)
           .snapshots();
       stream.listen((event) {
@@ -93,7 +86,7 @@ class _ListaPedidosState extends State<ListaPedidos> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Pedidos"),
+        title: Text("Pedidos em Atendimento"),
       ),
       body: StreamBuilder(
           stream: _controller.stream,
@@ -112,17 +105,17 @@ class _ListaPedidosState extends State<ListaPedidos> {
                 if (querySnapshot.docs.length == 0) {
                   return Container(
                     decoration: BoxDecoration(color: Color(0xffDCDCDC)),
-                    child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Sem pedidos no momento :(",
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        )),
+                      child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Sem trabalhos no momento :(",
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          )),
                   );
                 } else {
                   return Container(
@@ -144,9 +137,8 @@ class _ListaPedidosState extends State<ListaPedidos> {
                                 .update({
                               "idProfissional": _usuario.idUsuario,
                               "nomeProfissional": _usuario.nome,
-                              "telefoneProfissional": _usuario.telefone,
                               "dataResposta": DateTime.now().toString(),
-                              "status": "Em atendimento",
+                              "status": "Atendido",
                             });
                             /*
                             await db
@@ -183,7 +175,10 @@ class _ListaPedidosState extends State<ListaPedidos> {
                           child: Card(
                             color: Color(0xff37474f),
                             child: ListTile(
-                                title: Text(
+                              onTap: (){
+                                Navigator.pushNamed(context, "/detalhesPedidos" , arguments: dados );
+                              },
+                                title: Text("Cliente: "+
                                   dados["nome"],
                                   style: TextStyle(color: Colors.white),
                                 ),

@@ -36,6 +36,7 @@ dependencies:
   url_launcher: 5.7.10
   mask_text_input_formatter: ^1.1.0
   mask_shifter: ^0.1.0
+  intl : ^ 0.16.1
 
 dev_dependencies:
   flutter_test:
@@ -65,6 +66,8 @@ flutter:
     - images/sugestao.png
     - images/solicitacao.png
     - images/comunicacao.png
+    - images/excluir.png
+    - images/icone.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

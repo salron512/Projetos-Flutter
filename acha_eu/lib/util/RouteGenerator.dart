@@ -12,6 +12,7 @@ import 'package:acha_eu/telas/ListaPedidos.dart';
 import 'package:acha_eu/telas/ListaServicos.dart';
 import 'package:acha_eu/telas/ListaSolicitacao.dart';
 import 'package:acha_eu/telas/ListaSugestao.dart';
+import 'package:acha_eu/telas/ListaTrabalhos.dart';
 import 'package:acha_eu/telas/RecuperaSenha.dart';
 import 'package:acha_eu/telas/SugestaoUsuario.dart';
 import 'package:flutter/material.dart';
@@ -86,6 +87,10 @@ class RouteGenerator{
       case "/detalhesPedidos" :
         return MaterialPageRoute(
             builder: (_) => DetalhesPedido(args)
+        );
+      case "/listaTrabalho" :
+        return MaterialPageRoute(
+            builder: (_) => ListaTrabalhos()
         );
 
 

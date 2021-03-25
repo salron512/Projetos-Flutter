@@ -10,7 +10,7 @@ class ListaCategorias extends StatefulWidget {
 }
 
 class _ListaCategoriasState extends State<ListaCategorias> {
-  List<String> itensMenu = ["Perfil", "Deslogar","Anuncie","Solicitação"];
+  List<String> itensMenu = ["Perfil", "Deslogar","Anuncie"];
   Future _recuperaCategorias() async {
     // ignore: deprecated_member_use
     List<Categorias> listacategoria = List<Categorias>();
@@ -47,9 +47,6 @@ class _ListaCategoriasState extends State<ListaCategorias> {
         break;
       case "Anuncie":
         Navigator.pushNamed(context, "/contado");
-        break;
-      case "Solicitação":
-        Navigator.pushNamed(context, "/listaSolicitacao");
         break;
     }
   }
@@ -151,14 +148,14 @@ class _ListaCategoriasState extends State<ListaCategorias> {
               }
             }),
       ),
-      /*
+ 
       floatingActionButton: FloatingActionButton.extended(
           onPressed: (){
-            Navigator.pushNamed(context, "/config");
+            Navigator.pushNamed(context, "/listaSolicitacao");
           }
-          , label: Text("SEJA PROFISSIONAL")
+          , label: Text("Solicite um profissional")
       ),
-      */
+    
     );
   }
 }

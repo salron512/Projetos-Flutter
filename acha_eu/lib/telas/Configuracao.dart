@@ -476,6 +476,17 @@ class _ConfiguracaoState extends State<Configuracao> {
         title: Text("Perfil"),
        actions: [
          _mostraPagamento != false ?  IconButton(
+           icon: Icon(Icons.work,
+             color: Colors.white,
+           ),
+           onPressed: (){
+             Navigator.pushNamed(context, "/listaTrabalho",
+                 arguments: _escolhaCategoria);
+           },
+         )
+         :
+        Container(),
+         _mostraPagamento != false ?  IconButton(
            icon: Icon(Icons.storage,
              color: Colors.white,
            ),
@@ -484,8 +495,8 @@ class _ConfiguracaoState extends State<Configuracao> {
                  arguments: _escolhaCategoria);
            },
          )
-         :
-        Container()
+             :
+         Container()
        ],
       ),
       body: cond == null

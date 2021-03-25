@@ -32,6 +32,18 @@ class _DetalhesPedidoState extends State<DetalhesPedido> {
       throw 'Could not launch $telefoneUrl';
     }
   }
+  _alteraPedido() async{
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    await db.collection("solicitacao").doc(widget.dados.reference.id).update({
+      "status": "Não atendido",
+      "idProfissional": " ",
+      "idProfissional": " ",
+      "nomeProfissional":  " ",
+      "telefoneProfissional": " ",
+      "dataResposta": " ",
+    });
+    Navigator.pop(context);
+  }
 
 
   @override
@@ -95,6 +107,22 @@ class _DetalhesPedidoState extends State<DetalhesPedido> {
                       borderRadius: BorderRadius.circular(32)),
                   onPressed: () {
                     _abrirTelefone();
+                  },
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(bottom: 16),
+                child: RaisedButton(
+                  child: Text(
+                    "Desistir do atendimento",
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                  color: Colors.red,
+                  padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32)),
+                  onPressed: () {
+                    _alteraPedido();
                   },
                 ),
               ),

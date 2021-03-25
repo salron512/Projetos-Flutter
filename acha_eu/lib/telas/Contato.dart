@@ -8,7 +8,7 @@ class Contato extends StatefulWidget {
 
 class _ContatoState extends State<Contato> {
   _abrirWhatsApp() async {
-    String telefone = "";
+    String telefone = "66992040567";
     var whatsappUrl = "whatsapp://send?phone=+55$telefone=Olá,tudo bem ?";
 
     if (await canLaunch(whatsappUrl)) {
@@ -19,7 +19,7 @@ class _ContatoState extends State<Contato> {
   }
 
   _abrirTelefone() async {
-    String telefone = "";
+    String telefone = "66992040567";
     var telefoneUrl = "tel:$telefone";
 
     if (await canLaunch(telefoneUrl)) {

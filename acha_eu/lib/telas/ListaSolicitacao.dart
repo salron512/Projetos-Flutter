@@ -3,6 +3,9 @@ import 'package:acha_eu/model/Usuario.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_custom.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 
 class ListaSolicitacao extends StatefulWidget {
   @override
@@ -15,7 +18,6 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
   List<String> _listaCadegorias;
   Usuario _usuario = Usuario();
   String _escolhaCategoria;
-  String _idUsuario;
 
   Stream _recuperaSolicitacao() {
     FirebaseFirestore db = FirebaseFirestore.instance;
@@ -25,11 +27,27 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
         .collection("solicitacao")
         .where("idSolicitante", isEqualTo: id)
         .snapshots();
-
     stream.listen((event) {
       _controller.add(event);
     });
-    print("teste");
+    if (!_controller.hasListener) {
+      final stream = db
+          .collection("solicitacao")
+          .where("idSolicitante", isEqualTo: id)
+          .snapshots();
+      stream.listen((event) {
+        _controller.add(event);
+      });
+    } else {
+      final stream = db
+          .collection("solicitacao")
+          .where("idSolicitante", isEqualTo: id)
+          .orderBy("data", descending: true)
+          .snapshots();
+      stream.listen((event) {
+        _controller.add(event);
+      });
+    }
   }
 
   _recuperaCategorias() async {
@@ -38,7 +56,7 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
         .collection("categorias")
         .orderBy("categoria", descending: false)
         .get();
-    List<String> listarecuperada = List();
+    List<String> listarecuperada = [];
     for (var item in snapshot.docs) {
       Map<String, dynamic> dados = item.data();
       if (dados["categoria"] == "Cliente") continue;
@@ -98,19 +116,20 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                 Container(
-                   height: 100,
-                   width: 100,
-                   child:  Padding(padding: EdgeInsets.only(bottom: 2),
-                     child: Image.asset("images/solicitacao.png"),
-                   ),
-                 ),
+                  Container(
+                    height: 100,
+                    width: 100,
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 2),
+                      child: Image.asset("images/solicitacao.png"),
+                    ),
+                  ),
                   TextField(
                     controller: _controllerDescricao,
                     autofocus: true,
                     keyboardType: TextInputType.text,
                     decoration: InputDecoration(
-                      labelText:"Ex: Preciso de um professor de inglês" ,
+                      labelText: "Ex: Preciso de um professor de inglês",
                     ),
                   )
                 ],
@@ -137,8 +156,7 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
   _salvaSolicitacao() async {
     String descricao = _controllerDescricao.text;
     FirebaseFirestore db = FirebaseFirestore.instance;
-    await db.collection("solicitacao")
-    .doc().set({
+    await db.collection("solicitacao").doc().set({
       "idSolicitante": _usuario.idUsuario,
       "nome": _usuario.nome,
       "telefone": _usuario.telefone,
@@ -146,8 +164,22 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
       "cidade": _usuario.cidade,
       "categoria": _escolhaCategoria,
       "descricao": descricao,
-      "data": DateTime.now(),
+      "data": DateTime.now().toString(),
+      "status": "Não atendido",
+      "telefoneProfissional": " ",
+      "nomeProfissional": " ",
+      "dataResposta": " "
     });
+    _recuperaSolicitacao();
+  }
+
+  _formatarData(String data) {
+    initializeDateFormatting("pt_BR");
+    var formatador = DateFormat("dd/MM/y H:mm:s");
+
+    DateTime dataConvertida = DateTime.parse(data);
+    String dataFormatada = formatador.format(dataConvertida);
+    return dataFormatada;
   }
 
   _recuperaDadosUsuario() async {
@@ -165,6 +197,50 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
     _usuario.cidade = dados["cidade"];
     _usuario.idUsuario = dados["idUsuario"];
     _recuperaSolicitacao();
+  }
+
+  _alertDelete(String id) {
+    showDialog(
+        context: context,
+        // ignore: missing_return
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Confirmar exclusão?"),
+            content: Container(
+              height: 100,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    height: 100,
+                    width: 100,
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 2),
+                      child: Image.asset("images/excluir.png"),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              FlatButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _recuperaSolicitacao();
+                  },
+                child: Text("Cancelar"),
+              ),
+              FlatButton(
+                onPressed: () {
+                  FirebaseFirestore db = FirebaseFirestore.instance;
+                  db.collection("solicitacao").doc(id).delete();
+                  Navigator.pop(context);
+                },
+                child: Text("Excluir"),
+              ),
+            ],
+          );
+        });
   }
 
   @override
@@ -194,19 +270,22 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
                 break;
               case ConnectionState.active:
               case ConnectionState.done:
-              QuerySnapshot querySnapshot = snapshot.data;
+                QuerySnapshot querySnapshot = snapshot.data;
                 if (querySnapshot.docs.length == 0) {
-                  return Center(
-                      child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Crie uma solicitado",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ));
+                  return Container(
+                    decoration: BoxDecoration(color: Color(0xffDCDCDC)),
+                    child: Center(
+                        child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Crie uma solicitação",
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    )),
+                  );
                 } else {
                   return Container(
                     decoration: BoxDecoration(color: Color(0xffDCDCDC)),
@@ -219,13 +298,11 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
                             querySnapshot.docs.toList();
                         DocumentSnapshot dados = requisicoes[indice];
                         return Dismissible(
-                          onDismissed: (direcao)async{
-                            FirebaseFirestore db = FirebaseFirestore.instance;
-                            await db.collection("solicitacao").doc(dados.reference.id).delete();
+                          onDismissed: (direcao) async {
+                            _alertDelete(dados.reference.id);
                           },
-                          key: Key(DateTime.now()
-                              .millisecondsSinceEpoch
-                              .toString()),
+                          key: Key(
+                              DateTime.now().millisecondsSinceEpoch.toString()),
                           direction: DismissDirection.endToStart,
                           background: Container(
                               padding: EdgeInsets.all(8),
@@ -239,31 +316,95 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
                                   ),
                                 ],
                               )),
-                          child:  Card(
-                            color: Color(0xff37474f),
+                          child: Card(
+                            color: dados["status"] == "Em atendimento"
+                                ? Colors.green
+                                : Color(0xff37474f),
                             child: ListTile(
-                              title: Text(
-                                dados["nome"],
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Text(
-                                    "Tipo do profissional: " + dados["categoria"],
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  Padding(padding: EdgeInsets.only(top: 5),
-                                  child:  Text(
-                                    "Descrição: " + dados["descricao"],
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  ),
-                                ],
-                              )
-
-
-                            ),
+                                title: Text(
+                                  dados["nome"],
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                subtitle: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Text(
+                                      "Tipo do profissional: " +
+                                          dados["categoria"],
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 5),
+                                      child: Text(
+                                        "Descrição: " + dados["descricao"],
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 5),
+                                      child: Text(
+                                        "Status: " + dados["status"],
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 5),
+                                      child: Text(
+                                        "Data da solicitação: " +
+                                            _formatarData(dados["data"]),
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 5),
+                                      child: dados["nomeProfissional"] == " "
+                                          ? Text(
+                                              "",
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            )
+                                          : Text(
+                                              "Atendido Por: " +
+                                                  dados["nomeProfissional"],
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 5),
+                                      child: dados["dataResposta"] == " "
+                                          ? Text(
+                                              "",
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            )
+                                          : Text(
+                                              "Data da visualização: " +
+                                                  _formatarData(
+                                                      dados["dataResposta"]),
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 5),
+                                      child: dados["telefoneProfissional"] ==
+                                              " "
+                                          ? Text(
+                                              "",
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            )
+                                          : Text(
+                                              "Contado: " +
+                                                  dados["telefoneProfissional"],
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                    ),
+                                  ],
+                                )),
                           ),
                         );
                       },
