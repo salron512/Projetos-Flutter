@@ -6,13 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_custom.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
-
 class ListaSolicitacao extends StatefulWidget {
   @override
   _ListaSolicitacaoState createState() => _ListaSolicitacaoState();
 }
 
-class _ListaSolicitacaoState extends State<ListaSolicitacao> {
+class _ListaSolicitacaoState extends State<ListaSolicitacao>{
   TextEditingController _controllerDescricao = TextEditingController();
   final _controller = StreamController<QuerySnapshot>.broadcast();
   List<String> _listaCadegorias;
@@ -201,6 +200,7 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
 
   _alertDelete(String id) {
     showDialog(
+      barrierDismissible: false,
         context: context,
         // ignore: missing_return
         builder: (context) {
@@ -321,7 +321,7 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
                                 ? Colors.green
                                 : Color(0xff37474f),
                             child: ListTile(
-                                title: Text(
+                                title: Text( "Cliente: "+
                                   dados["nome"],
                                   style: TextStyle(color: Colors.white),
                                 ),

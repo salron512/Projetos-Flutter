@@ -252,6 +252,7 @@ class _ConfiguracaoState extends State<Configuracao> {
     List<String> listarecuperada = List();
     for (var item in snapshot.docs) {
       Map<String, dynamic> dados = item.data();
+      if (dados["categoria"] == "Cliente") continue;
       listarecuperada.add(dados["categoria"]);
     }
     setState(() {
@@ -474,30 +475,32 @@ class _ConfiguracaoState extends State<Configuracao> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Perfil"),
-       actions: [
-         _mostraPagamento != false ?  IconButton(
-           icon: Icon(Icons.work,
-             color: Colors.white,
-           ),
-           onPressed: (){
-             Navigator.pushNamed(context, "/listaTrabalho",
-                 arguments: _escolhaCategoria);
-           },
-         )
-         :
-        Container(),
-         _mostraPagamento != false ?  IconButton(
-           icon: Icon(Icons.storage,
-             color: Colors.white,
-           ),
-           onPressed: (){
-             Navigator.pushNamed(context, "/listaPedidos",
-                 arguments: _escolhaCategoria);
-           },
-         )
-             :
-         Container()
-       ],
+        actions: [
+          _mostraPagamento != false
+              ? IconButton(
+                  icon: Icon(
+                    Icons.work,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    Navigator.pushNamed(context, "/listaTrabalho",
+                        arguments: _escolhaCategoria);
+                  },
+                )
+              : Container(),
+          _mostraPagamento != false
+              ? IconButton(
+                  icon: Icon(
+                    Icons.storage,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    Navigator.pushNamed(context, "/listaPedidos",
+                        arguments: _escolhaCategoria);
+                  },
+                )
+              : Container()
+        ],
       ),
       body: cond == null
           ? Center(

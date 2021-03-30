@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "746057820936",
+    "project_id": "cesta-8b086",
+    "storage_bucket": "cesta-8b086.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:746057820936:android:62d1c8e8c4f9a3fc245abd",
+        "android_client_info": {
+          "package_name": "com.example.projeto_aelton"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "746057820936-uj3l8mi42fd030jktaje9ro86ctqljdc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7ArYZf5v4KaauH35XCgdE1LDtF3AlCOE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "746057820936-uj3l8mi42fd030jktaje9ro86ctqljdc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

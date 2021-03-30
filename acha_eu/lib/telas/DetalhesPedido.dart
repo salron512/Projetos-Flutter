@@ -10,7 +10,6 @@ class DetalhesPedido extends StatefulWidget {
 }
 
 class _DetalhesPedidoState extends State<DetalhesPedido> {
-
   _abrirWhatsApp() async {
     String telefone = widget.dados["whatsapp"];
     var whatsappUrl = "whatsapp://send?phone=+55$telefone=Olá,tudo bem ?";
@@ -32,19 +31,62 @@ class _DetalhesPedidoState extends State<DetalhesPedido> {
       throw 'Could not launch $telefoneUrl';
     }
   }
-  _alteraPedido() async{
+
+  _alteraPedido() async {
     FirebaseFirestore db = FirebaseFirestore.instance;
     await db.collection("solicitacao").doc(widget.dados.reference.id).update({
       "status": "Não atendido",
       "idProfissional": " ",
       "idProfissional": " ",
-      "nomeProfissional":  " ",
+      "nomeProfissional": " ",
       "telefoneProfissional": " ",
       "dataResposta": " ",
     });
     Navigator.pop(context);
   }
 
+  _alertAlterar() {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        // ignore: missing_return
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Confirmar desistencia"),
+            content: Container(
+              height: 100,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    height: 100,
+                    width: 100,
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 2),
+                      child: Image.asset("images/excluir.png"),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              FlatButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text("Cancelar"),
+              ),
+              FlatButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _alteraPedido();
+                },
+                child: Text("Confirmar"),
+              ),
+            ],
+          );
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -122,7 +164,7 @@ class _DetalhesPedidoState extends State<DetalhesPedido> {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(32)),
                   onPressed: () {
-                    _alteraPedido();
+                    _alertAlterar();
                   },
                 ),
               ),

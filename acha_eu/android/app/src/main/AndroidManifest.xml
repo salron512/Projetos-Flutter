@@ -1,9 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.acha_eu">
    <application
-        android:label="Acha Eu"
-        android:icon="@mipmap/icone">
+        android:label="Chama Eu"
+        android:icon="@mipmap/logo">
         <activity
+
             android:name=".MainActivity"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"

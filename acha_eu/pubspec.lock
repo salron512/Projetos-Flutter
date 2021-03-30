@@ -142,7 +142,7 @@ packages:
     source: hosted
     version: "0.3.2+3"
   firebase_core:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: firebase_core
       url: "https://pub.dartlang.org"
@@ -247,13 +247,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.6.3"
-  mask_shifter:
-    dependency: "direct main"
-    description:
-      name: mask_shifter
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.0"
   mask_text_input_formatter:
     dependency: "direct main"
     description:

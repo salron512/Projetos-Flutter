@@ -136,6 +136,7 @@ class _CadastroState extends State<Cadastro> {
 
   _mostraListaEstado() {
     showDialog(
+      barrierDismissible: false,
         context: context,
         builder: (context) {
           return AlertDialog(
@@ -192,6 +193,7 @@ class _CadastroState extends State<Cadastro> {
     if (_listaCidades.isNotEmpty) {
       var item;
       showDialog(
+        barrierDismissible: false,
           context: context,
           builder: (context) {
             return AlertDialog(

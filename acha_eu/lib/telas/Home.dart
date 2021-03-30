@@ -2,7 +2,6 @@ import 'package:acha_eu/model/Usuario.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
-
 class Home extends StatefulWidget {
   Home({Key key}) : super(key: key);
 
@@ -14,6 +13,7 @@ class _HomeState extends State<Home> {
   TextEditingController _controllerEmail = TextEditingController();
   TextEditingController _controllerSenha = TextEditingController();
   String _mensagemErro = "";
+  bool _motrarSenha = false;
 
   _validarCampos() {
     String email = _controllerEmail.text;
@@ -72,7 +72,11 @@ class _HomeState extends State<Home> {
     }
   }
 
-  bool _motrarSenha = false;
+
+
+
+
+
 
   @override
   void initState() {
@@ -95,9 +99,9 @@ class _HomeState extends State<Home> {
                   Padding(
                     padding: EdgeInsets.only(bottom: 10),
                     child: Image.asset(
-                      "images/icone.png",
-                      width: 200,
-                      height: 150,
+                      "images/logo.png",
+                      width: 250,
+                      height: 200,
                     ),
                   ),
                   Padding(
