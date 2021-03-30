@@ -49,7 +49,7 @@ class _LoginState extends State<Login> {
         .signInWithEmailAndPassword(
         email: usuario.email, password: usuario.senha)
         .then((firebaseUser) {
-      Navigator.popAndPushNamed(context, "/listacategorias");
+      Navigator.popAndPushNamed(context, "/carrinho");
     }).catchError((error) {
       setState(() {
         _mensagemErro =

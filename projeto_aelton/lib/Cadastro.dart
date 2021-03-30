@@ -133,6 +133,7 @@ class _CadastroState extends State<Cadastro> {
         "whatsapp": usuario.whatsapp,
         "endereco": usuario.endereco,
         "bairro": usuario.bairro,
+        "adm": false,
       });
       Navigator.popAndPushNamed(context, "/carrinho");
     }).catchError((erro) {
