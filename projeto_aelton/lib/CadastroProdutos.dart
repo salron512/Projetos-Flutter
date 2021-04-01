@@ -289,8 +289,7 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
               break;
           }
         },
-      )
-      ),
+      )),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         backgroundColor: Color(0xffFF0000),

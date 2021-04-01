@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:projeto_aelton/Cadastro.dart';
 import 'package:projeto_aelton/Carrinho.dart';
 import 'package:projeto_aelton/ConfiguracaoUsuario.dart';
+import 'package:projeto_aelton/ListaPedidos.dart';
 import 'package:projeto_aelton/Login.dart';
 import 'package:projeto_aelton/RecuperaSenha.dart';
 
@@ -34,10 +35,16 @@ class RouteGenerator{
       case "/produtos" :
         return MaterialPageRoute(
             builder: (_) => CadastroProdutos()
-        ); case "/config" :
+        );
+        case "/config" :
       return MaterialPageRoute(
           builder: (_) => ConfiguracaoUsuario()
       );
+      case "/listapedidos" :
+        return MaterialPageRoute(
+            builder: (_) => ListaPedidos()
+        );
+
 
 
 

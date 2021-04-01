@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:projeto_aelton/model/Produtos.dart';
 
@@ -11,8 +12,11 @@ class Carrinho extends StatefulWidget {
 
 class _CarrinhoState extends State<Carrinho> {
   StreamController _controller = StreamController.broadcast();
+  TextEditingController _controllerNome = TextEditingController();
+  TextEditingController _controllerMarca = TextEditingController();
   TextEditingController _controllerProduto = TextEditingController();
-  List<Produtos> _listaProdutos = [];
+  List<Produtos> _listaRecuperadaProdutos = [];
+  bool _retorno;
   int index;
   String _nome = "";
   bool _mostraCadastroProdutos = false;
@@ -31,63 +35,115 @@ class _CarrinhoState extends State<Carrinho> {
     }
   }
 
-  _deslogar() {
+  _confirmarPedido() async {
+    FirebaseFirestore db = FirebaseFirestore.instance;
     FirebaseAuth auth = FirebaseAuth.instance;
-    auth.signOut();
-    Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
+    String id = auth.currentUser.uid;
+
+    if (_retorno) {
+      var dados = await db.collection("pedido").doc(id).get();
+      if (!dados.exists) {
+        var user = await db.collection("usuarios").doc(id).get();
+        Map<String, dynamic> map = user.data();
+        _mostraErro("Pedido Realizado com sucesso");
+        await db.collection("pedido").doc(id).set({
+          "idUsuario": id,
+          "nome": map["nome"],
+          "telefone": map["telefone"],
+          "whatsapp": map["whatsapp"],
+          "endereco": map["endereco"],
+          "bairro": map["bairro"],
+          "cidade": map["cidade"],
+          "pontoReferencia": map["pontoReferencia"],
+          "status": "pendente",
+          "data": DateTime.now(),
+        });
+        var dados = await db
+            .collection("requisicoesAtivas")
+            .where("status", isEqualTo: "pendente")
+            .where("idUsuario", isEqualTo: id)
+            .get();
+        List list = [];
+        for (var item in dados.docs) {
+          Map<String, dynamic> dados = item.data();
+          list.add(dados);
+        }
+        db.collection("pedido").doc(id).update({"listaCompras": list});
+        db.collection("requisicoesAtivas")
+          .where("status", isEqualTo: "pendente")
+            .where("idUsuario", isEqualTo: id).get().then((value){
+              value.docs.forEach((element) {
+               db..collection("requisicoesAtivas").doc(element.id).delete();
+              });
+      });
+
+
+      } else {
+        _mostraErro("Você já tem um pedido em adamento");
+      }
+    } else {
+      _mostraErro("Adicione produtos ao carrinho");
+    }
   }
 
-  Stream _recuperaProdutos() {
+  _recuperaProdutos() async {
     FirebaseFirestore db = FirebaseFirestore.instance;
-    var stream = db
+    var snaphot = await db
         .collection("produtos")
         .orderBy("nome", descending: false)
-        .snapshots();
-    stream.listen((event) {
-      _controller.add(event);
-    });
+        .get();
+
+    for (var item in snaphot.docs) {
+      Map<String, dynamic> dados = item.data();
+      Produtos produtos = Produtos();
+      produtos.nome = dados["nome"];
+      produtos.marca = dados["marca"];
+      _listaRecuperadaProdutos.add(produtos);
+    }
   }
 
-  _adicionaProduto(String nome, String marca, String id) {
+  _salvaProduto(String nome, String marca) {
     showDialog(
+        barrierDismissible: false,
         context: context,
-        // ignore: missing_return
         builder: (context) {
           return AlertDialog(
-            title: Text("Produtos"),
+            title: Text("Digite a quantidade"),
             content: Container(
-              height: 250,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Container(
-                    height: 100,
-                    width: 100,
-                    child: Padding(
-                      padding: EdgeInsets.only(bottom: 2),
-                      child: Image.asset("images/cart.png"),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 10),
+                    child: Image.asset(
+                      "images/cart.png",
+                      width: 200,
+                      height: 150,
                     ),
                   ),
-                  Text("Produto: "+nome),
-                  Padding(padding: EdgeInsets.only(bottom: 5),
-                  child:   Text("Marca: "+marca),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 5),
+                    child: Text("Produto: " + nome),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 5),
+                    child: Text("Marca: " + marca),
                   ),
                   TextField(
                     controller: _controllerProduto,
                     autofocus: true,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      labelText: "Quantidade do produto",
+                      labelText: "Digite a quantidade do produto",
                     ),
                   ),
                 ],
               ),
             ),
             actions: [
+              // ignore: deprecated_member_use
               FlatButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+                onPressed: () => Navigator.pop(context),
                 child: Text("Cancelar"),
               ),
               FlatButton(
@@ -96,16 +152,26 @@ class _CarrinhoState extends State<Carrinho> {
                       _controllerProduto.text.contains("-") ||
                       _controllerProduto.text.contains(",") ||
                       _controllerProduto.text.isEmpty) {
-                    _mostraErro();
+                    _mostraErro("Quantidade inválida");
+                  } else {
+                    FirebaseFirestore db = FirebaseFirestore.instance;
+                    FirebaseAuth auth = FirebaseAuth.instance;
+                    String id = auth.currentUser.uid;
+                    Produtos produtos = Produtos();
+                    produtos.nome = nome;
+                    produtos.marca = marca;
+                    produtos.qtd = _controllerProduto.text;
+                    db.collection("requisicoesAtivas").doc().set({
+                      "idUsuario": id,
+                      "nome": nome,
+                      "marca": marca,
+                      "quantidade": _controllerProduto.text,
+                      "status": "pendente",
+                      "data": DateTime.now(),
+                    });
+                    _controllerProduto.clear();
+                    Navigator.pop(context);
                   }
-                  Produtos produtos = Produtos();
-                  produtos.nome = nome;
-                  produtos.marca = marca;
-                  produtos.qtd = _controllerProduto.text;
-                  setState(() {
-                    _listaProdutos.add(produtos);
-                  });
-                  Navigator.pop(context);
                 },
                 child: Text("Salvar"),
               ),
@@ -114,7 +180,7 @@ class _CarrinhoState extends State<Carrinho> {
         });
   }
 
-  _mostraErro() {
+  _mostraErro(String msg) {
     showDialog(
         context: context,
         // ignore: missing_return
@@ -136,7 +202,7 @@ class _CarrinhoState extends State<Carrinho> {
                     ),
                   ),
                   Text(
-                    "Quantidade Inválida",
+                    msg,
                     style: TextStyle(
                         color: Colors.red, fontWeight: FontWeight.bold),
                   )
@@ -146,9 +212,178 @@ class _CarrinhoState extends State<Carrinho> {
             actions: [
               FlatButton(
                 onPressed: () {
+                  _controllerProduto.clear();
                   Navigator.pop(context);
                 },
                 child: Text("OK"),
+              ),
+            ],
+          );
+        });
+  }
+
+  _adicionaProduto() {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Produtos"),
+            content: ListView.separated(
+              itemCount: _listaRecuperadaProdutos.length,
+              separatorBuilder: (context, indice) => Divider(
+                height: 2,
+                color: Colors.grey,
+              ),
+              // ignore: missing_return
+              itemBuilder: (context, indice) {
+                var item = _listaRecuperadaProdutos[indice];
+                return ListTile(
+                  title: Text("Produto: " + item.nome),
+                  subtitle: Text("Marca: " + item.marca),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _salvaProduto(item.nome, item.marca);
+                  },
+                );
+              },
+            ),
+            actions: [
+              // ignore: deprecated_member_use
+              FlatButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("Cancelar"),
+              ),
+            ],
+          );
+        });
+  }
+
+  _deslogar() {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    auth.signOut();
+    Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
+  }
+
+  Stream _recuperaItensCarrinho() {
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    FirebaseAuth auth = FirebaseAuth.instance;
+    String id = auth.currentUser.uid;
+    var stream = db
+        .collection("requisicoesAtivas")
+        .where("status", isEqualTo: "pendente")
+        .where("idUsuario", isEqualTo: id)
+        .snapshots();
+    stream.listen((event) {
+      _controller.add(event);
+    });
+  }
+
+  _editaProduto(String nome, String marca, String id) {
+    setState(() {
+      _controllerNome.text = nome;
+      _controllerMarca.text = marca;
+    });
+    showDialog(
+        context: context,
+        // ignore: missing_return
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Dados do produtos"),
+            content: Container(
+              height: 250,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    height: 100,
+                    width: 100,
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 2),
+                      child: Image.asset("images/solicitacao.png"),
+                    ),
+                  ),
+                  TextField(
+                    controller: _controllerProduto,
+                    autofocus: true,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: "Quantidade do produto",
+                    ),
+                  )
+                ],
+              ),
+            ),
+            actions: [
+              FlatButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("Cancelar"),
+              ),
+              FlatButton(
+                onPressed: () {
+                  if (_controllerProduto.text.contains(".") ||
+                      _controllerProduto.text.contains(",") ||
+                      _controllerProduto.text.contains("-")) {
+                    _mostraErro("Quantidade inválida");
+                  } else {
+                    FirebaseFirestore db = FirebaseFirestore.instance;
+                    db.collection("requisicoesAtivas").doc(id).update({
+                      "quantidade": _controllerProduto.text,
+                    });
+                    Navigator.pop(context);
+                    _controllerProduto.clear();
+                  }
+                },
+                child: Text("Salvar"),
+              ),
+            ],
+          );
+        });
+  }
+
+  _apagaProduto(String nome, String marca, String id) {
+    showDialog(
+        context: context,
+        // ignore: missing_return
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Excluir produtos"),
+            content: Container(
+              height: 250,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    height: 100,
+                    width: 100,
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 2),
+                      child: Image.asset("images/excluir.png"),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 5),
+                    child: Text("Produto: " + nome),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 5),
+                    child: Text("Marca: " + marca),
+                  )
+                ],
+              ),
+            ),
+            actions: [
+              FlatButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("Cancelar"),
+              ),
+              FlatButton(
+                onPressed: () {
+                  FirebaseFirestore db = FirebaseFirestore.instance;
+                  db.collection("requisicoesAtivas").doc(id).delete();
+                  Navigator.pop(context);
+                },
+                child: Text("Deletar"),
               ),
             ],
           );
@@ -160,6 +395,7 @@ class _CarrinhoState extends State<Carrinho> {
     // TODO: implement initState
     super.initState();
     _recuperaDadosUsuario();
+    _recuperaItensCarrinho();
     _recuperaProdutos();
   }
 
@@ -167,7 +403,7 @@ class _CarrinhoState extends State<Carrinho> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Produtos"),
+        title: Text("Carrinho de compra"),
       ),
       drawer: Drawer(
         child: ListView(
@@ -213,6 +449,16 @@ class _CarrinhoState extends State<Carrinho> {
                 },
               ),
             ),
+            Visibility(
+              visible: _mostraCadastroProdutos,
+              child: ListTile(
+                leading: Icon(Icons.delivery_dining),
+                title: Text('Pedidos pendentes'),
+                onTap: () {
+                  Navigator.pushNamed(context, "/listapedidos");
+                },
+              ),
+            ),
             ListTile(
               leading: Icon(Icons.shopping_cart),
               title: Text('Meus pedidos'),
@@ -244,13 +490,15 @@ class _CarrinhoState extends State<Carrinho> {
             case ConnectionState.done:
               QuerySnapshot querySnapshot = snapshot.data;
               if (querySnapshot.docs.length == 0) {
+                _retorno = false;
                 return Center(
                   child: Text(
-                    "Sem produtos cadastrados!",
+                    "Sem produtos no carrinho!",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 );
               } else {
+                _retorno = true;
                 return ListView.separated(
                   itemCount: querySnapshot.docs.length,
                   separatorBuilder: (context, indice) => Divider(
@@ -263,11 +511,36 @@ class _CarrinhoState extends State<Carrinho> {
                     DocumentSnapshot dados = requisicoes[indice];
                     return ListTile(
                       title: Text("Produto: " + dados["nome"]),
-                      subtitle: Text("Marca: " + dados["marca"]),
-                      onTap: () {
-                        _adicionaProduto(
-                            dados["nome"], dados["marca"], dados.reference.id);
-                      },
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Marca: " + dados["marca"]),
+                          Text("Quantidade: " + dados["quantidade"]),
+                        ],
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                              icon: Icon(
+                                Icons.edit,
+                                color: Colors.green,
+                              ),
+                              onPressed: () {
+                                _editaProduto(dados["nome"], dados["marca"],
+                                    dados.reference.id);
+                              }),
+                          IconButton(
+                              icon: Icon(
+                                Icons.delete,
+                                color: Colors.red,
+                              ),
+                              onPressed: () {
+                                _apagaProduto(dados["nome"], dados["marca"],
+                                    dados.reference.id);
+                              }),
+                        ],
+                      ),
                     );
                   },
                 );
@@ -279,8 +552,30 @@ class _CarrinhoState extends State<Carrinho> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.local_grocery_store),
         backgroundColor: Color(0xffFF0000),
-        onPressed: () {},
+        onPressed: () {
+          _adicionaProduto();
+        },
       ),
+      persistentFooterButtons: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            RaisedButton(
+              child: Text(
+                "Confirmar Pedido",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              color: Color(0xffFF0000),
+              padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15)),
+              onPressed: () {
+                _confirmarPedido();
+              },
+            ),
+          ],
+        )
+      ],
     );
   }
 }

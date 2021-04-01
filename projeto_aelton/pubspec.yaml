@@ -31,6 +31,7 @@ dependencies:
   firebase_auth: ^1.0.1
   firebase_core: ^1.0.2
   cloud_firestore: ^1.0.3
+
   mask_text_input_formatter: ^1.2.1
 
 dev_dependencies:
