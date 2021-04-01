@@ -25,6 +25,7 @@ class _CadastroState extends State<Cadastro> {
   TextEditingController _controllerBairro = TextEditingController();
   TextEditingController _controllerCidade = TextEditingController();
   TextEditingController _controllerWhatsapp = TextEditingController();
+  TextEditingController _controllerPontoReferencia = TextEditingController();
   String _mensagemErro = "";
   bool _motrarSenha = false;
   bool _motrarSenhaConfirma = false;
@@ -38,6 +39,7 @@ class _CadastroState extends State<Cadastro> {
     String bairro = _controllerBairro.text;
     String cidade = _controllerCidade.text;
     String whatsapp = _controllerWhatsapp.text;
+    String pontoReferencia = _controllerPontoReferencia.text;
 
     if (nome.isNotEmpty) {
       if (email.isNotEmpty) {
@@ -50,17 +52,27 @@ class _CadastroState extends State<Cadastro> {
                     if (bairro.isNotEmpty) {
                       if (cidade.isNotEmpty) {
                         if (whatsapp.isNotEmpty) {
-                          Usuario usuario = Usuario();
-                          usuario.nome = nome;
-                          usuario.email = email;
-                          usuario.senha = senha;
-                          usuario.telefone = telefone;
-                          usuario.whatsapp = whatsapp;
-                          usuario.endereco = endereco;
-                          usuario.bairro = bairro;
-                          usuario.cidade = cidade;
-
-                          _cadastraUsuario(usuario);
+                          if (pontoReferencia.isNotEmpty) {
+                            Usuario usuario = Usuario();
+                            usuario.nome = nome;
+                            usuario.email = email;
+                            usuario.senha = senha;
+                            usuario.telefone = telefone;
+                            usuario.whatsapp = whatsapp;
+                            usuario.endereco = endereco;
+                            usuario.bairro = bairro;
+                            usuario.cidade = cidade;
+                            usuario.pontoReferencia = pontoReferencia;
+                            _cadastraUsuario(usuario);
+                            setState(() {
+                              _mensagemErro = "";
+                            });
+                          } else {
+                            setState(() {
+                              _mensagemErro =
+                                  "Preencha o campo Ponto de referência";
+                            });
+                          }
                         } else {
                           setState(() {
                             _mensagemErro = "Preencha o campo Whatsapp";
@@ -133,6 +145,8 @@ class _CadastroState extends State<Cadastro> {
         "whatsapp": usuario.whatsapp,
         "endereco": usuario.endereco,
         "bairro": usuario.bairro,
+        "cidade": usuario.cidade,
+        "pontoReferencia": usuario.pontoReferencia,
         "adm": false,
       });
       Navigator.popAndPushNamed(context, "/carrinho");
@@ -310,6 +324,23 @@ class _CadastroState extends State<Cadastro> {
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(15))),
                       controller: _controllerCidade,
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 8),
+                    child: TextField(
+                      keyboardType: TextInputType.text,
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                      decoration: InputDecoration(
+                          contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                          hintText: "Ponto de referência",
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15))),
+                      controller: _controllerPontoReferencia,
                     ),
                   ),
                   TextField(

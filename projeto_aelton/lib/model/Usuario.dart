@@ -5,12 +5,19 @@ class Usuario {
   String _whatsapp;
   String _endereco;
   String _bairro;
+  String _pontoReferencia;
   String _cidade;
   bool _adm;
   String _email;
   String _senha;
 
   Usuario();
+
+  String get pontoReferencia => _pontoReferencia;
+
+  set pontoReferencia(String value) {
+    _pontoReferencia = value;
+  }
 
   bool get adm => _adm;
 
