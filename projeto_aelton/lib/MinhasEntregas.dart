@@ -1,26 +1,33 @@
 import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
-class ListaPedidos extends StatefulWidget {
+class MinhasEntregas extends StatefulWidget {
   @override
-  _ListaPedidosState createState() => _ListaPedidosState();
+  _MinhasEntregasState createState() => _MinhasEntregasState();
 }
 
-class _ListaPedidosState extends State<ListaPedidos> {
+class _MinhasEntregasState extends State<MinhasEntregas> {
   StreamController _controller = StreamController.broadcast();
   _recuperaPedidos() {
     FirebaseFirestore db = FirebaseFirestore.instance;
+    FirebaseAuth auth = FirebaseAuth.instance;
+    String id = auth.currentUser.uid;
     var stream = db
-        .collection("pedido")
-        .where("status", isEqualTo: "pendente")
+        .collection("entregasRealizadas")
+        .limit(10)
+        .where("idUsuario", isEqualTo: id)
         .snapshots();
     stream.listen((event) {
       _controller.add(event);
     });
   }
+
+
   _formatarData(String data) {
     initializeDateFormatting("pt_BR");
     var formatador = DateFormat("dd/MM/y H:mm:s");
@@ -38,10 +45,17 @@ class _ListaPedidosState extends State<ListaPedidos> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _controller.close();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Entregas"),
+        title: Text("Meus pedidos"),
       ),
       body: StreamBuilder(
           stream: _controller.stream,
@@ -75,7 +89,7 @@ class _ListaPedidosState extends State<ListaPedidos> {
                 } else {
                   return Container(
                     decoration: BoxDecoration(color: Color(0xffDCDCDC)),
-                    padding: EdgeInsets.all(10),
+                    //padding: EdgeInsets.all(10),
                     child: ListView.builder(
                       itemCount: querySnapshot.docs.length,
                       // ignore: missing_return
@@ -84,23 +98,20 @@ class _ListaPedidosState extends State<ListaPedidos> {
                             querySnapshot.docs.toList();
                         DocumentSnapshot dados = requisicoes[indice];
                         return Card(
-                          color: dados["status"] == "recebido" ?
-                          Colors.green
-                              :
-                          Color(0xffFF0000)
-                          ,
+                          color: dados["status"] == "entregue"
+                              ? Colors.green
+                              : Color(0xffFF0000),
                           child: ListTile(
-                              onTap: (){
-                                Navigator.pushNamed(context, "/listaprodutos",
+                              onTap: () {
+                                Navigator.pushNamed(context, "/detalhesentrega",
                                     arguments: dados["listaCompras"]);
                               },
                               title: Text(
-                                "Cliente: " + dados["nome"],
+                                "Cliente: " + dados["nomeUsuario"],
                                 style: TextStyle(color: Colors.white),
                               ),
                               subtitle: Column(
-                                crossAxisAlignment:
-                                CrossAxisAlignment.stretch,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
                                   Text(
                                     "Telefone: " + dados["telefone"],
@@ -141,10 +152,28 @@ class _ListaPedidosState extends State<ListaPedidos> {
                                       "Cidade: " + dados["cidade"],
                                       style: TextStyle(color: Colors.white),
                                     ),
-                                  ), Padding(
+                                  ),
+                                  Padding(
                                     padding: EdgeInsets.only(top: 5),
                                     child: Text(
-                                      "Data do pedido: " + _formatarData(dados["data"]),
+                                      "Data do pedido: " +
+                                          _formatarData(dados["data"]),
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 5),
+                                    child: Text(
+                                      "Entregue por: " +
+                                          dados["nomeEntregador"],
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 5),
+                                    child: Text(
+                                      "Data da Entrega: " +
+                                          _formatarData(dados["dataEntrega"]),
                                       style: TextStyle(color: Colors.white),
                                     ),
                                   ),
@@ -156,8 +185,7 @@ class _ListaPedidosState extends State<ListaPedidos> {
                                     ),
                                   ),
                                 ],
-                              )
-                          ),
+                              )),
                         );
                       },
                     ),

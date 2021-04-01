@@ -17,6 +17,7 @@ class _CarrinhoState extends State<Carrinho> {
   TextEditingController _controllerProduto = TextEditingController();
   List<Produtos> _listaRecuperadaProdutos = [];
   bool _retorno;
+  bool _estado = false;
   int index;
   String _nome = "";
   bool _mostraCadastroProdutos = false;
@@ -56,7 +57,7 @@ class _CarrinhoState extends State<Carrinho> {
           "cidade": map["cidade"],
           "pontoReferencia": map["pontoReferencia"],
           "status": "pendente",
-          "data": DateTime.now(),
+          "data": DateTime.now().toString(),
         });
         var dados = await db
             .collection("requisicoesAtivas")
@@ -167,6 +168,7 @@ class _CarrinhoState extends State<Carrinho> {
                       "marca": marca,
                       "quantidade": _controllerProduto.text,
                       "status": "pendente",
+                      "estado": _estado,
                       "data": DateTime.now(),
                     });
                     _controllerProduto.clear();
@@ -429,6 +431,16 @@ class _CarrinhoState extends State<Carrinho> {
                 color: Color(0xffFF0000),
               ),
             ),
+            Visibility(
+              visible: _mostraCadastroProdutos,
+              child: ListTile(
+                leading: Icon(Icons.people_alt),
+                title: Text('Cadastrar Adm'),
+                onTap: () {
+                  Navigator.pushNamed(context, "/adm");
+                },
+              ),
+            ),
             ListTile(
               leading: Icon(Icons.account_box_outlined),
               title: Text("Alterar cadastro"),
@@ -436,6 +448,16 @@ class _CarrinhoState extends State<Carrinho> {
                 //Navigator.push(context, MaterialPageRoute(builder: (context) => SegundaTela()));
                 setState(() {
                   Navigator.pushNamed(context, "/config");
+                });
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.access_alarms_outlined),
+              title: Text("Pedido em andamento"),
+              onTap: () {
+                //Navigator.push(context, MaterialPageRoute(builder: (context) => SegundaTela()));
+                setState(() {
+                  Navigator.pushNamed(context, "/pedidousuario");
                 });
               },
             ),
@@ -452,17 +474,29 @@ class _CarrinhoState extends State<Carrinho> {
             Visibility(
               visible: _mostraCadastroProdutos,
               child: ListTile(
-                leading: Icon(Icons.delivery_dining),
+                leading: Icon(Icons.update),
                 title: Text('Pedidos pendentes'),
                 onTap: () {
                   Navigator.pushNamed(context, "/listapedidos");
                 },
               ),
             ),
+            Visibility(
+              visible: _mostraCadastroProdutos,
+              child: ListTile(
+                leading: Icon(Icons.delivery_dining),
+                title: Text('Entregas em andamento'),
+                onTap: () {
+                  Navigator.pushNamed(context, "/listaentregas");
+                },
+              ),
+            ),
             ListTile(
               leading: Icon(Icons.shopping_cart),
               title: Text('Meus pedidos'),
-              onTap: () {},
+              onTap: () {
+                Navigator.pushNamed(context, "/minhasentregas");
+              },
             ),
             ListTile(
               leading: Icon(Icons.exit_to_app),

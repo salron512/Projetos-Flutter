@@ -205,7 +205,7 @@ class _ConfiguracaoUsuarioState extends State<ConfiguracaoUsuario> {
                               ),
                               contentPadding:
                                   EdgeInsets.fromLTRB(32, 16, 32, 16),
-                              labelText: "Telefone",
+                              labelText: "Whatsapp",
                               filled: true,
                               fillColor: Colors.white,
                               border: OutlineInputBorder(
