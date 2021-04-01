@@ -19,8 +19,9 @@ class _MinhasEntregasState extends State<MinhasEntregas> {
     String id = auth.currentUser.uid;
     var stream = db
         .collection("entregasRealizadas")
-        .limit(10)
         .where("idUsuario", isEqualTo: id)
+         .limit(10)
+        .orderBy("data", descending: true)
         .snapshots();
     stream.listen((event) {
       _controller.add(event);
@@ -43,13 +44,7 @@ class _MinhasEntregasState extends State<MinhasEntregas> {
     super.initState();
     _recuperaPedidos();
   }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    _controller.close();
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +60,7 @@ class _MinhasEntregasState extends State<MinhasEntregas> {
               case ConnectionState.none:
               case ConnectionState.waiting:
                 return Center(
-                  child: CircularProgressIndicator(),
+                  child: Text("Sem pedidos no momento"),
                 );
                 break;
               case ConnectionState.active:
