@@ -137,6 +137,7 @@ class _ConfiguracaoUsuarioState extends State<ConfiguracaoUsuario> {
                       Padding(
                         padding: EdgeInsets.only(bottom: 8),
                         child: TextField(
+                          textCapitalization: TextCapitalization.sentences,
                           autofocus: true,
                           keyboardType: TextInputType.text,
                           style: TextStyle(
@@ -216,6 +217,7 @@ class _ConfiguracaoUsuarioState extends State<ConfiguracaoUsuario> {
                       Padding(
                         padding: EdgeInsets.only(bottom: 8),
                         child: TextField(
+                          textCapitalization: TextCapitalization.sentences,
                           autofocus: false,
                           keyboardType: TextInputType.text,
                           style: TextStyle(
@@ -235,6 +237,7 @@ class _ConfiguracaoUsuarioState extends State<ConfiguracaoUsuario> {
                       Padding(
                         padding: EdgeInsets.only(bottom: 8),
                         child: TextField(
+                          textCapitalization: TextCapitalization.sentences,
                           autofocus: false,
                           keyboardType: TextInputType.text,
                           style: TextStyle(
@@ -254,6 +257,7 @@ class _ConfiguracaoUsuarioState extends State<ConfiguracaoUsuario> {
                       Padding(
                         padding: EdgeInsets.only(bottom: 8),
                         child: TextField(
+                          textCapitalization: TextCapitalization.sentences,
                           autofocus: false,
                           keyboardType: TextInputType.text,
                           style: TextStyle(
@@ -273,6 +277,7 @@ class _ConfiguracaoUsuarioState extends State<ConfiguracaoUsuario> {
                       Padding(
                         padding: EdgeInsets.only(bottom: 8),
                         child: TextField(
+                          textCapitalization: TextCapitalization.sentences,
                           autofocus: false,
                           keyboardType: TextInputType.text,
                           style: TextStyle(
@@ -291,6 +296,7 @@ class _ConfiguracaoUsuarioState extends State<ConfiguracaoUsuario> {
                       ),
                       Padding(
                         padding: EdgeInsets.only(top: 16, bottom: 10),
+                        // ignore: deprecated_member_use
                         child: RaisedButton(
                           child: Text(
                             "Atualizar",

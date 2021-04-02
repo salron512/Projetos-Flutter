@@ -111,6 +111,7 @@ class _CarrinhoState extends State<Carrinho> {
           return AlertDialog(
             title: Text("Digite a quantidade"),
             content: Container(
+              height: 220,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -118,8 +119,8 @@ class _CarrinhoState extends State<Carrinho> {
                     padding: EdgeInsets.only(bottom: 10),
                     child: Image.asset(
                       "images/cart.png",
-                      width: 200,
-                      height: 150,
+                      width: 100,
+                      height: 100,
                     ),
                   ),
                   Padding(
@@ -188,9 +189,9 @@ class _CarrinhoState extends State<Carrinho> {
         // ignore: missing_return
         builder: (context) {
           return AlertDialog(
-            title: Text("Erro"),
+            title: Text("Menssagem"),
             content: Container(
-              height: 250,
+              height: 200,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -231,24 +232,29 @@ class _CarrinhoState extends State<Carrinho> {
         builder: (context) {
           return AlertDialog(
             title: Text("Produtos"),
-            content: ListView.separated(
-              itemCount: _listaRecuperadaProdutos.length,
-              separatorBuilder: (context, indice) => Divider(
-                height: 2,
-                color: Colors.grey,
+            content: Container(
+              width: 150,
+              height: 250,
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemCount: _listaRecuperadaProdutos.length,
+                separatorBuilder: (context, indice) => Divider(
+                  height: 2,
+                  color: Colors.grey,
+                ),
+                // ignore: missing_return
+                itemBuilder: (context, indice) {
+                  var item = _listaRecuperadaProdutos[indice];
+                  return ListTile(
+                    title: Text("Produto: " + item.nome),
+                    subtitle: Text("Marca: " + item.marca),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _salvaProduto(item.nome, item.marca);
+                    },
+                  );
+                },
               ),
-              // ignore: missing_return
-              itemBuilder: (context, indice) {
-                var item = _listaRecuperadaProdutos[indice];
-                return ListTile(
-                  title: Text("Produto: " + item.nome),
-                  subtitle: Text("Marca: " + item.marca),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _salvaProduto(item.nome, item.marca);
-                  },
-                );
-              },
             ),
             actions: [
               // ignore: deprecated_member_use
@@ -417,6 +423,11 @@ class _CarrinhoState extends State<Carrinho> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
+                    Container(
+                      width: 100,
+                      height: 100,
+                      child: Image.asset("images/usericon.png"),
+                    ),
                     Text(
                       _nome,
                       style: TextStyle(
@@ -528,7 +539,9 @@ class _CarrinhoState extends State<Carrinho> {
                 return Center(
                   child: Text(
                     "Sem produtos no carrinho!",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold),
                   ),
                 );
               } else {

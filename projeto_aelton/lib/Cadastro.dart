@@ -187,6 +187,7 @@ class _CadastroState extends State<Cadastro> {
                   Padding(
                     padding: EdgeInsets.only(bottom: 8),
                     child: TextField(
+                      textCapitalization: TextCapitalization.sentences,
                       autofocus: true,
                       keyboardType: TextInputType.text,
                       style: TextStyle(
@@ -278,6 +279,7 @@ class _CadastroState extends State<Cadastro> {
                   Padding(
                     padding: EdgeInsets.only(bottom: 8),
                     child: TextField(
+                      textCapitalization: TextCapitalization.sentences,
                       keyboardType: TextInputType.text,
                       style: TextStyle(
                         fontSize: 20,
@@ -295,6 +297,7 @@ class _CadastroState extends State<Cadastro> {
                   Padding(
                     padding: EdgeInsets.only(bottom: 8),
                     child: TextField(
+                      textCapitalization: TextCapitalization.sentences,
                       keyboardType: TextInputType.emailAddress,
                       style: TextStyle(
                         fontSize: 20,
@@ -312,6 +315,7 @@ class _CadastroState extends State<Cadastro> {
                   Padding(
                     padding: EdgeInsets.only(bottom: 8),
                     child: TextField(
+                      textCapitalization: TextCapitalization.sentences,
                       keyboardType: TextInputType.text,
                       style: TextStyle(
                         fontSize: 20,
@@ -329,6 +333,7 @@ class _CadastroState extends State<Cadastro> {
                   Padding(
                     padding: EdgeInsets.only(bottom: 8),
                     child: TextField(
+                      textCapitalization: TextCapitalization.sentences,
                       keyboardType: TextInputType.text,
                       style: TextStyle(
                         fontSize: 20,

@@ -49,7 +49,7 @@ class _ListaProdutosState extends State<ListaProdutos> {
             var dados = requisicoes[indice];
             return CheckboxListTile(
                 activeColor: Color(0xffFF0000),
-                title: Text("Produto:" + dados["nome"]),
+                title: Text("Produto: " + dados["nome"]),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

@@ -54,6 +54,7 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                     ),
                   ),
                   TextField(
+                    textCapitalization: TextCapitalization.sentences,
                     controller: _controllerNome,
                     autofocus: true,
                     keyboardType: TextInputType.text,
@@ -62,6 +63,7 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                     ),
                   ),
                   TextField(
+                    textCapitalization: TextCapitalization.sentences,
                     controller: _controllerMarca,
                     autofocus: true,
                     keyboardType: TextInputType.text,
@@ -121,6 +123,7 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                   ),
                   TextField(
                     controller: _controllerNome,
+                    textCapitalization: TextCapitalization.sentences,
                     autofocus: true,
                     keyboardType: TextInputType.text,
                     decoration: InputDecoration(
@@ -129,6 +132,7 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                   ),
                   TextField(
                     controller: _controllerMarca,
+                    textCapitalization: TextCapitalization.sentences,
                     autofocus: true,
                     keyboardType: TextInputType.text,
                     decoration: InputDecoration(
@@ -140,7 +144,11 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
             ),
             actions: [
               FlatButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  Navigator.pop(context);
+                  _controllerNome.clear();
+                  _controllerMarca..clear();
+                },
                 child: Text("Cancelar"),
               ),
               FlatButton(
@@ -151,6 +159,8 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                     "marca": _controllerMarca.text,
                   });
                   Navigator.pop(context);
+                  _controllerNome.clear();
+                  _controllerMarca..clear();
                 },
                 child: Text("Salvar"),
               ),
@@ -167,7 +177,7 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
           return AlertDialog(
             title: Text("Excluir produtos"),
             content: Container(
-              height: 250,
+              height: 190,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [

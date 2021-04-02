@@ -33,6 +33,49 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
     return dataFormatada;
   }
 
+  _apagaSolcilidacao(String id,String status) {
+   if(status == "pendente"){
+      showDialog(
+        context: context,
+        // ignore: missing_return
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Excluir pedido"),
+            content: Container(
+              height: 100,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    height: 100,
+                    width: 100,
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 2),
+                      child: Image.asset("images/excluir.png"),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              FlatButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("Cancelar"),
+              ),
+              FlatButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  FirebaseFirestore db = FirebaseFirestore.instance;
+                  db.collection("pedido").doc(id).delete();
+                },
+                child: Text("Confirmar"),
+              ),
+            ],
+          );
+        });
+   }
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -78,7 +121,6 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
                 } else {
                   return Container(
                     decoration: BoxDecoration(color: Color(0xffDCDCDC)),
-                    padding: EdgeInsets.all(10),
                     child: ListView.builder(
                       itemCount: querySnapshot.docs.length,
                       // ignore: missing_return
@@ -91,6 +133,11 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
                               ? Colors.green
                               : Color(0xffFF0000),
                           child: ListTile(
+                              onLongPress: () {
+                              
+                                  _apagaSolcilidacao(dados.reference.id, dados["status"]);
+                              
+                              },
                               onTap: () {
                                 Navigator.pushNamed(context, "/detalhesentrega",
                                     arguments: dados["listaCompras"]);
