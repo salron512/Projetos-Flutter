@@ -321,27 +321,31 @@ class _ConfiguracaoState extends State<Configuracao> {
         builder: (context) {
           return AlertDialog(
             title: Text("Escolha seu estado"),
-            content: ListView.separated(
-              itemCount: _listaEstado.length,
-              separatorBuilder: (context, indice) => Divider(
-                height: 2,
-                color: Colors.grey,
+            content: Container(
+              width: 100,
+              height: 250,
+              child:  ListView.separated(
+                itemCount: _listaEstado.length,
+                separatorBuilder: (context, indice) => Divider(
+                  height: 2,
+                  color: Colors.grey,
+                ),
+                // ignore: missing_return
+                itemBuilder: (context, indice) {
+                  String item = _listaEstado[indice];
+                  return ListTile(
+                    title: Text(item),
+                    onTap: () {
+                      setState(() {
+                        _listaCidades.clear();
+                        _scolhaEstado = item;
+                        Navigator.pop(context);
+                      });
+                      _recuperaListaCidades();
+                    },
+                  );
+                },
               ),
-              // ignore: missing_return
-              itemBuilder: (context, indice) {
-                String item = _listaEstado[indice];
-                return ListTile(
-                  title: Text(item),
-                  onTap: () {
-                    setState(() {
-                      _listaCidades.clear();
-                      _scolhaEstado = item;
-                      Navigator.pop(context);
-                    });
-                    _recuperaListaCidades();
-                  },
-                );
-              },
             ),
             actions: [
               FlatButton(
@@ -378,26 +382,30 @@ class _ConfiguracaoState extends State<Configuracao> {
           builder: (context) {
             return AlertDialog(
               title: Text("Escolha sua cidade"),
-              content: ListView.separated(
-                itemCount: _listaCidades.length,
-                separatorBuilder: (context, indice) => Divider(
-                  height: 2,
-                  color: Colors.grey,
+              content: Container(
+                width: 100,
+                height: 250,
+                child:  ListView.separated(
+                  itemCount: _listaCidades.length,
+                  separatorBuilder: (context, indice) => Divider(
+                    height: 2,
+                    color: Colors.grey,
+                  ),
+                  // ignore: missing_return
+                  itemBuilder: (context, indice) {
+                    String item = _listaCidades[indice];
+                    return ListTile(
+                      title: Text(item),
+                      onTap: () {
+                        _recuperaListaCidades();
+                        setState(() {
+                          _escolhaCidade = item;
+                          Navigator.pop(context);
+                        });
+                      },
+                    );
+                  },
                 ),
-                // ignore: missing_return
-                itemBuilder: (context, indice) {
-                  String item = _listaCidades[indice];
-                  return ListTile(
-                    title: Text(item),
-                    onTap: () {
-                      _recuperaListaCidades();
-                      setState(() {
-                        _escolhaCidade = item;
-                        Navigator.pop(context);
-                      });
-                    },
-                  );
-                },
               ),
               actions: [
                 FlatButton(
@@ -429,27 +437,31 @@ class _ConfiguracaoState extends State<Configuracao> {
           builder: (context) {
             return AlertDialog(
               title: Text("Escolha sua categoria de serviço"),
-              content: ListView.separated(
-                itemCount: _listaCadegorias.length,
-                separatorBuilder: (context, indice) => Divider(
-                  height: 2,
-                  color: Colors.grey,
+              content: Container(
+                width: 100,
+                height: 250,
+                child: ListView.separated(
+                  itemCount: _listaCadegorias.length,
+                  separatorBuilder: (context, indice) => Divider(
+                    height: 2,
+                    color: Colors.grey,
+                  ),
+                  // ignore: missing_return
+                  itemBuilder: (context, indice) {
+                    String item = _listaCadegorias[indice];
+                    return ListTile(
+                      title: Text(item),
+                      onTap: () {
+                        setState(() {
+                          _escolhaCategoria = item;
+                        });
+                        Navigator.pop(context);
+                        _verificaFormaPagamento();
+                        _mostraOpcoesPagamento();
+                      },
+                    );
+                  },
                 ),
-                // ignore: missing_return
-                itemBuilder: (context, indice) {
-                  String item = _listaCadegorias[indice];
-                  return ListTile(
-                    title: Text(item),
-                    onTap: () {
-                      setState(() {
-                        _escolhaCategoria = item;
-                      });
-                      Navigator.pop(context);
-                      _verificaFormaPagamento();
-                      _mostraOpcoesPagamento();
-                    },
-                  );
-                },
               ),
               actions: [
                 FlatButton(

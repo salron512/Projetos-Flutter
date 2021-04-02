@@ -89,6 +89,7 @@ class _SugestaoUsuarioState extends State<SugestaoUsuario> {
               Padding(
                 padding: EdgeInsets.only(bottom: 8),
                 child: TextField(
+                  textCapitalization: TextCapitalization.sentences,
                   autofocus: true,
                   keyboardType: TextInputType.text,
                   style: TextStyle(

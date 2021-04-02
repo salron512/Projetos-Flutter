@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:projeto_aelton/model/Produtos.dart';
 
 class Carrinho extends StatefulWidget {
@@ -104,6 +105,22 @@ class _CarrinhoState extends State<Carrinho> {
     }
   }
 
+  _postaNotificao(){
+    FirebaseAuth auth = FirebaseAuth.instance;
+    String id = "wSiVJS0cj5YlkpIQImrFYGUwmgE2";
+   Map<String, String> map = {
+     "player_id": id
+   };
+   List<String> list = [];
+    list.add(id);
+
+    OneSignal.shared.postNotification(
+      OSCreateNotification(
+          playerIds: list,
+          content: "teste")
+    );
+  }
+
   _salvaProduto(String nome, String marca) {
     showDialog(
         barrierDismissible: false,
@@ -175,6 +192,7 @@ class _CarrinhoState extends State<Carrinho> {
                     });
                     _controllerProduto.clear();
                     Navigator.pop(context);
+                    _postaNotificao();
                   }
                 },
                 child: Text("Salvar"),
@@ -398,6 +416,8 @@ class _CarrinhoState extends State<Carrinho> {
           );
         });
   }
+
+
 
   @override
   void initState() {

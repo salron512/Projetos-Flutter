@@ -72,26 +72,30 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao>{
         builder: (context) {
           return AlertDialog(
             title: Text("Escolha a categoria de serviço"),
-            content: ListView.separated(
-              itemCount: _listaCadegorias.length,
-              separatorBuilder: (context, indice) => Divider(
-                height: 2,
-                color: Colors.grey,
+            content: Container(
+              width: 100,
+              height: 350,
+              child:  ListView.separated(
+                itemCount: _listaCadegorias.length,
+                separatorBuilder: (context, indice) => Divider(
+                  height: 2,
+                  color: Colors.grey,
+                ),
+                // ignore: missing_return
+                itemBuilder: (context, indice) {
+                  String item = _listaCadegorias[indice];
+                  return ListTile(
+                    title: Text(item),
+                    onTap: () {
+                      setState(() {
+                        _escolhaCategoria = item;
+                      });
+                      Navigator.pop(context);
+                      _criaSolicitacao();
+                    },
+                  );
+                },
               ),
-              // ignore: missing_return
-              itemBuilder: (context, indice) {
-                String item = _listaCadegorias[indice];
-                return ListTile(
-                  title: Text(item),
-                  onTap: () {
-                    setState(() {
-                      _escolhaCategoria = item;
-                    });
-                    Navigator.pop(context);
-                    _criaSolicitacao();
-                  },
-                );
-              },
             ),
             actions: [
               FlatButton(
@@ -125,6 +129,7 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao>{
                   ),
                   TextField(
                     controller: _controllerDescricao,
+                    textCapitalization: TextCapitalization.sentences,
                     autofocus: true,
                     keyboardType: TextInputType.text,
                     decoration: InputDecoration(

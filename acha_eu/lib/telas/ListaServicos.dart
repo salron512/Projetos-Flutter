@@ -89,7 +89,7 @@ class _ListaSericosState extends State<ListaSericos> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Sem contado para essa categoria :(",
+                        "Sem contados para essa categoria :(",
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
