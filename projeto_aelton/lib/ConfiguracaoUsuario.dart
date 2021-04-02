@@ -110,6 +110,7 @@ class _ConfiguracaoUsuarioState extends State<ConfiguracaoUsuario> {
     _recuperaUsuario();
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

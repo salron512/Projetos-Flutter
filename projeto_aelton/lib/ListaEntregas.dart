@@ -62,7 +62,7 @@ class _ListaEntregasState extends State<ListaEntregas> {
         // ignore: missing_return
         builder: (context) {
           return AlertDialog(
-            title: Text("Erro"),
+            title: Text(""),
             content: Container(
               height: 250,
               child: Column(
@@ -184,8 +184,8 @@ class _ListaEntregasState extends State<ListaEntregas> {
           );
         });
   }
-  _abrirWhatsApp(String telefone) async {
 
+  _abrirWhatsApp(String telefone) async {
     var whatsappUrl = "whatsapp://send?phone=+55$telefone=Olá,tudo bem ?";
 
     if (await canLaunch(whatsappUrl)) {
@@ -255,12 +255,18 @@ class _ListaEntregasState extends State<ListaEntregas> {
         });
   }
 
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _recuperaPedidos();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _controller.close();
   }
 
   @override

@@ -70,15 +70,16 @@ class _CarrinhoState extends State<Carrinho> {
           list.add(dados);
         }
         db.collection("pedido").doc(id).update({"listaCompras": list});
-        db.collection("requisicoesAtivas")
-          .where("status", isEqualTo: "pendente")
-            .where("idUsuario", isEqualTo: id).get().then((value){
-              value.docs.forEach((element) {
-               db..collection("requisicoesAtivas").doc(element.id).delete();
-              });
-      });
-
-
+        db
+            .collection("requisicoesAtivas")
+            .where("status", isEqualTo: "pendente")
+            .where("idUsuario", isEqualTo: id)
+            .get()
+            .then((value) {
+          value.docs.forEach((element) {
+            db..collection("requisicoesAtivas").doc(element.id).delete();
+          });
+        });
       } else {
         _mostraErro("Você já tem um pedido em adamento");
       }
@@ -406,6 +407,12 @@ class _CarrinhoState extends State<Carrinho> {
     _recuperaItensCarrinho();
     _recuperaProdutos();
   }
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _controller.close();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -509,6 +516,16 @@ class _CarrinhoState extends State<Carrinho> {
                 Navigator.pushNamed(context, "/minhasentregas");
               },
             ),
+            Visibility(
+              visible: _mostraCadastroProdutos,
+              child: ListTile(
+                leading: Icon(Icons.assignment_outlined),
+                title: Text('Histórico'),
+                onTap: () {
+                  Navigator.pushNamed(context, "/historico");
+                },
+              ),
+            ),
             ListTile(
               leading: Icon(Icons.exit_to_app),
               title: Text('Sair'),
@@ -539,9 +556,7 @@ class _CarrinhoState extends State<Carrinho> {
                 return Center(
                   child: Text(
                     "Sem produtos no carrinho!",
-                    style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
                 );
               } else {

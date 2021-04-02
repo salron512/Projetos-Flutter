@@ -563,6 +563,7 @@ class _ConfiguracaoState extends State<Configuracao> {
                         padding: EdgeInsets.only(
                             top: 10, left: 16, right: 16, bottom: 16),
                         child: TextField(
+                          textCapitalization: TextCapitalization.sentences,
                           autofocus: true,
                           keyboardType: TextInputType.text,
                           style: TextStyle(
@@ -708,6 +709,7 @@ class _ConfiguracaoState extends State<Configuracao> {
                           child: Padding(
                             padding: EdgeInsets.only(bottom: 5, top: 16),
                             child: TextField(
+                              textCapitalization: TextCapitalization.sentences,
                               keyboardType: TextInputType.text,
                               style: TextStyle(
                                 fontSize: 20,
@@ -729,6 +731,7 @@ class _ConfiguracaoState extends State<Configuracao> {
                             padding: EdgeInsets.only(bottom: 8, top: 5),
                             child: TextField(
                               maxLines: 5,
+                              textCapitalization: TextCapitalization.sentences,
                               keyboardType: TextInputType.text,
                               style: TextStyle(
                                 fontSize: 20,

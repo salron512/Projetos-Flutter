@@ -22,7 +22,7 @@ class _DetalhesEntregaState extends State<DetalhesEntrega> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Detalhes Entrega"),
+        title: Text("Detalhes da entrega"),
       ),
       body: Container(
         child: ListView.separated(

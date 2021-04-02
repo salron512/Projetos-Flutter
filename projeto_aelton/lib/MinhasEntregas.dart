@@ -44,6 +44,12 @@ class _MinhasEntregasState extends State<MinhasEntregas> {
     super.initState();
     _recuperaPedidos();
   }
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _controller.close();
+  }
   
 
   @override
@@ -167,7 +173,7 @@ class _MinhasEntregasState extends State<MinhasEntregas> {
                                   Padding(
                                     padding: EdgeInsets.only(top: 5),
                                     child: Text(
-                                      "Data da Entrega: " +
+                                      "Data da entrega: " +
                                           _formatarData(dados["dataEntrega"]),
                                       style: TextStyle(color: Colors.white),
                                     ),

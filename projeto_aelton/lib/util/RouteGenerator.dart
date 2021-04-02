@@ -4,6 +4,7 @@ import 'package:projeto_aelton/Cadastro.dart';
 import 'package:projeto_aelton/Carrinho.dart';
 import 'package:projeto_aelton/ConfiguracaoUsuario.dart';
 import 'package:projeto_aelton/DetalhesEntrega.dart';
+import 'package:projeto_aelton/Historico.dart';
 import 'package:projeto_aelton/ListaEntregas.dart';
 import 'package:projeto_aelton/ListaPedidos.dart';
 import 'package:projeto_aelton/ListaProdutos.dart';
@@ -73,6 +74,10 @@ class RouteGenerator{
       case "/adm" :
         return MaterialPageRoute(
             builder: (_) => Adm()
+        );
+      case "/historico" :
+        return MaterialPageRoute(
+            builder: (_) => Historico()
         );
 
 
