@@ -47,16 +47,15 @@ class _LoginState extends State<Login> {
 
     auth
         .signInWithEmailAndPassword(
-        email: usuario.email, password: usuario.senha)
+            email: usuario.email, password: usuario.senha)
         .then((firebaseUser) {
       Navigator.popAndPushNamed(context, "/carrinho");
     }).catchError((error) {
       setState(() {
         _mensagemErro =
-        "Erro ao autenticar o usuário, verifique e-mail e senha e tente novamente!";
+            "Erro ao autenticar o usuário, verifique e-mail e senha e tente novamente!";
       });
     });
-
     setState(() {
       _controllerSenha.text = "";
     });
@@ -64,14 +63,12 @@ class _LoginState extends State<Login> {
 
   Future _verificaUsuarioLogado() async {
     FirebaseAuth auth = FirebaseAuth.instance;
-    //auth.signOut();
     var usuariologado = await auth.currentUser;
 
     if (usuariologado != null) {
       Navigator.popAndPushNamed(context, "/carrinho");
     }
   }
-
 
   @override
   void initState() {
@@ -103,12 +100,12 @@ class _LoginState extends State<Login> {
                       padding: EdgeInsets.only(bottom: 8),
                       child: Center(
                           child: Text(
-                            _mensagemErro,
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 20,
-                            ),
-                          ))),
+                        _mensagemErro,
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 20,
+                        ),
+                      ))),
                   Padding(
                     padding: EdgeInsets.only(bottom: 8),
                     child: TextField(
@@ -134,7 +131,7 @@ class _LoginState extends State<Login> {
                       fontSize: 20,
                     ),
                     decoration: InputDecoration(
-                      //prefix:Icon(Icons.security),
+                        //prefix:Icon(Icons.security),
                         suffixIcon: IconButton(
                           icon: Icon(
                             Icons.remove_red_eye,
@@ -166,7 +163,7 @@ class _LoginState extends State<Login> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15)),
                       onPressed: () {
-                       _validarCampos();
+                        _validarCampos();
                       },
                     ),
                   ),

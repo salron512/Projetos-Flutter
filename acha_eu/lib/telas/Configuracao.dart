@@ -38,7 +38,7 @@ class _ConfiguracaoState extends State<Configuracao> {
   bool _adm = false;
   bool _mostraCategoria = false;
   var cond;
-  List<String> _listaEstado = ["MT", "MS"];
+  List<String> _listaEstado = ["MT"];
   Future _recuperaImagem(bool daCamera) async {
     var picker = ImagePicker();
     PickedFile imagemSelecionada;
@@ -262,7 +262,7 @@ class _ConfiguracaoState extends State<Configuracao> {
 
   _recuperaDadosUsuario() async {
     FirebaseAuth auth = FirebaseAuth.instance;
-    var usuarioLogado = await auth.currentUser;
+    var usuarioLogado =  auth.currentUser;
     _idUsuarioLogado = usuarioLogado.uid;
 
     FirebaseFirestore db = FirebaseFirestore.instance;

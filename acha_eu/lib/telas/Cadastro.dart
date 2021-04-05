@@ -20,7 +20,7 @@ class _CadastroState extends State<Cadastro> {
   TextEditingController _controllerConfirmaSenha = TextEditingController();
   TextEditingController _controllerTelefone = TextEditingController();
   TextEditingController _controllerWhatsapp = TextEditingController();
-  List<String> _listaEstado = ["MT", "MS"];
+  List<String> _listaEstado = ["MT"];
   List<String> _listaCidades;
   String _scolhaEstado = "";
   String _mensagemErro = "";

@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 import 'model/Usuario.dart';
 
@@ -135,10 +136,13 @@ class _CadastroState extends State<Cadastro> {
     auth
         .createUserWithEmailAndPassword(
             email: usuario.email, password: usuario.senha)
-        .then((user) {
+        .then((user) async {
+      var status = await OneSignal.shared.getPermissionSubscriptionState();
+      var playerId = status.subscriptionStatus.userId;
       FirebaseFirestore db = FirebaseFirestore.instance;
       db.collection("usuarios").doc(user.user.uid).set({
         "idUsuario": user.user.uid,
+        "playerId": playerId,
         "nome": usuario.nome,
         "email": usuario.email,
         "telefone": usuario.telefone,

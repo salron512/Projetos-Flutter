@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:projeto_aelton/model/Produtos.dart';
@@ -59,6 +58,8 @@ class _CarrinhoState extends State<Carrinho> {
           "pontoReferencia": map["pontoReferencia"],
           "status": "pendente",
           "data": DateTime.now().toString(),
+        }).then((value){
+          _postaNotificao();
         });
         var dados = await db
             .collection("requisicoesAtivas")
@@ -105,19 +106,24 @@ class _CarrinhoState extends State<Carrinho> {
     }
   }
 
-  _postaNotificao(){
-    FirebaseAuth auth = FirebaseAuth.instance;
-    String id = "wSiVJS0cj5YlkpIQImrFYGUwmgE2";
-   Map<String, String> map = {
-     "player_id": id
-   };
+  _postaNotificao()async{
+    FirebaseFirestore db = FirebaseFirestore.instance;
    List<String> list = [];
-    list.add(id);
+    var snapshot = await db.collection("usuarios")
+        .where("adm", isEqualTo: true )
+        .get();
 
+    for(var item in snapshot.docs){
+      Map<String, dynamic> map = item.data();
+      print("id Usuario"+ map["playerId"]);
+      String idUsuarioNotigicacao = map["playerId"];
+      list.add(idUsuarioNotigicacao);
+    }
     OneSignal.shared.postNotification(
       OSCreateNotification(
           playerIds: list,
-          content: "teste")
+          heading: "Nova entrega",
+          content: "Você tem uma nova entrega!")
     );
   }
 
@@ -192,7 +198,6 @@ class _CarrinhoState extends State<Carrinho> {
                     });
                     _controllerProduto.clear();
                     Navigator.pop(context);
-                    _postaNotificao();
                   }
                 },
                 child: Text("Salvar"),

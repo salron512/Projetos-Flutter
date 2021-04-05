@@ -10,7 +10,7 @@ class ListaCategorias extends StatefulWidget {
 }
 
 class _ListaCategoriasState extends State<ListaCategorias> {
-  List<String> itensMenu = ["Perfil", "Deslogar","Anuncie"];
+  List<String> itensMenu = ["Perfil", "Deslogar","Anúncie"];
   Future _recuperaCategorias() async {
     // ignore: deprecated_member_use
     List<Categorias> listacategoria = List<Categorias>();

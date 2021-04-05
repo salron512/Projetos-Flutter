@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.projeto_aelton">
    <application
-        android:label="projeto_aelton"
+        android:label="Cesta de compras"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
