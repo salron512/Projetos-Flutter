@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 import 'model/Usuario.dart';
 
@@ -49,6 +51,7 @@ class _LoginState extends State<Login> {
         .signInWithEmailAndPassword(
             email: usuario.email, password: usuario.senha)
         .then((firebaseUser) {
+      _recuperaIdNotificacao();
       Navigator.popAndPushNamed(context, "/carrinho");
     }).catchError((error) {
       setState(() {
@@ -68,6 +71,17 @@ class _LoginState extends State<Login> {
     if (usuariologado != null) {
       Navigator.popAndPushNamed(context, "/carrinho");
     }
+  }
+
+  _recuperaIdNotificacao() async {
+    var status = await OneSignal.shared.getPermissionSubscriptionState();
+    var playerId = status.subscriptionStatus.userId;
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    FirebaseAuth auth = FirebaseAuth.instance;
+    String id = auth.currentUser.uid;
+    db.collection("usuarios").doc(id).update({
+      "playerId": playerId,
+    });
   }
 
   @override
