@@ -45,7 +45,7 @@ class _ListaCategoriasState extends State<ListaCategorias> {
       case "Deslogar":
         _deslogarUsuario();
         break;
-      case "Anuncie":
+      case "Anúncie":
         Navigator.pushNamed(context, "/contado");
         break;
     }

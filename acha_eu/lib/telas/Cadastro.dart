@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 class Cadastro extends StatefulWidget {
   @override
@@ -123,6 +124,7 @@ class _CadastroState extends State<Cadastro> {
           .collection("usuarios")
           .doc(firebase.user.uid)
           .update({"idUsuario": firebase.user.uid});
+      _cadastraNotificacao(firebase.user.uid);
 
       Navigator.pushNamedAndRemoveUntil(
           context, "/listacategorias", (_) => false);
@@ -132,6 +134,15 @@ class _CadastroState extends State<Cadastro> {
             "Erro ao cadastrar o usuário, verificar os campos novamente!";
       });
     });
+  }
+  _cadastraNotificacao(String idUsuario) async{
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    var status = await OneSignal.shared.getPermissionSubscriptionState();
+    var playerId = status.subscriptionStatus.userId;
+    db.collection("usuarios")
+        .doc(idUsuario)
+        .update({"playerId": playerId});
+
   }
 
   _mostraListaEstado() {

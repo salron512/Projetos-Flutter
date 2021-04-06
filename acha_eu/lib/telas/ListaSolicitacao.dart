@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_custom.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
+
 class ListaSolicitacao extends StatefulWidget {
   @override
   _ListaSolicitacaoState createState() => _ListaSolicitacaoState();
 }
 
-class _ListaSolicitacaoState extends State<ListaSolicitacao>{
+class _ListaSolicitacaoState extends State<ListaSolicitacao> {
   TextEditingController _controllerDescricao = TextEditingController();
   final _controller = StreamController<QuerySnapshot>.broadcast();
   List<String> _listaCadegorias;
@@ -75,7 +77,7 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao>{
             content: Container(
               width: 100,
               height: 350,
-              child:  ListView.separated(
+              child: ListView.separated(
                 itemCount: _listaCadegorias.length,
                 separatorBuilder: (context, indice) => Divider(
                   height: 2,
@@ -173,8 +175,29 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao>{
       "telefoneProfissional": " ",
       "nomeProfissional": " ",
       "dataResposta": " "
+    }).then((value) {
+      _postaNotificao(_usuario.cidade);
     });
-    _recuperaSolicitacao();
+  }
+
+  _postaNotificao(String cidade) async {
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    List<String> list = [];
+    var snapshot = await db
+        .collection("usuarios")
+        .where("cidade", isEqualTo: cidade)
+        .where("categoria", isEqualTo: _escolhaCategoria)
+        .get();
+
+    for (var item in snapshot.docs) {
+      Map<String, dynamic> map = item.data();
+      String idUsuarioNotigicacao = map["playerId"];
+      list.add(idUsuarioNotigicacao);
+    }
+    OneSignal.shared.postNotification(OSCreateNotification(
+        playerIds: list,
+        heading: "Novo trabalho",
+        content: "Você tem uma nova prostosta de trabalho!"));
   }
 
   _formatarData(String data) {
@@ -205,7 +228,7 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao>{
 
   _alertDelete(String id) {
     showDialog(
-      barrierDismissible: false,
+        barrierDismissible: false,
         context: context,
         // ignore: missing_return
         builder: (context) {
@@ -232,7 +255,7 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao>{
                 onPressed: () {
                   Navigator.pop(context);
                   _recuperaSolicitacao();
-                  },
+                },
                 child: Text("Cancelar"),
               ),
               FlatButton(
@@ -326,8 +349,8 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao>{
                                 ? Colors.green
                                 : Color(0xff37474f),
                             child: ListTile(
-                                title: Text( "Cliente: "+
-                                  dados["nome"],
+                                title: Text(
+                                  "Cliente: " + dados["nome"],
                                   style: TextStyle(color: Colors.white),
                                 ),
                                 subtitle: Column(

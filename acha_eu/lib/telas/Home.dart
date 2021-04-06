@@ -1,7 +1,10 @@
 import 'package:acha_eu/model/Usuario.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'dart:async';
+
 class Home extends StatefulWidget {
   Home({Key key}) : super(key: key);
 
@@ -44,11 +47,12 @@ class _HomeState extends State<Home> {
 
   _logarUsuario(Usuario usuario) {
     FirebaseAuth auth = FirebaseAuth.instance;
-  
+
     auth
         .signInWithEmailAndPassword(
             email: usuario.email, password: usuario.senha)
         .then((firebaseUser) {
+      _recuperaIdNotificacao();
       Navigator.popAndPushNamed(context, "/listacategorias");
     }).catchError((error) {
       setState(() {
@@ -62,6 +66,17 @@ class _HomeState extends State<Home> {
     });
   }
 
+  _recuperaIdNotificacao() async {
+    var status = await OneSignal.shared.getPermissionSubscriptionState();
+    var playerId = status.subscriptionStatus.userId;
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    FirebaseAuth auth = FirebaseAuth.instance;
+    String id = auth.currentUser.uid;
+    db.collection("usuarios").doc(id).update({
+      "playerId": playerId,
+    });
+  }
+
   Future _verificaUsuarioLogado() async {
     FirebaseAuth auth = FirebaseAuth.instance;
     //auth.signOut();
@@ -71,12 +86,6 @@ class _HomeState extends State<Home> {
       Navigator.popAndPushNamed(context, "/listacategorias");
     }
   }
-
-
-
-
-
-
 
   @override
   void initState() {
