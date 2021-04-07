@@ -1,4 +1,5 @@
 import 'package:acha_eu/model/Usuario.dart';
+import 'package:acha_eu/util/ListaEstado.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -9,7 +10,7 @@ class Adm extends StatefulWidget {
 
 class _AdmState extends State<Adm> {
   List<String> itensMenu = ["Sugestões"];
-  List<String> _listaEstado = ["MT"];
+  List<String> _listaEstado = ListaEstado.LISTAESTADO;
   List<String> _listaCidades;
   String _scolhaEstado;
   String _escolhaCidade = "";

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:acha_eu/util/ListaEstado.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -38,7 +39,7 @@ class _ConfiguracaoState extends State<Configuracao> {
   bool _adm = false;
   bool _mostraCategoria = false;
   var cond;
-  List<String> _listaEstado = ["MT"];
+  List<String> _listaEstado = ListaEstado.LISTAESTADO;
   Future _recuperaImagem(bool daCamera) async {
     var picker = ImagePicker();
     PickedFile imagemSelecionada;

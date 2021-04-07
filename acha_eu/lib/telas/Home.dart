@@ -57,7 +57,8 @@ class _HomeState extends State<Home> {
     }).catchError((error) {
       setState(() {
         _mensagemErro =
-            "Erro ao autenticar o usuário, verifique e-mail e senha e tente novamente!";
+            "Erro ao autenticar o usuário, verifique e-mail e"
+                " senha e tente novamente!";
       });
     });
 
@@ -80,7 +81,7 @@ class _HomeState extends State<Home> {
   Future _verificaUsuarioLogado() async {
     FirebaseAuth auth = FirebaseAuth.instance;
     //auth.signOut();
-    var usuariologado = await auth.currentUser;
+    var usuariologado =  auth.currentUser;
 
     if (usuariologado != null) {
       Navigator.popAndPushNamed(context, "/listacategorias");

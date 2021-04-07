@@ -106,8 +106,9 @@ class _ListaCategoriasState extends State<ListaCategorias> {
                         crossAxisSpacing: 2,
                         children: List.generate(
                           // ignore: missing_return
-                            item.length, (index) {
-                          var dados = item[index];
+                            item.length,
+                                (indice) {
+                          var dados = item[indice];
                           return Container(
                             padding: EdgeInsets.all(8),
                             width: 100,
@@ -130,10 +131,10 @@ class _ListaCategoriasState extends State<ListaCategorias> {
                                   Padding(
                                     padding: EdgeInsets.only(top: 8),
                                     child: Text(dados.nome,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold
-                                    ),
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold
+                                      ),
                                     ),
                                   )
                                 ],
@@ -148,14 +149,31 @@ class _ListaCategoriasState extends State<ListaCategorias> {
               }
             }),
       ),
- 
+/*
       floatingActionButton: FloatingActionButton.extended(
           onPressed: (){
             Navigator.pushNamed(context, "/listaSolicitacao");
           }
           , label: Text("Solicite um profissional")
       ),
-    
+ */
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          children: [
+            IconButton(icon: Icon(Icons.menu), onPressed: () {}),
+            Spacer(),
+            IconButton(icon: Icon(Icons.search), onPressed: () {}),
+            IconButton(icon: Icon(Icons.more_vert), onPressed: () {}),
+          ],
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: FloatingActionButton.extended(
+          onPressed: (){
+            Navigator.pushNamed(context, "/listaSolicitacao");
+          }
+          , label: Text("Solicite um profissional")
+      ),
     );
   }
 }

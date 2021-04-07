@@ -2,7 +2,7 @@
     package="com.example.projeto_aelton">
    <application
         android:label="Cesta de compras"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/scart">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

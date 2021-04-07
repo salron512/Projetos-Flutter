@@ -1,4 +1,5 @@
 import 'package:acha_eu/model/Usuario.dart';
+import 'package:acha_eu/util/ListaEstado.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -21,7 +22,7 @@ class _CadastroState extends State<Cadastro> {
   TextEditingController _controllerConfirmaSenha = TextEditingController();
   TextEditingController _controllerTelefone = TextEditingController();
   TextEditingController _controllerWhatsapp = TextEditingController();
-  List<String> _listaEstado = ["MT"];
+  List<String> _listaEstado = ListaEstado.LISTAESTADO;
   List<String> _listaCidades;
   String _scolhaEstado = "";
   String _mensagemErro = "";
