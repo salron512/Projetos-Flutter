@@ -442,21 +442,24 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
                 break;
             }
           }),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () {
           _mostraListaCategorias();
         },
       ),
-      /*
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       bottomNavigationBar: BottomAppBar(
+        color:Color(0xff37474f),
         shape:CircularNotchedRectangle(),
-        child:Container(
-            color: Color(0xff546e7a),
-            height: 50.0),
+        child:Row(
+          children: [
+            Container(
+                color: Color(0xff37474f),
+                height: 50.0),
+          ],
+        )
       ),
-       */
     );
   }
 }
