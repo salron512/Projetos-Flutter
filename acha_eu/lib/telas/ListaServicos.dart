@@ -21,7 +21,7 @@ class _ListaSericosState extends State<ListaSericos> {
     _categoria = widget.categoria.nome;
     FirebaseFirestore db = FirebaseFirestore.instance;
     FirebaseAuth auth = FirebaseAuth.instance;
-    String idusuario = await auth.currentUser.uid;
+    String idusuario =  auth.currentUser.uid;
     String cidadeUsuario;
     var dadosUsuario = await db.collection("usuarios").doc(idusuario).get();
     Map<String, dynamic> dados = dadosUsuario.data();

@@ -442,12 +442,21 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
                 break;
             }
           }),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () {
           _mostraListaCategorias();
         },
       ),
+      /*
+      bottomNavigationBar: BottomAppBar(
+        shape:CircularNotchedRectangle(),
+        child:Container(
+            color: Color(0xff546e7a),
+            height: 50.0),
+      ),
+       */
     );
   }
 }

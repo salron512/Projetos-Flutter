@@ -11,6 +11,8 @@ class ListaCategorias extends StatefulWidget {
 
 class _ListaCategoriasState extends State<ListaCategorias> {
   List<String> itensMenu = ["Perfil", "Deslogar","Anúncie"];
+
+
   Future _recuperaCategorias() async {
     // ignore: deprecated_member_use
     List<Categorias> listacategoria = List<Categorias>();
@@ -149,30 +151,40 @@ class _ListaCategoriasState extends State<ListaCategorias> {
               }
             }),
       ),
-/*
+        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: FloatingActionButton.extended(
           onPressed: (){
             Navigator.pushNamed(context, "/listaSolicitacao");
           }
           , label: Text("Solicite um profissional")
       ),
- */
       bottomNavigationBar: BottomAppBar(
-        child: Row(
-          children: [
-            IconButton(icon: Icon(Icons.menu), onPressed: () {}),
-            Spacer(),
-            IconButton(icon: Icon(Icons.search), onPressed: () {}),
-            IconButton(icon: Icon(Icons.more_vert), onPressed: () {}),
-          ],
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: FloatingActionButton.extended(
-          onPressed: (){
-            Navigator.pushNamed(context, "/listaSolicitacao");
-          }
-          , label: Text("Solicite um profissional")
+        color:Color(0xffDCDCDC),
+        child:   SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(children: [
+           GestureDetector(
+             child:  Padding(
+               padding: EdgeInsets.only(left: 5),
+               child:  Container(
+                 decoration: BoxDecoration(
+                     borderRadius: BorderRadius.circular(15),
+                     image: DecorationImage(
+                         image:  AssetImage("images/teste.png"),
+                         fit: BoxFit.cover
+                     )
+                 ) ,
+                 width: 100,
+                 height: 100,
+               ),
+             ),
+             onTap: (){
+               Navigator.pushNamed(context, "/propaganda");
+             },
+           )
+          ]
+          ),
+        )
       ),
     );
   }
