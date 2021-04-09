@@ -263,7 +263,7 @@ class _ConfiguracaoState extends State<Configuracao> {
 
   _recuperaDadosUsuario() async {
     FirebaseAuth auth = FirebaseAuth.instance;
-    var usuarioLogado =  auth.currentUser;
+    var usuarioLogado = auth.currentUser;
     _idUsuarioLogado = usuarioLogado.uid;
 
     FirebaseFirestore db = FirebaseFirestore.instance;
@@ -325,7 +325,7 @@ class _ConfiguracaoState extends State<Configuracao> {
             content: Container(
               width: 100,
               height: 250,
-              child:  ListView.separated(
+              child: ListView.separated(
                 itemCount: _listaEstado.length,
                 separatorBuilder: (context, indice) => Divider(
                   height: 2,
@@ -386,7 +386,7 @@ class _ConfiguracaoState extends State<Configuracao> {
               content: Container(
                 width: 100,
                 height: 250,
-                child:  ListView.separated(
+                child: ListView.separated(
                   itemCount: _listaCidades.length,
                   separatorBuilder: (context, indice) => Divider(
                     height: 2,
@@ -489,6 +489,18 @@ class _ConfiguracaoState extends State<Configuracao> {
       appBar: AppBar(
         title: Text("Perfil"),
         actions: [
+          IconButton(
+            icon: Icon(
+              Icons.account_balance_sharp,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                "/pagamento",
+              );
+            },
+          ),
           _mostraPagamento != false
               ? IconButton(
                   icon: Icon(

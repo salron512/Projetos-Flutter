@@ -13,6 +13,7 @@ import 'package:acha_eu/telas/ListaServicos.dart';
 import 'package:acha_eu/telas/ListaSolicitacao.dart';
 import 'package:acha_eu/telas/ListaSugestao.dart';
 import 'package:acha_eu/telas/ListaTrabalhos.dart';
+import 'package:acha_eu/telas/Pagamento.dart';
 import 'package:acha_eu/telas/Propaganda.dart';
 import 'package:acha_eu/telas/RecuperaSenha.dart';
 import 'package:acha_eu/telas/SugestaoUsuario.dart';
@@ -96,6 +97,10 @@ class RouteGenerator{
       case "/propaganda" :
         return MaterialPageRoute(
             builder: (_) => Propaganda()
+        );
+      case "/pagamento" :
+        return MaterialPageRoute(
+            builder: (_) => Pagamento()
         );
 
 

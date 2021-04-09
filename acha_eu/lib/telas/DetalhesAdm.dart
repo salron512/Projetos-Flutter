@@ -49,7 +49,7 @@ class _DetalhesAdmState extends State<DetalhesAdm> {
     }else{
       await db.collection("usuarios").doc(widget.usuario.idUsuario).update({
         "mostraPagamento": widget.usuario.mostraPagamento,
-        "categoria": "Cliente"
+        "categoria": "Cliente",
       });
     }
   }
