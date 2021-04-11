@@ -2,6 +2,7 @@ import 'package:acha_eu/model/Usuario.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+// ignore: must_be_immutable
 class DetalhesSugestao extends StatefulWidget {
   Usuario usuario;
   DetalhesSugestao(this.usuario);
@@ -11,7 +12,6 @@ class DetalhesSugestao extends StatefulWidget {
 }
 
 class _DetalhesSugestaoState extends State<DetalhesSugestao> {
-
   _abrirWhatsApp() async {
     String telefone = widget.usuario.whatsapp;
     var whatsappUrl = "whatsapp://send?phone=+55$telefone=Olá,tudo bem ?";
@@ -40,9 +40,9 @@ class _DetalhesSugestaoState extends State<DetalhesSugestao> {
       appBar: AppBar(
         title: Text("Detalhes"),
       ),
-      body:  Container(
+      body: Container(
         child: SingleChildScrollView(
-          padding: EdgeInsets.only(top: 36,left: 32,right: 16,bottom: 16),
+          padding: EdgeInsets.only(top: 36, left: 32, right: 16, bottom: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -51,49 +51,47 @@ class _DetalhesSugestaoState extends State<DetalhesSugestao> {
                 width: 200,
                 height: 150,
               ),
-              Padding(padding: EdgeInsets.only(top: 16),
-                child: Text("Nome: " + widget.usuario.nome,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20
-                  ),
+              Padding(
+                padding: EdgeInsets.only(top: 16),
+                child: Text(
+                  "Nome: " + widget.usuario.nome,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
               ),
-              Padding(padding: EdgeInsets.only(top: 10),
-                child: Text("Telefone: " + widget.usuario.telefone,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20
-                  ),
+              Padding(
+                padding: EdgeInsets.only(top: 10),
+                child: Text(
+                  "Telefone: " + widget.usuario.telefone,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
               ),
-              Padding(padding: EdgeInsets.only(top: 10),
-                child: Text("Whatsapp " + widget.usuario.whatsapp,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20
-                  ),
+              Padding(
+                padding: EdgeInsets.only(top: 10),
+                child: Text(
+                  "Whatsapp " + widget.usuario.whatsapp,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
               ),
-              Padding(padding: EdgeInsets.only(top: 10),
-                child: Text("Categoria: " + widget.usuario.categoriaUsuario,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20
-                  ),
+              Padding(
+                padding: EdgeInsets.only(top: 10),
+                child: Text(
+                  "Categoria: " + widget.usuario.categoriaUsuario,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
               ),
               Padding(
                 padding: EdgeInsets.only(bottom: 16, top: 16),
-                child: RaisedButton(
+                child: ElevatedButton(
                   child: Text(
                     "Whatasapp",
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
-                  color: Colors.green,
-                  padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(32)),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.green,
+                    padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(32)),
+                  ),
                   onPressed: () {
                     _abrirWhatsApp();
                   },
@@ -101,15 +99,17 @@ class _DetalhesSugestaoState extends State<DetalhesSugestao> {
               ),
               Padding(
                 padding: EdgeInsets.only(bottom: 16),
-                child: RaisedButton(
+                child: ElevatedButton(
                   child: Text(
                     "Telefone",
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
-                  color:Color(0xff37474f),
-                  padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(32)),
+                  style: ElevatedButton.styleFrom(
+                    primary: Color(0xff37474f),
+                    padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(32)),
+                  ),
                   onPressed: () {
                     _abrirTelefone();
                   },

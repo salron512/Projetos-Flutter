@@ -3,7 +3,6 @@ import 'package:acha_eu/model/Usuario.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/date_symbol_data_custom.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
@@ -16,6 +15,7 @@ class _ListaTrabalhosState extends State<ListaTrabalhos> {
   final _controller = StreamController<QuerySnapshot>.broadcast();
   Usuario _usuario = Usuario();
 
+  // ignore: missing_return
   Stream _recuperaSolicitacao() {
     FirebaseFirestore db = FirebaseFirestore.instance;
 
@@ -77,7 +77,6 @@ class _ListaTrabalhosState extends State<ListaTrabalhos> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _recuperaDadosUsuario();
   }

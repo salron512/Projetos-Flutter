@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 //datalhes do usuario
 // ignore: must_be_immutable
 class DetalhesAdm extends StatefulWidget {
@@ -37,17 +38,18 @@ class _DetalhesAdmState extends State<DetalhesAdm> {
     }
   }
 
-  _AtualizadDados() async{
+  // ignore: non_constant_identifier_names
+  _AtualizadDados() async {
     //habilita o campo mostraPagamento do usuario
     // caso widget.usuario.mostraPagamento seja true
-    FirebaseFirestore db =  FirebaseFirestore.instance;
-    if(widget.usuario.mostraPagamento){
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    if (widget.usuario.mostraPagamento) {
       await db.collection("usuarios").doc(widget.usuario.idUsuario).update({
         "mostraPagamento": widget.usuario.mostraPagamento,
       });
-       //habilita o campo mostraPagamento do usuario
-       // caso widget.usuario.mostraPagamento seja false
-    }else{
+      //habilita o campo mostraPagamento do usuario
+      // caso widget.usuario.mostraPagamento seja false
+    } else {
       await db.collection("usuarios").doc(widget.usuario.idUsuario).update({
         "mostraPagamento": widget.usuario.mostraPagamento,
         "categoria": "Cliente",
@@ -60,10 +62,10 @@ class _DetalhesAdmState extends State<DetalhesAdm> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Detalhes usuario"),
-      ) ,
+      ),
       body: Container(
         child: SingleChildScrollView(
-          padding: EdgeInsets.only(top: 36,left: 32,right: 16,bottom: 16),
+          padding: EdgeInsets.only(top: 36, left: 32, right: 16, bottom: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -72,68 +74,62 @@ class _DetalhesAdmState extends State<DetalhesAdm> {
                 width: 200,
                 height: 150,
               ),
-              Padding(padding: EdgeInsets.only(top: 16),
-                child: Text("Nome: " + widget.usuario.nome,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20
-                  ),
+              Padding(
+                padding: EdgeInsets.only(top: 16),
+                child: Text(
+                  "Nome: " + widget.usuario.nome,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
               ),
-              Padding(padding: EdgeInsets.only(top: 10),
-                child: Text("Telefone: " + widget.usuario.telefone,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20
-                  ),
+              Padding(
+                padding: EdgeInsets.only(top: 10),
+                child: Text(
+                  "Telefone: " + widget.usuario.telefone,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
               ),
-              Padding(padding: EdgeInsets.only(top: 10),
-                child: Text("ID Usuario: " + widget.usuario.idUsuario,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15
-                  ),
+              Padding(
+                padding: EdgeInsets.only(top: 10),
+                child: Text(
+                  "ID Usuario: " + widget.usuario.idUsuario,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                 ),
               ),
-              Padding(padding: EdgeInsets.only(top: 10),
-                child: Text("E-mail: " + widget.usuario.email,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20
-                  ),
+              Padding(
+                padding: EdgeInsets.only(top: 10),
+                child: Text(
+                  "E-mail: " + widget.usuario.email,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
               ),
-              Padding(padding: EdgeInsets.only(top: 10),
-                child: Text("Categoria: " + widget.usuario.categoriaUsuario,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20
-                  ),
+              Padding(
+                padding: EdgeInsets.only(top: 10),
+                child: Text(
+                  "Categoria: " + widget.usuario.categoriaUsuario,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
               ),
-              Padding(padding: EdgeInsets.only(top: 10),
-                child: Text("Cidade: " + widget.usuario.cidade,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20
-                  ),
+              Padding(
+                padding: EdgeInsets.only(top: 10),
+                child: Text(
+                  "Cidade: " + widget.usuario.cidade,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
               ),
-              Padding(padding: EdgeInsets.only(top: 10),
-                child: Text("Estado: " + widget.usuario.estado,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20
-                  ),
+              Padding(
+                padding: EdgeInsets.only(top: 10),
+                child: Text(
+                  "Estado: " + widget.usuario.estado,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
               ),
-              Padding(padding: EdgeInsets.only(top: 5,bottom: 5),
+              Padding(
+                  padding: EdgeInsets.only(top: 5, bottom: 5),
                   child: Row(
                     children: [
                       Checkbox(
                         value: widget.usuario.mostraPagamento,
-                        onChanged: (value){
+                        onChanged: (value) {
                           setState(() {
                             widget.usuario.mostraPagamento = value;
                           });
@@ -142,19 +138,20 @@ class _DetalhesAdmState extends State<DetalhesAdm> {
                       ),
                       Text("Anunciante")
                     ],
-                  )
-              ),
+                  )),
               Padding(
                 padding: EdgeInsets.only(bottom: 16, top: 16),
-                child: RaisedButton(
+                child: ElevatedButton(
                   child: Text(
                     "Whatasapp",
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
-                  color: Colors.green,
-                  padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(32)),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.green,
+                    padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(32)),
+                  ),
                   onPressed: () {
                     _abrirWhatsApp();
                   },
@@ -162,15 +159,17 @@ class _DetalhesAdmState extends State<DetalhesAdm> {
               ),
               Padding(
                 padding: EdgeInsets.only(bottom: 16),
-                child: RaisedButton(
+                child: ElevatedButton(
                   child: Text(
                     "Telefone",
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
-                  color:Color(0xff37474f),
-                  padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(32)),
+                  style: ElevatedButton.styleFrom(
+                    primary: Color(0xff37474f),
+                    padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(32)),
+                  ),
                   onPressed: () {
                     _abrirTelefone();
                   },

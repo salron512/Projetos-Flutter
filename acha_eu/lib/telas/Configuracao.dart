@@ -477,7 +477,6 @@ class _ConfiguracaoState extends State<Configuracao> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _recuperaDadosUsuario();
     _recuperaCategorias();
@@ -933,15 +932,17 @@ class _ConfiguracaoState extends State<Configuracao> {
                           ))),
                       Padding(
                         padding: EdgeInsets.only(top: 8, bottom: 8),
-                        child: RaisedButton(
+                        child: ElevatedButton(
                           child: Text(
                             "Salvar",
                             style: TextStyle(color: Colors.white, fontSize: 20),
                           ),
-                          color: Color(0xff37474f),
+                        style: ElevatedButton.styleFrom(
+                            primary: Color(0xff37474f),
                           padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(32)),
+                        ),
                           onPressed: () {
                             _atualizarNomeFirestore();
                           },
@@ -951,16 +952,18 @@ class _ConfiguracaoState extends State<Configuracao> {
                         visible: _adm,
                         child: Padding(
                           padding: EdgeInsets.only(top: 8, bottom: 8),
-                          child: RaisedButton(
+                          child: ElevatedButton(
                             child: Text(
                               "Lista Usuarios",
                               style:
                                   TextStyle(color: Colors.white, fontSize: 20),
                             ),
-                            color: Color(0xff37474f),
+                            style: ElevatedButton.styleFrom(
+                              primary: Color(0xff37474f),
                             padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(32)),
+                            ),
                             onPressed: () {
                               Navigator.pushNamed(context, "/adm");
                             },

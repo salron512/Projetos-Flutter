@@ -3,7 +3,6 @@ import 'package:acha_eu/model/Usuario.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/date_symbol_data_custom.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
@@ -20,6 +19,7 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
   Usuario _usuario = Usuario();
   String _escolhaCategoria;
 
+  // ignore: missing_return
   Stream _recuperaSolicitacao() {
     FirebaseFirestore db = FirebaseFirestore.instance;
     FirebaseAuth auth = FirebaseAuth.instance;
@@ -273,7 +273,6 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _recuperaCategorias();
     _recuperaDadosUsuario();

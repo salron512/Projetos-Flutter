@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+// ignore: must_be_immutable
 class DetalhesPedido extends StatefulWidget {
   DocumentSnapshot dados;
   DetalhesPedido(this.dados);
@@ -36,7 +37,6 @@ class _DetalhesPedidoState extends State<DetalhesPedido> {
     FirebaseFirestore db = FirebaseFirestore.instance;
     await db.collection("solicitacao").doc(widget.dados.reference.id).update({
       "status": "Não atendido",
-      "idProfissional": " ",
       "idProfissional": " ",
       "nomeProfissional": " ",
       "telefoneProfissional": " ",
@@ -122,15 +122,17 @@ class _DetalhesPedidoState extends State<DetalhesPedido> {
               ),
               Padding(
                 padding: EdgeInsets.only(bottom: 16, top: 16),
-                child: RaisedButton(
+                child: ElevatedButton(
                   child: Text(
                     "Whatasapp",
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
-                  color: Colors.green,
-                  padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(32)),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.green,
+                    padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(32)),
+                  ),
                   onPressed: () {
                     _abrirWhatsApp();
                   },
@@ -138,15 +140,17 @@ class _DetalhesPedidoState extends State<DetalhesPedido> {
               ),
               Padding(
                 padding: EdgeInsets.only(bottom: 16),
-                child: RaisedButton(
+                child: ElevatedButton(
                   child: Text(
                     "Telefone",
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
-                  color: Color(0xff37474f),
-                  padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(32)),
+                  style: ElevatedButton.styleFrom(
+                    primary: Color(0xff37474f),
+                    padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(32)),
+                  ),
                   onPressed: () {
                     _abrirTelefone();
                   },
@@ -154,15 +158,17 @@ class _DetalhesPedidoState extends State<DetalhesPedido> {
               ),
               Padding(
                 padding: EdgeInsets.only(bottom: 16),
-                child: RaisedButton(
+                child: ElevatedButton(
                   child: Text(
                     "Desistir do atendimento",
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
-                  color: Colors.red,
-                  padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(32)),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.red,
+                    padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(32)),
+                  ),
                   onPressed: () {
                     _alertAlterar();
                   },

@@ -3,10 +3,10 @@ import 'package:acha_eu/model/Usuario.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/date_symbol_data_custom.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
+// ignore: must_be_immutable
 class ListaPedidos extends StatefulWidget {
   String categoria;
   ListaPedidos(this.categoria);
@@ -18,6 +18,7 @@ class _ListaPedidosState extends State<ListaPedidos> {
   final _controller = StreamController<QuerySnapshot>.broadcast();
   Usuario _usuario = Usuario();
 
+  // ignore: missing_return
   Stream _recuperaSolicitacao() {
     FirebaseFirestore db = FirebaseFirestore.instance;
     String categoria = widget.categoria;
@@ -84,7 +85,6 @@ class _ListaPedidosState extends State<ListaPedidos> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _recuperaDadosUsuario();
   }

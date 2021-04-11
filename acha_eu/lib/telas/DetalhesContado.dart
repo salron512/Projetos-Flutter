@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 //tela de contado do profissional
+// ignore: must_be_immutable
 class DetalhesContado extends StatefulWidget {
   Usuario usuario;
   DetalhesContado(this.usuario);
@@ -73,7 +74,6 @@ class _DetalhesContadoState extends State<DetalhesContado> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _recuperaFormaPagamento();
     _veirificaDescricao();
@@ -102,15 +102,17 @@ class _DetalhesContadoState extends State<DetalhesContado> {
                     backgroundColor: Colors.grey),
                 Padding(
                   padding: EdgeInsets.only(bottom: 16, top: 16),
-                  child: RaisedButton(
+                  child: ElevatedButton(
                     child: Text(
                       "Whatasapp",
                       style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
-                    color: Colors.green,
+                  style: ElevatedButton.styleFrom(
+                      primary: Colors.green,
                     padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(32)),
+                  ),
                     onPressed: () {
                       _abrirWhatsApp();
                     },
@@ -118,15 +120,17 @@ class _DetalhesContadoState extends State<DetalhesContado> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(bottom: 16),
-                  child: RaisedButton(
+                  child: ElevatedButton(
                     child: Text(
                       "Telefone",
                       style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
-                    color: Color(0xff37474f),
+                  style: ElevatedButton.styleFrom(
+                      primary: Color(0xff37474f),
                     padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(32)),
+                  ),
                     onPressed: () {
                       _abrirTelefone();
                     },

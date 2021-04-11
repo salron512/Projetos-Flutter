@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class ListaSericos extends StatefulWidget {
   Categorias categoria;
   ListaSericos(this.categoria);
@@ -13,7 +14,7 @@ class ListaSericos extends StatefulWidget {
 }
 
 class _ListaSericosState extends State<ListaSericos> {
-  List<Usuario> _listaContados =[];
+  List<Usuario> _listaContados = [];
   String _categoria;
 
   Future _recuperaContatos() async {
@@ -21,7 +22,7 @@ class _ListaSericosState extends State<ListaSericos> {
     _categoria = widget.categoria.nome;
     FirebaseFirestore db = FirebaseFirestore.instance;
     FirebaseAuth auth = FirebaseAuth.instance;
-    String idusuario =  auth.currentUser.uid;
+    String idusuario = auth.currentUser.uid;
     String cidadeUsuario;
     var dadosUsuario = await db.collection("usuarios").doc(idusuario).get();
     Map<String, dynamic> dados = dadosUsuario.data();
@@ -57,7 +58,6 @@ class _ListaSericosState extends State<ListaSericos> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _listaContados.clear();
   }
@@ -97,16 +97,18 @@ class _ListaSericosState extends State<ListaSericos> {
                         padding: EdgeInsets.all(10),
                         child: Padding(
                           padding: EdgeInsets.only(bottom: 16),
-                          child: RaisedButton(
+                          child: ElevatedButton(
                             child: Text(
                               "Indique alguém",
                               style:
                                   TextStyle(color: Colors.white, fontSize: 20),
                             ),
-                            color: Color(0xff37474f),
-                            padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(32)),
+                            style: ElevatedButton.styleFrom(
+                              primary: Color(0xff37474f),
+                              padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(32)),
+                            ),
                             onPressed: () {
                               Navigator.pushNamed(context, "/sugestaoUsuario",
                                   arguments: _categoria);

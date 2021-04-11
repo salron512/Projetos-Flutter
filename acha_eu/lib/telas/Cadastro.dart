@@ -452,15 +452,17 @@ class _CadastroState extends State<Cadastro> {
                   ),
                   Padding(
                     padding: EdgeInsets.only(top: 16, bottom: 10),
-                    child: RaisedButton(
+                    child: ElevatedButton(
                       child: Text(
                         "Cadastrar",
                         style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
-                      color: Colors.green,
+                     style: ElevatedButton.styleFrom(
+                        primary: Colors.green,
                       padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(32)),
+                     ),
                       onPressed: () {
                         _validarCampos();
                       },

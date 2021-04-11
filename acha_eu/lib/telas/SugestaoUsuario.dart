@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
+// ignore: must_be_immutable
 class SugestaoUsuario extends StatefulWidget {
   String categorias;
   SugestaoUsuario(this.categorias);
@@ -165,15 +166,17 @@ class _SugestaoUsuarioState extends State<SugestaoUsuario> {
               ),
               Padding(
                 padding: EdgeInsets.only(top: 16, bottom: 10),
-                child: RaisedButton(
+                child: ElevatedButton(
                   child: Text(
                     "Enviar sugestão",
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
-                  color: Colors.green,
-                  padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(32)),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.green,
+                    padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(32)),
+                  ),
                   onPressed: () {
                     _validarCampos();
                   },
