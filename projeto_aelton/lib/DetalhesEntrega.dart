@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class DetalhesEntrega extends StatefulWidget {
   var dados;
   DetalhesEntrega(this.dados);
@@ -13,7 +14,6 @@ class _DetalhesEntregaState extends State<DetalhesEntrega> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
   }

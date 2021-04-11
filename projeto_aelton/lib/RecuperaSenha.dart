@@ -55,12 +55,12 @@ class _RecuperaSenhaState extends State<RecuperaSenha> {
                       padding: EdgeInsets.only(bottom: 8),
                       child: Center(
                           child: Text(
-                            _mensagenError,
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 20,
-                            ),
-                          ))),
+                        _mensagenError,
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 20,
+                        ),
+                      ))),
                   Padding(
                     padding: EdgeInsets.only(bottom: 8),
                     child: TextField(
@@ -79,15 +79,17 @@ class _RecuperaSenhaState extends State<RecuperaSenha> {
                       controller: _controllerEmail,
                     ),
                   ),
-                  RaisedButton(
+                  ElevatedButton(
                     child: Text(
                       "Recuperar senha",
                       style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
-                    color: Color(0xffFF0000),
-                    padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15)),
+                    style: ElevatedButton.styleFrom(
+                      primary: Color(0xffFF0000),
+                      padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15)),
+                    ),
                     onPressed: () {
                       _recuperaSenha();
                     },

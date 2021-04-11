@@ -20,6 +20,7 @@ import 'package:acha_eu/telas/SugestaoUsuario.dart';
 import 'package:flutter/material.dart';
 
 class RouteGenerator{
+  // ignore: missing_return
   static Route<dynamic> generateRoute(RouteSettings settings){
 
     final args = settings.arguments;

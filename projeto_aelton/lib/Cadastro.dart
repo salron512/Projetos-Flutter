@@ -1,4 +1,3 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -411,15 +410,17 @@ class _CadastroState extends State<Cadastro> {
                   ),
                   Padding(
                     padding: EdgeInsets.only(top: 16, bottom: 10),
-                    child: RaisedButton(
+                    child: ElevatedButton(
                       child: Text(
                         "Cadastrar",
                         style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
-                      color: Color(0xffFF0000),
+                    style: ElevatedButton.styleFrom(
+                        primary: Color(0xffFF0000),
                       padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15)),
+                    ),
                       onPressed: () {
                         _validarCampos();
                       },

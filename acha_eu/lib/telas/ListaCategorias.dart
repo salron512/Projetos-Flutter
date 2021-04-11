@@ -30,11 +30,11 @@ class _ListaCategoriasState extends State<ListaCategorias> {
       Categorias categorias = Categorias();
       categorias.nome = dados["categoria"];
       categorias.idImagem = dados["idImagem"];
-      var imagem = await storage.ref("imagensCategoria/" + categorias.idImagem);
+      var imagem =  storage.ref("imagensCategoria/" + categorias.idImagem);
       String url = await imagem.getDownloadURL();
       categorias.urlImagem = url;
-      print("categorias: " + categorias.nome);
-      print("url: " + categorias.urlImagem);
+      //print("categorias: " + categorias.nome);
+      //print("url: " + categorias.urlImagem);
       listacategoria.add(categorias);
     }
     return listacategoria;
@@ -93,6 +93,22 @@ class _ListaCategoriasState extends State<ListaCategorias> {
             builder: (context, snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.none:
+                return Center(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                       Padding(
+                    padding: EdgeInsets.only(bottom: 10),
+                    child: Image.asset(
+                      "images/conexao.png",
+                      width: 250,
+                      height: 200,
+                    ),
+                  ),
+                    Text("Sem conexão")
+                  ],),
+                );
                 case ConnectionState.waiting:
                   return Center(
                     child: CircularProgressIndicator(),

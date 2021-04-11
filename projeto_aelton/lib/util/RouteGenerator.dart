@@ -16,6 +16,7 @@ import 'package:projeto_aelton/RecuperaSenha.dart';
 import '../CadastroProdutos.dart';
 
 class RouteGenerator{
+  // ignore: missing_return
   static Route<dynamic> generateRoute(RouteSettings settings){
 
     final args = settings.arguments;

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class ListaProdutos extends StatefulWidget {
   var documentSnapshot;
   String id;
@@ -71,15 +72,17 @@ class _ListaProdutosState extends State<ListaProdutos> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            RaisedButton(
+            ElevatedButton(
               child: Text(
                 "Confirmar Pedido",
                 style: TextStyle(color: Colors.white, fontSize: 20),
               ),
-              color: Color(0xffFF0000),
+             style: ElevatedButton.styleFrom(
+                primary: Color(0xffFF0000),
               padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
+             ),
               onPressed: () {
                 _auteraStatus();
                 Navigator.pushNamed(context, "/listaentregas");

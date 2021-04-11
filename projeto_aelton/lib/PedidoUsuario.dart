@@ -58,11 +58,11 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
               ),
             ),
             actions: [
-              FlatButton(
+              TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: Text("Cancelar"),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                   FirebaseFirestore db = FirebaseFirestore.instance;
@@ -78,14 +78,12 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _recuperaPedidos();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _controller.close();
   }

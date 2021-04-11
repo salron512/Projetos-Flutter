@@ -13,7 +13,7 @@ class ListaSericos extends StatefulWidget {
 }
 
 class _ListaSericosState extends State<ListaSericos> {
-  List<Usuario> _listaContados = List();
+  List<Usuario> _listaContados =[];
   String _categoria;
 
   Future _recuperaContatos() async {

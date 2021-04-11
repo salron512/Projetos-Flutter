@@ -30,7 +30,6 @@ class _CadastroState extends State<Cadastro> {
   bool _motrarSenha = false;
   bool _motrarSenhaConfirma = false;
 
-
   _validarCampos() {
     //verifica campo da tela de cadastro
     String nome = _controllerNome.text;
@@ -49,27 +48,27 @@ class _CadastroState extends State<Cadastro> {
             if (telefone.isNotEmpty) {
               if (_scolhaEstado.isNotEmpty) {
                 if (_escolhaCidade.isNotEmpty) {
-                 if(whatsapp.isNotEmpty){
-                   Usuario usuario = Usuario();
-                   usuario.nome = nome;
-                   usuario.email = email;
-                   usuario.senha = senha;
-                   usuario.telefone = telefone;
-                   usuario.estado = estado;
-                   usuario.cidade = cidade;
-                   usuario.categoriaUsuario = "Cliente";
-                   usuario.whatsapp = whatsapp;
-                   usuario.mostraPagamento = false;
-                   usuario.adm = false;
-                   setState(() {
-                     _mensagemErro = "";
-                   });
-                   _cadastrarUsuairo(usuario);
-                 }else{
-                   setState(() {
-                     _mensagemErro = "Preencha o campo whatsapp";
-                   });
-                 }
+                  if (whatsapp.isNotEmpty) {
+                    Usuario usuario = Usuario();
+                    usuario.nome = nome;
+                    usuario.email = email;
+                    usuario.senha = senha;
+                    usuario.telefone = telefone;
+                    usuario.estado = estado;
+                    usuario.cidade = cidade;
+                    usuario.categoriaUsuario = "Cliente";
+                    usuario.whatsapp = whatsapp;
+                    usuario.mostraPagamento = false;
+                    usuario.adm = false;
+                    setState(() {
+                      _mensagemErro = "";
+                    });
+                    _cadastrarUsuairo(usuario);
+                  } else {
+                    setState(() {
+                      _mensagemErro = "Preencha o campo whatsapp";
+                    });
+                  }
                 } else {
                   setState(() {
                     _mensagemErro = "Escolha sua cidade";
@@ -120,7 +119,7 @@ class _CadastroState extends State<Cadastro> {
           .collection("usuarios")
           .doc(firebase.user.uid)
           .set(usuario.toMap());
-          //insere o campo do id do usuario
+      //insere o campo do id do usuario
       await db
           .collection("usuarios")
           .doc(firebase.user.uid)
@@ -136,19 +135,17 @@ class _CadastroState extends State<Cadastro> {
       });
     });
   }
-  _cadastraNotificacao(String idUsuario) async{
+
+  _cadastraNotificacao(String idUsuario) async {
     FirebaseFirestore db = FirebaseFirestore.instance;
     var status = await OneSignal.shared.getPermissionSubscriptionState();
     var playerId = status.subscriptionStatus.userId;
-    db.collection("usuarios")
-        .doc(idUsuario)
-        .update({"playerId": playerId});
-
+    db.collection("usuarios").doc(idUsuario).update({"playerId": playerId});
   }
 
   _mostraListaEstado() {
     showDialog(
-      barrierDismissible: false,
+        barrierDismissible: false,
         context: context,
         builder: (context) {
           return AlertDialog(
@@ -156,7 +153,7 @@ class _CadastroState extends State<Cadastro> {
             content: Container(
               width: 100,
               height: 250,
-              child:  ListView.separated(
+              child: ListView.separated(
                 shrinkWrap: true,
                 itemCount: _listaEstado.length,
                 separatorBuilder: (context, indice) => Divider(
@@ -180,7 +177,7 @@ class _CadastroState extends State<Cadastro> {
               ),
             ),
             actions: [
-              FlatButton(
+              TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: Text("Cancelar"),
               ),
@@ -194,7 +191,7 @@ class _CadastroState extends State<Cadastro> {
     var dados =
         await db.collection("cidades").where("estado", isEqualTo: estado).get();
 
-    List<String> listaCidadesRecuperadas = List();
+    List<String> listaCidadesRecuperadas = [];
     for (var item in dados.docs) {
       var dados = item.data();
       print("teste for: " + dados["cidade"].toString());
@@ -208,9 +205,8 @@ class _CadastroState extends State<Cadastro> {
 
   _mostraListaCidade() {
     if (_listaCidades.isNotEmpty) {
-      var item;
       showDialog(
-        barrierDismissible: false,
+          barrierDismissible: false,
           context: context,
           builder: (context) {
             return AlertDialog(
@@ -218,7 +214,7 @@ class _CadastroState extends State<Cadastro> {
               content: Container(
                 width: 100,
                 height: 250,
-                child:  ListView.separated(
+                child: ListView.separated(
                   shrinkWrap: true,
                   itemCount: _listaCidades.length,
                   separatorBuilder: (context, indice) => Divider(

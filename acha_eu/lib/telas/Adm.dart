@@ -128,7 +128,7 @@ class _AdmState extends State<Adm> {
                 ),
               ),
               actions: [
-                FlatButton(
+                TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: Text("Cancelar"),
                 ),
@@ -169,7 +169,7 @@ class _AdmState extends State<Adm> {
               ),
             ),
             actions: [
-              FlatButton(
+              TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: Text("Cancelar"),
               ),

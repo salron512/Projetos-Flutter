@@ -20,7 +20,7 @@ class _PagamentoState extends State<Pagamento> {
   TextEditingController _controllerCartao = TextEditingController();
   TextEditingController _controllerCodigoSeguracao = TextEditingController();
   String _mensagemErro = "Realize o pagamento"
-      " para se tornar um anúnciante em sua ciddade ";
+      " para se tornar um anúnciante em sua cidade ";
 
 
  /*

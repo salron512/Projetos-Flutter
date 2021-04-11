@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'model/Produtos.dart';
+
 
 class CadastroProdutos extends StatefulWidget {
   @override
@@ -13,6 +13,7 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
   TextEditingController _controllerNome = TextEditingController();
   TextEditingController _controllerMarca = TextEditingController();
 
+  // ignore: missing_return
   Stream _recuperaProdutos() {
     FirebaseFirestore db = FirebaseFirestore.instance;
     var stream = db
@@ -75,7 +76,7 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
               ),
             ),
             actions: [
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                   _controllerMarca.clear();
@@ -83,7 +84,7 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                 },
                 child: Text("Cancelar"),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   _salvarProduto(_controllerNome.text, _controllerMarca.text);
                   Navigator.pop(context);
@@ -143,7 +144,7 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
               ),
             ),
             actions: [
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                   _controllerNome.clear();
@@ -151,7 +152,7 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                 },
                 child: Text("Cancelar"),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   FirebaseFirestore db = FirebaseFirestore.instance;
                   db.collection("produtos").doc(id).update({
@@ -201,11 +202,11 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
               ),
             ),
             actions: [
-              FlatButton(
+              TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: Text("Cancelar"),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   FirebaseFirestore db = FirebaseFirestore.instance;
                   db.collection("produtos").doc(id).delete();
@@ -220,7 +221,6 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _recuperaProdutos();
     _controllerNome.clear();
@@ -229,7 +229,6 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _controller.close();
   }

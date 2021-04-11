@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 //datalhes do usuario
+// ignore: must_be_immutable
 class DetalhesAdm extends StatefulWidget {
   Usuario usuario;
 

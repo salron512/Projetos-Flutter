@@ -67,13 +67,13 @@ class _HistoricoState extends State<Historico> {
               ),
             ),
             actions: [
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
                 child: Text("Cancelar"),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: () {
                 setState(() {
                   String i = _controllerQtd.text;
@@ -92,14 +92,13 @@ class _HistoricoState extends State<Historico> {
 
   @override
   void initState() {
-    // TODO: implement initState
+
     super.initState();
     _recuperaPedidos();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _controller.close();
   }

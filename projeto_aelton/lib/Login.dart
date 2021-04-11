@@ -66,7 +66,7 @@ class _LoginState extends State<Login> {
 
   Future _verificaUsuarioLogado() async {
     FirebaseAuth auth = FirebaseAuth.instance;
-    var usuariologado = await auth.currentUser;
+    var usuariologado = auth.currentUser;
 
     if (usuariologado != null) {
       Navigator.popAndPushNamed(context, "/carrinho");
@@ -86,7 +86,6 @@ class _LoginState extends State<Login> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _verificaUsuarioLogado();
   }
@@ -167,15 +166,17 @@ class _LoginState extends State<Login> {
                   ),
                   Padding(
                     padding: EdgeInsets.only(top: 8, bottom: 10),
-                    child: RaisedButton(
+                    child: ElevatedButton(
                       child: Text(
                         "Entrar",
                         style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
-                      color: Color(0xffFF0000),
-                      padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)),
+                      style: ElevatedButton.styleFrom(
+                        primary: Color(0xffFF0000),
+                        padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15)),
+                      ),
                       onPressed: () {
                         _validarCampos();
                       },
@@ -183,15 +184,17 @@ class _LoginState extends State<Login> {
                   ),
                   Padding(
                     padding: EdgeInsets.only(bottom: 10),
-                    child: RaisedButton(
+                    child: ElevatedButton(
                       child: Text(
                         "Cadastrar",
                         style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
-                      color: Color(0xff37474f),
-                      padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)),
+                      style: ElevatedButton.styleFrom(
+                        primary: Color(0xff37474f),
+                        padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15)),
+                      ),
                       onPressed: () {
                         Navigator.pushNamed(context, "/cadastro");
                       },

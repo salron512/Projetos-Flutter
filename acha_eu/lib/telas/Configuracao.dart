@@ -250,7 +250,7 @@ class _ConfiguracaoState extends State<Configuracao> {
         .collection("categorias")
         .orderBy("categoria", descending: false)
         .get();
-    List<String> listarecuperada = List();
+    List<String> listarecuperada =[];
     for (var item in snapshot.docs) {
       Map<String, dynamic> dados = item.data();
       if (dados["categoria"] == "Cliente") continue;
@@ -349,7 +349,7 @@ class _ConfiguracaoState extends State<Configuracao> {
               ),
             ),
             actions: [
-              FlatButton(
+              TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: Text("Cancelar"),
               ),
@@ -365,7 +365,7 @@ class _ConfiguracaoState extends State<Configuracao> {
         .where("estado", isEqualTo: _scolhaEstado)
         .get();
 
-    List<String> listaCidadesRecuperadas = List();
+    List<String> listaCidadesRecuperadas =[];
     for (var item in dados.docs) {
       var dados = item.data();
       print("teste for: " + dados["cidade"].toString());
@@ -409,7 +409,7 @@ class _ConfiguracaoState extends State<Configuracao> {
                 ),
               ),
               actions: [
-                FlatButton(
+                TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: Text("Cancelar"),
                 ),
@@ -465,7 +465,7 @@ class _ConfiguracaoState extends State<Configuracao> {
                 ),
               ),
               actions: [
-                FlatButton(
+                TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: Text("Cancelar"),
                 ),
@@ -556,7 +556,7 @@ class _ConfiguracaoState extends State<Configuracao> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              FlatButton(
+                              TextButton(
                                 child: Text(
                                   "Câmera",
                                   style: TextStyle(
@@ -568,7 +568,7 @@ class _ConfiguracaoState extends State<Configuracao> {
                                   _recuperaImagem(true);
                                 },
                               ),
-                              FlatButton(
+                              TextButton(
                                 child: Text(
                                   "Galeria",
                                   style: TextStyle(

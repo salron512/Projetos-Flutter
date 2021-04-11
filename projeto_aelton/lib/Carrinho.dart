@@ -58,7 +58,7 @@ class _CarrinhoState extends State<Carrinho> {
           "pontoReferencia": map["pontoReferencia"],
           "status": "pendente",
           "data": DateTime.now().toString(),
-        }).then((value){
+        }).then((value) {
           _postaNotificao();
         });
         var dados = await db
@@ -106,25 +106,22 @@ class _CarrinhoState extends State<Carrinho> {
     }
   }
 
-  _postaNotificao()async{
+  _postaNotificao() async {
     FirebaseFirestore db = FirebaseFirestore.instance;
-   List<String> list = [];
-    var snapshot = await db.collection("usuarios")
-        .where("adm", isEqualTo: true )
-        .get();
+    List<String> list = [];
+    var snapshot =
+        await db.collection("usuarios").where("adm", isEqualTo: true).get();
 
-    for(var item in snapshot.docs){
+    for (var item in snapshot.docs) {
       Map<String, dynamic> map = item.data();
-      print("id Usuario"+ map["playerId"]);
+      print("id Usuario" + map["playerId"]);
       String idUsuarioNotigicacao = map["playerId"];
       list.add(idUsuarioNotigicacao);
     }
-    OneSignal.shared.postNotification(
-      OSCreateNotification(
-          playerIds: list,
-          heading: "Nova entrega",
-          content: "Você tem uma nova entrega!")
-    );
+    OneSignal.shared.postNotification(OSCreateNotification(
+        playerIds: list,
+        heading: "Nova entrega",
+        content: "Você tem uma nova entrega!"));
   }
 
   _salvaProduto(String nome, String marca) {
@@ -167,12 +164,11 @@ class _CarrinhoState extends State<Carrinho> {
               ),
             ),
             actions: [
-              // ignore: deprecated_member_use
-              FlatButton(
+              TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: Text("Cancelar"),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   if (_controllerProduto.text.contains(".") ||
                       _controllerProduto.text.contains("-") ||
@@ -237,7 +233,7 @@ class _CarrinhoState extends State<Carrinho> {
               ),
             ),
             actions: [
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   _controllerProduto.clear();
                   Navigator.pop(context);
@@ -297,6 +293,7 @@ class _CarrinhoState extends State<Carrinho> {
     Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
   }
 
+  // ignore: missing_return
   Stream _recuperaItensCarrinho() {
     FirebaseFirestore db = FirebaseFirestore.instance;
     FirebaseAuth auth = FirebaseAuth.instance;
@@ -347,11 +344,11 @@ class _CarrinhoState extends State<Carrinho> {
               ),
             ),
             actions: [
-              FlatButton(
+              TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: Text("Cancelar"),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   if (_controllerProduto.text.contains(".") ||
                       _controllerProduto.text.contains(",") ||
@@ -405,11 +402,11 @@ class _CarrinhoState extends State<Carrinho> {
               ),
             ),
             actions: [
-              FlatButton(
+              TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: Text("Cancelar"),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   FirebaseFirestore db = FirebaseFirestore.instance;
                   db.collection("requisicoesAtivas").doc(id).delete();
@@ -422,19 +419,16 @@ class _CarrinhoState extends State<Carrinho> {
         });
   }
 
-
-
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _recuperaDadosUsuario();
     _recuperaItensCarrinho();
     _recuperaProdutos();
   }
+
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _controller.close();
   }
@@ -647,15 +641,21 @@ class _CarrinhoState extends State<Carrinho> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            RaisedButton(
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                primary: Color(0xffFF0000),
+                padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15)),
+              ),
               child: Text(
-                "Confirmar Pedido",
+                "Confirmar pedido",
                 style: TextStyle(color: Colors.white, fontSize: 20),
               ),
-              color: Color(0xffFF0000),
-              padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15)),
+              // color: Color(0xffFF0000),
+              //  padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+              // shape: RoundedRectangleBorder(
+              //   borderRadius: BorderRadius.circular(15)),
               onPressed: () {
                 _confirmarPedido();
               },

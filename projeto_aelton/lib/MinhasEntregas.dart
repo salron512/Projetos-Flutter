@@ -40,13 +40,11 @@ class _MinhasEntregasState extends State<MinhasEntregas> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _recuperaPedidos();
   }
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _controller.close();
   }

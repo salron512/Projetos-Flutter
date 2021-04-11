@@ -100,7 +100,7 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
               ),
             ),
             actions: [
-              FlatButton(
+              TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: Text("Cancelar"),
               ),
@@ -142,11 +142,11 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
               ),
             ),
             actions: [
-              FlatButton(
+              TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: Text("Cancelar"),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   _salvaSolicitacao();
                   _controllerDescricao.clear();
@@ -251,14 +251,14 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
               ),
             ),
             actions: [
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                   _recuperaSolicitacao();
                 },
                 child: Text("Cancelar"),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   FirebaseFirestore db = FirebaseFirestore.instance;
                   db.collection("solicitacao").doc(id).delete();

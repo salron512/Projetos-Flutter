@@ -29,7 +29,6 @@ class _ConfiguracaoUsuarioState extends State<ConfiguracaoUsuario> {
     String id = auth.currentUser.uid;
     var dados = await db.collection("usuarios").doc(id).get();
     Map<String, dynamic> map = dados.data();
-    Usuario usuario = Usuario();
 
     setState(() {
       _controllerNome.text = map["nome"];
@@ -105,7 +104,6 @@ class _ConfiguracaoUsuarioState extends State<ConfiguracaoUsuario> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _recuperaUsuario();
   }

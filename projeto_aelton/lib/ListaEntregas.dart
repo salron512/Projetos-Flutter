@@ -86,28 +86,28 @@ class _ListaEntregasState extends State<ListaEntregas> {
               ),
             ),
             actions: [
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                   _finalizaEntrega(dados);
                 },
                 child: Text("Finalizar entrega"),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                   _cancelarEntrega(dados);
                 },
                 child: Text("Cancelar entrega"),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                   _abrirTelefone(dados["telefone"]);
                 },
                 child: Text("Ligar para o cliente"),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                   _abrirWhatsApp(dados["whatsapp"]);
@@ -149,13 +149,13 @@ class _ListaEntregasState extends State<ListaEntregas> {
               ),
             ),
             actions: [
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
                 child: Text("Não"),
               ),
-              FlatButton(
+              TextButton(
                 child: Text("Sim"),
                 onPressed: () {
                   FirebaseFirestore db = FirebaseFirestore.instance;
@@ -235,13 +235,13 @@ class _ListaEntregasState extends State<ListaEntregas> {
               ),
             ),
             actions: [
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
                 child: Text("Não"),
               ),
-              FlatButton(
+              TextButton(
                 child: Text("Sim"),
                 onPressed: () {
                   FirebaseFirestore db = FirebaseFirestore.instance;
@@ -257,14 +257,12 @@ class _ListaEntregasState extends State<ListaEntregas> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _recuperaPedidos();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _controller.close();
   }

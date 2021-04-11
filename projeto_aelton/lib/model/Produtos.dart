@@ -5,20 +5,21 @@ class Produtos{
 
   Produtos();
 
+  // ignore: unnecessary_getters_setters
   String get qtd => _qtd;
-
+// ignore: unnecessary_getters_setters
   set qtd(String value) {
     _qtd = value;
   }
-
+// ignore: unnecessary_getters_setters
   String get marca => _marca;
-
+// ignore: unnecessary_getters_setters
   set marca(String value) {
     _marca = value;
   }
-
+// ignore: unnecessary_getters_setters
   String get nome => _nome;
-
+// ignore: unnecessary_getters_setters
   set nome(String value) {
     _nome = value;
   }
