@@ -24,10 +24,14 @@ void main() async {
   await OneSignal.shared
       .promptUserForPushNotificationPermission(fallbackToSettings: true);
 
+      
+
+ 
+
   runApp(MaterialApp(
     // debugShowCheckedModeBanner: false,
     title: "Chama Eu",
-    theme:temaPadrao ,
+    theme: temaPadrao,
     debugShowCheckedModeBanner: false,
     home: Home(),
     initialRoute: "/",
@@ -38,8 +42,6 @@ void main() async {
       GlobalWidgetsLocalizations.delegate,
       GlobalCupertinoLocalizations.delegate,
     ],
-    supportedLocales: [
-      const Locale('pt', 'BR')
-    ],
+    supportedLocales: [const Locale('pt', 'BR')],
   ));
 }

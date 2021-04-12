@@ -86,7 +86,7 @@ class _DetalhesContadoState extends State<DetalhesContado> {
         title: Text(widget.usuario.nome),
       ),
       body: Container(
-        decoration: BoxDecoration(color: Color(0xffDCDCDC)),
+      //  decoration: BoxDecoration(color: Color(0xffDCDCDC)),
         alignment: Alignment.center,
         child: SingleChildScrollView(
             padding: EdgeInsets.all(16),
@@ -140,7 +140,7 @@ class _DetalhesContadoState extends State<DetalhesContado> {
                     alignment: Alignment.center,
                     height: 250,
                     decoration: BoxDecoration(
-                        color: Color(0xffDCDCDC),
+                      //  color: Color(0xffDCDCDC),
                         borderRadius: BorderRadius.circular(32),
                         border: Border.all(color: Colors.black)),
                     child: Column(
@@ -257,7 +257,7 @@ class _DetalhesContadoState extends State<DetalhesContado> {
                       alignment: Alignment.center,
                       height: 250,
                       decoration: BoxDecoration(
-                          color: Color(0xffDCDCDC),
+                         // color: Color(0xffDCDCDC),
                           borderRadius: BorderRadius.circular(32),
                           border: Border.all(color: Colors.black)),
                       child: Column(

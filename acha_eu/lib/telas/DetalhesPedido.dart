@@ -95,7 +95,7 @@ class _DetalhesPedidoState extends State<DetalhesPedido> {
         title: Text("Pedido"),
       ),
       body: Container(
-        decoration: BoxDecoration(color: Color(0xffDCDCDC)),
+       // decoration: BoxDecoration(color: Color(0xffDCDCDC)),
         alignment: Alignment.center,
         child: SingleChildScrollView(
           padding: EdgeInsets.all(16),

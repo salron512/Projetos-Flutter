@@ -103,7 +103,7 @@ class _ListaTrabalhosState extends State<ListaTrabalhos> {
                 QuerySnapshot querySnapshot = snapshot.data;
                 if (querySnapshot.docs.length == 0) {
                   return Container(
-                    decoration: BoxDecoration(color: Color(0xffDCDCDC)),
+                   // decoration: BoxDecoration(color: Color(0xffDCDCDC)),
                       child: Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -118,7 +118,7 @@ class _ListaTrabalhosState extends State<ListaTrabalhos> {
                   );
                 } else {
                   return Container(
-                    decoration: BoxDecoration(color: Color(0xffDCDCDC)),
+                  //  decoration: BoxDecoration(color: Color(0xffDCDCDC)),
                     padding: EdgeInsets.all(10),
                     child: ListView.builder(
                       itemCount: querySnapshot.docs.length,

@@ -120,7 +120,7 @@ class _ListaSericosState extends State<ListaSericos> {
                   ));
                 } else {
                   return Container(
-                    decoration: BoxDecoration(color: Color(0xffDCDCDC)),
+                   // decoration: BoxDecoration(color: Color(0xffDCDCDC)),
                     padding: EdgeInsets.all(10),
                     child: ListView.builder(
                       itemCount: item.length,

@@ -195,9 +195,10 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
       list.add(idUsuarioNotigicacao);
     }
     OneSignal.shared.postNotification(OSCreateNotification(
-        playerIds: list,
-        heading: "Novo trabalho",
-        content: "Você tem uma nova prostosta de trabalho!"));
+      playerIds: list,
+      heading: "Novo trabalho",
+      content: "Você tem uma nova prostosta de trabalho!",
+    ));
   }
 
   _formatarData(String data) {
@@ -271,6 +272,7 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
         });
   }
 
+ 
   @override
   void initState() {
     super.initState();
@@ -300,7 +302,7 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
                 QuerySnapshot querySnapshot = snapshot.data;
                 if (querySnapshot.docs.length == 0) {
                   return Container(
-                    decoration: BoxDecoration(color: Color(0xffDCDCDC)),
+                    //  decoration: BoxDecoration(color: Color(0xffDCDCDC)),
                     child: Center(
                         child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -315,7 +317,7 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
                   );
                 } else {
                   return Container(
-                    decoration: BoxDecoration(color: Color(0xffDCDCDC)),
+                    //  decoration: BoxDecoration(color: Color(0xffDCDCDC)),
                     padding: EdgeInsets.all(10),
                     child: ListView.builder(
                       itemCount: querySnapshot.docs.length,
@@ -449,16 +451,13 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       bottomNavigationBar: BottomAppBar(
-        color:Color(0xff37474f),
-        shape:CircularNotchedRectangle(),
-        child:Row(
-          children: [
-            Container(
-                color: Color(0xff37474f),
-                height: 50.0),
-          ],
-        )
-      ),
+          color: Color(0xff37474f),
+          shape: CircularNotchedRectangle(),
+          child: Row(
+            children: [
+              Container(color: Color(0xff37474f), height: 50.0),
+            ],
+          )),
     );
   }
 }

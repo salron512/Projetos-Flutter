@@ -37,7 +37,7 @@ class _ContatoState extends State<Contato> {
           title: Text("Contato"),
         ),
         body: Container(
-          decoration: BoxDecoration(color: Color(0xffDCDCDC)),
+         // decoration: BoxDecoration(color: Color(0xffDCDCDC)),
           padding: EdgeInsets.all(16),
           child: Center(
             child: Column(

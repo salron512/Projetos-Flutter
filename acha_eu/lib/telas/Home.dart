@@ -87,6 +87,8 @@ class _HomeState extends State<Home> {
     }
   }
 
+ 
+
   @override
   void initState() {
     super.initState();
@@ -97,7 +99,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(color: Color(0xffDCDCDC)),
+        //  decoration: BoxDecoration(color: Color(0xffDCDCDC)),
         child: Center(
           child: SingleChildScrollView(
             padding: EdgeInsets.all(16),

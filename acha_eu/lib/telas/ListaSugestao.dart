@@ -33,7 +33,7 @@ class _ListaSugestaoState extends State<ListaSugestao> {
         title: Text("Lista de sugestões"),
       ),
       body: Container(
-        decoration: BoxDecoration(color: Color(0xffDCDCDC)),
+      //  decoration: BoxDecoration(color: Color(0xffDCDCDC)),
         // ignore: missing_return
         child: FutureBuilder(
             future: _recuperaSugestao(),

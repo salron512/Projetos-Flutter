@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 class ListaCategorias extends StatefulWidget {
   @override
@@ -10,8 +11,7 @@ class ListaCategorias extends StatefulWidget {
 }
 
 class _ListaCategoriasState extends State<ListaCategorias> {
-  List<String> itensMenu = ["Perfil", "Deslogar","Anúncie"];
-
+  List<String> itensMenu = ["Perfil", "Deslogar", "Anúncie"];
 
   Future _recuperaCategorias() async {
     // ignore: deprecated_member_use
@@ -23,14 +23,13 @@ class _ListaCategoriasState extends State<ListaCategorias> {
         .orderBy("categoria", descending: false)
         .get();
     for (var item in snapshot.docs) {
-
       Map<String, dynamic> dados = item.data();
-      if(dados["categoria"] == "Cliente" ) continue;
+      if (dados["categoria"] == "Cliente") continue;
 
       Categorias categorias = Categorias();
       categorias.nome = dados["categoria"];
       categorias.idImagem = dados["idImagem"];
-      var imagem =  storage.ref("imagensCategoria/" + categorias.idImagem);
+      var imagem = storage.ref("imagensCategoria/" + categorias.idImagem);
       String url = await imagem.getDownloadURL();
       categorias.urlImagem = url;
       //print("categorias: " + categorias.nome);
@@ -39,6 +38,7 @@ class _ListaCategoriasState extends State<ListaCategorias> {
     }
     return listacategoria;
   }
+
   _escolhaMenuItem(String itemEscolhido) {
     switch (itemEscolhido) {
       case "Perfil":
@@ -59,6 +59,29 @@ class _ListaCategoriasState extends State<ListaCategorias> {
     Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
   }
 
+  recebeNot() {
+    OneSignal.shared.setNotificationOpenedHandler(
+        (OSNotificationOpenedResult result) async {
+      // será chamado sempre que uma notificação for aberta / botão pressionado.
+      if (result != null) {
+        FirebaseFirestore db = FirebaseFirestore.instance;
+        FirebaseAuth auth = FirebaseAuth.instance;
+        String id = auth.currentUser.uid;
+        var dados = await db.collection("usuarios").doc(id).get();
+        Map<String, dynamic> map = dados.data();
+        String categoria = map["categoria"];
+        print("teste ok!");
+        Navigator.pushNamed(context, "/listaPedidos", arguments: categoria);
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    recebeNot();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,66 +96,170 @@ class _ListaCategoriasState extends State<ListaCategorias> {
               return itensMenu.map((String item) {
                 return PopupMenuItem<String>(
                   value: item,
-                  child: Text(item,
-                      style: TextStyle(
-                          color: Colors.white
-                      )
-                  ),
+                  child: Text(item, style: TextStyle(color: Colors.white)),
                 );
               }).toList();
             },
           )
         ],
       ),
-      body: Container(
-        decoration: BoxDecoration(color: Color(0xffDCDCDC)),
-        // ignore: missing_return
-        child: FutureBuilder(
-            future: _recuperaCategorias(),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          /*
+           SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(children: [
+             GestureDetector(
+             child:  Padding(
+               padding: EdgeInsets.only(left: 10),
+               child:  Container(
+                 decoration: BoxDecoration(
+                     borderRadius: BorderRadius.circular(15),
+                     image: DecorationImage(
+                         image:  AssetImage("images/teste.png"),
+                         fit: BoxFit.cover
+                     )
+                 ) ,
+                 width: 80,
+                 height: 80,
+               ),
+             ),
+             onTap: (){
+               Navigator.pushNamed(context, "/propaganda");
+             },
+           ),
+             GestureDetector(
+             child:  Padding(
+               padding: EdgeInsets.only(left: 10),
+               child:  Container(
+                 decoration: BoxDecoration(
+                     borderRadius: BorderRadius.circular(15),
+                     image: DecorationImage(
+                         image:  AssetImage("images/teste.png"),
+                         fit: BoxFit.cover
+                     )
+                 ) ,
+                 width: 80,
+                 height: 80,
+               ),
+             ),
+             onTap: (){
+               Navigator.pushNamed(context, "/propaganda");
+             },
+           ),
+           GestureDetector(
+             child:  Padding(
+               padding: EdgeInsets.only(left: 10),
+               child:  Container(
+                 decoration: BoxDecoration(
+                     borderRadius: BorderRadius.circular(15),
+                     image: DecorationImage(
+                         image:  AssetImage("images/teste.png"),
+                         fit: BoxFit.cover
+                     )
+                 ) ,
+                 width: 80,
+                 height: 80,
+               ),
+             ),
+             onTap: (){
+               Navigator.pushNamed(context, "/propaganda");
+             },
+           ),
+           GestureDetector(
+             child:  Padding(
+               padding: EdgeInsets.only(left: 10),
+               child:  Container(
+                 decoration: BoxDecoration(
+                     borderRadius: BorderRadius.circular(15),
+                     image: DecorationImage(
+                         image:  AssetImage("images/teste.png"),
+                         fit: BoxFit.cover
+                     )
+                 ) ,
+                 width: 80,
+                 height: 80,
+               ),
+             ),
+             onTap: (){
+               Navigator.pushNamed(context, "/propaganda");
+             },
+           ),
+           GestureDetector(
+             child:  Padding(
+               padding: EdgeInsets.only(left: 10),
+               child:  Container(
+                 decoration: BoxDecoration(
+                     borderRadius: BorderRadius.circular(15),
+                     image: DecorationImage(
+                         image:  AssetImage("images/teste.png"),
+                         fit: BoxFit.cover
+                     )
+                 ) ,
+                 width: 80,
+                 height: 80,
+               ),
+             ),
+             onTap: (){
+               Navigator.pushNamed(context, "/propaganda");
+             },
+           )
+          ]
+          ),
+          
+        ),
+        */
+          Expanded(
+            // decoration: BoxDecoration(color: Color(0xffDCDCDC)),
             // ignore: missing_return
-            builder: (context, snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.none:
-                return Center(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                       Padding(
-                    padding: EdgeInsets.only(bottom: 10),
-                    child: Image.asset(
-                      "images/conexao.png",
-                      width: 250,
-                      height: 200,
-                    ),
-                  ),
-                    Text("Sem conexão")
-                  ],),
-                );
-                case ConnectionState.waiting:
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                  break;
-                case ConnectionState.active:
-                case ConnectionState.done:
-                  List<Categorias> item = snapshot.data;
-                  return Container(
-                      child: GridView.count(
+            child: FutureBuilder(
+                future: _recuperaCategorias(),
+                // ignore: missing_return
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.none:
+                      return Center(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(bottom: 10),
+                              child: Image.asset(
+                                "images/conexao.png",
+                                width: 250,
+                                height: 200,
+                              ),
+                            ),
+                            Text("Sem conexão")
+                          ],
+                        ),
+                      );
+                    case ConnectionState.waiting:
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                      break;
+                    case ConnectionState.active:
+                    case ConnectionState.done:
+                      List<Categorias> item = snapshot.data;
+                      return Container(
+                          child: GridView.count(
                         crossAxisCount: 3,
                         mainAxisSpacing: 2,
                         crossAxisSpacing: 2,
                         children: List.generate(
-                          // ignore: missing_return
-                            item.length,
-                                (indice) {
+                            // ignore: missing_return
+                            item.length, (indice) {
                           var dados = item[indice];
                           return Container(
                             padding: EdgeInsets.all(8),
                             width: 100,
                             height: 100,
                             child: GestureDetector(
-                              onTap: (){
+                              onTap: () {
                                 Navigator.pushNamed(context, "/listaservicos",
                                     arguments: dados);
                               },
@@ -148,32 +275,32 @@ class _ListaCategoriasState extends State<ListaCategorias> {
                                           : null),
                                   Padding(
                                     padding: EdgeInsets.only(top: 8),
-                                    child: Text(dados.nome,
+                                    child: Text(
+                                      dados.nome,
                                       style: TextStyle(
                                           fontSize: 12,
-                                          fontWeight: FontWeight.bold
-                                      ),
+                                          fontWeight: FontWeight.bold),
                                     ),
                                   )
                                 ],
                               ),
-
                             ),
                           );
                         }),
-                      )
-                  );
-                  break;
-              }
-            }),
+                      ));
+                      break;
+                  }
+                }),
+          ),
+        ],
       ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+      // floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: FloatingActionButton.extended(
-          onPressed: (){
+          onPressed: () {
             Navigator.pushNamed(context, "/listaSolicitacao");
-          }
-          , label: Text("Solicite um profissional")
-      ),
+          },
+          label: Text("Solicite um profissional")),
+      /*
       bottomNavigationBar: BottomAppBar(
         color:Color(0xffDCDCDC),
         child:   SingleChildScrollView(
@@ -202,6 +329,7 @@ class _ListaCategoriasState extends State<ListaCategorias> {
           ),
         )
       ),
+      */
     );
   }
 }
