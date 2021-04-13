@@ -11,7 +11,7 @@ class ListaCategorias extends StatefulWidget {
 }
 
 class _ListaCategoriasState extends State<ListaCategorias> {
-  List<String> itensMenu = ["Perfil", "Deslogar", "Anúncie"];
+  List<String> itensMenu = ["Perfil", "Sair", "Anúncie"];
 
   Future _recuperaCategorias() async {
     // ignore: deprecated_member_use
@@ -44,7 +44,7 @@ class _ListaCategoriasState extends State<ListaCategorias> {
       case "Perfil":
         Navigator.pushNamed(context, "/config");
         break;
-      case "Deslogar":
+      case "Sair":
         _deslogarUsuario();
         break;
       case "Anúncie":
