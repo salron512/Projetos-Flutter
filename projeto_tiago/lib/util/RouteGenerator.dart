@@ -11,6 +11,7 @@ import 'package:projeto_tiago/ListaPedidos.dart';
 import 'package:projeto_tiago/ListaProdutos.dart';
 import 'package:projeto_tiago/MinhasEntregas.dart';
 import 'package:projeto_tiago/PedidoUsuario.dart';
+import 'package:projeto_tiago/Produto.dart';
 import '../Cadastro.dart';
 import '../CadastroProdutos.dart';
 import '../Login.dart';
@@ -80,6 +81,10 @@ class RouteGenerator{
       case "/historico" :
         return MaterialPageRoute(
             builder: (_) => Historico()
+        );
+         case "/produto" :
+        return MaterialPageRoute(
+            builder: (_) => Produto()
         );
 
 

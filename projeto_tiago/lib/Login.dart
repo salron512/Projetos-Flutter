@@ -94,13 +94,14 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(color: Colors.white),
+        decoration: BoxDecoration(color: Theme.of(context).accentColor),
         child: Center(
           child: SingleChildScrollView(
             padding: EdgeInsets.all(16),
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
+                  /*
                   Padding(
                     padding: EdgeInsets.only(bottom: 10),
                     child: Image.asset(
@@ -109,6 +110,7 @@ class _LoginState extends State<Login> {
                       height: 150,
                     ),
                   ),
+                  */
                   Padding(
                       padding: EdgeInsets.only(bottom: 8),
                       child: Center(
@@ -172,7 +174,7 @@ class _LoginState extends State<Login> {
                         style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
                       style: ElevatedButton.styleFrom(
-                        primary: Color(0xffFF0000),
+                        primary: Color(0xff00BFFF),
                         padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15)),
@@ -190,7 +192,7 @@ class _LoginState extends State<Login> {
                         style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
                       style: ElevatedButton.styleFrom(
-                        primary: Color(0xff37474f),
+                        primary: Theme.of(context).primaryColor,
                         padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15)),
@@ -206,7 +208,7 @@ class _LoginState extends State<Login> {
                         "Recuperar senha",
                         style: TextStyle(
                           fontSize: 20,
-                          color: Colors.black,
+                          color: Colors.white,
                         ),
                       ),
                       onTap: () {

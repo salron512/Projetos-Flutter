@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "929031287777",
+    "project_id": "loja-tim-a4c21",
+    "storage_bucket": "loja-tim-a4c21.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:929031287777:android:5f11b883343149ed3f58a0",
+        "android_client_info": {
+          "package_name": "com.tiago.projeto_tiago"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "929031287777-mj856bhs8ti076iicg80svn87qjgu4fl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPiUeyoRQ5iXt4OWw0XG1bw5pK-_CUfAE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "929031287777-mj856bhs8ti076iicg80svn87qjgu4fl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

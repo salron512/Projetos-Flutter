@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "755312841890",
-    "project_id": "acha-eu",
-    "storage_bucket": "acha-eu.appspot.com"
+    "project_number": "376292599943",
+    "project_id": "chama-eu-646e5",
+    "storage_bucket": "chama-eu-646e5.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:755312841890:android:89241bacf6356d4236f3fb",
+        "mobilesdk_app_id": "1:376292599943:android:a4008b86a3903e40157022",
         "android_client_info": {
-          "package_name": "com.example.acha_eu"
+          "package_name": "com.arv.chama_eu"
         }
       },
       "oauth_client": [
         {
-          "client_id": "755312841890-fdbk1q4puoh7lbri9hp9n2lars7g9dff.apps.googleusercontent.com",
+          "client_id": "376292599943-ee80cn3fpli1ujfmidkq24d35inn2o7m.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCD23y5tcQXAYwaljXkVmn3U0_Y5hamveY"
+          "current_key": "AIzaSyCTfFm_gqNYWOr83sChqqTfdAazcFdRgSw"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "755312841890-fdbk1q4puoh7lbri9hp9n2lars7g9dff.apps.googleusercontent.com",
+              "client_id": "376292599943-ee80cn3fpli1ujfmidkq24d35inn2o7m.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

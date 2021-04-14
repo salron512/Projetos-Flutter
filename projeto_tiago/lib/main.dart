@@ -10,7 +10,10 @@ import 'util/RouteGenerator.dart';
 
 final ThemeData temaPadrao = ThemeData(
   primaryColor: Color(0xffFF0000),
-  accentColor: Color(0xff8B0000),
+  accentColor: Color(0xff174076),
+ // primaryColor: Color(0xff174076),
+ // accentColor: Color(0xffd32337),
+ 
 );
 
 Future<void> main() async {

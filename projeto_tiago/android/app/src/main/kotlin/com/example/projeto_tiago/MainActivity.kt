@@ -1,4 +1,4 @@
-package com.example.projeto_tiago
+package com.tiago.projeto_tiago
 
 import io.flutter.embedding.android.FlutterActivity
 

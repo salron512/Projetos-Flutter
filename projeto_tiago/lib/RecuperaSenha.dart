@@ -37,6 +37,7 @@ class _RecuperaSenhaState extends State<RecuperaSenha> {
         title: Text("Recuperar senha"),
       ),
       body: Container(
+        decoration: BoxDecoration(color: Theme.of(context).accentColor),
         padding: EdgeInsets.all(16),
         child: Center(
           child: SingleChildScrollView(
@@ -46,7 +47,7 @@ class _RecuperaSenhaState extends State<RecuperaSenha> {
                   Padding(
                     padding: EdgeInsets.only(bottom: 10),
                     child: Image.asset(
-                      "images/reset.png",
+                      "images/fpassword.png",
                       width: 200,
                       height: 150,
                     ),
