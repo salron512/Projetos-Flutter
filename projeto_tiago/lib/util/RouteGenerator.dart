@@ -5,13 +5,15 @@ import 'package:projeto_tiago/Adm.dart';
 import 'package:projeto_tiago/Carrinho.dart';
 import 'package:projeto_tiago/ConfiguracaoUsuario.dart';
 import 'package:projeto_tiago/DetalhesEntrega.dart';
+import 'package:projeto_tiago/DetalhesProdutos.dart';
+import 'package:projeto_tiago/GriProduto.dart';
+import 'package:projeto_tiago/Grid.dart';
 import 'package:projeto_tiago/Historico.dart';
 import 'package:projeto_tiago/ListaEntregas.dart';
 import 'package:projeto_tiago/ListaPedidos.dart';
 import 'package:projeto_tiago/ListaProdutos.dart';
 import 'package:projeto_tiago/MinhasEntregas.dart';
 import 'package:projeto_tiago/PedidoUsuario.dart';
-import 'package:projeto_tiago/Produto.dart';
 import '../Cadastro.dart';
 import '../CadastroProdutos.dart';
 import '../Login.dart';
@@ -84,7 +86,15 @@ class RouteGenerator{
         );
          case "/produto" :
         return MaterialPageRoute(
-            builder: (_) => Produto()
+            builder: (_) => DetalhesProdutos()
+        );
+        case "/grid" :
+        return MaterialPageRoute(
+            builder: (_) => GridProduto(args)
+        );
+         case "/gridproduto" :
+        return MaterialPageRoute(
+            builder: (_) => Grid(args)
         );
 
 
