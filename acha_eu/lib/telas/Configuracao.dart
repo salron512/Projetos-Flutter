@@ -488,7 +488,7 @@ class _ConfiguracaoState extends State<Configuracao> {
       appBar: AppBar(
         title: Text("Perfil"),
         actions: [
-
+    /*
           IconButton(
             icon: Icon(
               Icons.account_balance_sharp,
@@ -501,6 +501,7 @@ class _ConfiguracaoState extends State<Configuracao> {
               );
             },
           ),
+     */
           
           _mostraPagamento != false
               ? IconButton(

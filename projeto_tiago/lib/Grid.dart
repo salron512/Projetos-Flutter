@@ -17,19 +17,31 @@ class Grid extends StatefulWidget {
 class _GridState extends State<Grid> {
   // ignore: close_sinks
   StreamController _streamController = StreamController.broadcast();
+  // ignore: unused_field
   bool _subindoImagem = false;
+  // ignore: unused_field
   String _urlImagem = "";
   File _imagem;
+  bool _imagemPerfil = false;
+  String _tituloImagem = "";
 
-  _atualizarUrlIamgemFirestore(String url) async {
+  _atualizarUrlIamgemFirestore(String url, String path) async {
     FirebaseFirestore db = FirebaseFirestore.instance;
 
-    db.collection("galeria").doc(widget.id).collection(widget.id).doc().set({
+    db
+        .collection("galeria")
+        .doc(widget.id)
+        .collection(widget.id)
+        .doc(_tituloImagem)
+        .set({
       "ordenador": DateTime.now().microsecondsSinceEpoch.toString(),
       "id": widget.id,
       "urlGaleria": url,
+      "path": path,
     });
-    //_recuperaGaleria();
+    setState(() {
+      _imagemPerfil = true;
+    });
   }
 
   // ignore: missing_return
@@ -73,9 +85,13 @@ class _GridState extends State<Grid> {
 
   Future _uploadImagem() async {
     FirebaseStorage storage = FirebaseStorage.instance;
+
     var pastaRaiz = storage.ref();
-    var arquivo =
-        pastaRaiz.child("produtos").child("perfil").child(widget.id + ".jpg");
+    _tituloImagem = DateTime.now().microsecondsSinceEpoch.toString();
+    var arquivo = pastaRaiz
+        .child("produtos")
+        .child(widget.id)
+        .child(_tituloImagem + ".jpg");
     UploadTask task = arquivo.putFile(_imagem);
     task.snapshotEvents.listen((TaskSnapshot storageTaskEvent) {
       if (storageTaskEvent.state == TaskState.running) {
@@ -96,11 +112,63 @@ class _GridState extends State<Grid> {
 
   Future _recuperarUrlImagem(TaskSnapshot snapshot) async {
     String url = await snapshot.ref.getDownloadURL();
-    _atualizarUrlIamgemFirestore(url);
+    String path = snapshot.ref.fullPath;
+    _atualizarUrlIamgemFirestore(url, path);
 
     setState(() {
       _urlImagem = url;
     });
+  }
+
+  _apagaImagem(String id, String path) {
+    showDialog(
+        context: context,
+        // ignore: missing_return
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Excluir imagem"),
+            content: Container(
+              height: 190,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    height: 100,
+                    width: 100,
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 2),
+                      child: Image.asset("images/excluir.png"),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("Cancelar"),
+              ),
+              TextButton(
+                onPressed: () {
+                  FirebaseFirestore db = FirebaseFirestore.instance;
+                  FirebaseStorage storage = FirebaseStorage.instance;
+
+                  db
+                      .collection("galeria")
+                      .doc(widget.id)
+                      .collection(widget.id)
+                      .doc(id)
+                      .delete();
+
+                  var pastaRaiz = storage.ref();
+                  pastaRaiz.child(path).delete();
+                  Navigator.pop(context);
+                },
+                child: Text("Excluir"),
+              ),
+            ],
+          );
+        });
   }
 
   @override
@@ -122,10 +190,8 @@ class _GridState extends State<Grid> {
           title: Text("Grid produto"),
         ),
         body: Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).accentColor
-          ),
-          padding: EdgeInsets.all(15),
+          decoration: BoxDecoration(color: Theme.of(context).accentColor),
+          padding: EdgeInsets.only(left: 15, right: 15, top: 5, bottom: 5),
           child: StreamBuilder(
             stream: _streamController.stream,
             // ignore: missing_return
@@ -148,26 +214,45 @@ class _GridState extends State<Grid> {
                   QuerySnapshot querySnapshot = snapshot.data;
                   if (querySnapshot.docs.length == 0) {
                     return Center(
-                      child: Text("Sem imagens na galeria"),
+                      child: Text(
+                        "Sem imagens na galeria",
+                        style: TextStyle(fontSize: 15, color: Colors.white),
+                      ),
                     );
                   } else {
-                   return
-                         GridView.count(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 2,
-                          crossAxisSpacing: 2,
-                          children: List.generate(
-                              // ignore: missing_return
-                              querySnapshot.docs.length, (indice) {
-                            List<DocumentSnapshot> urls =
-                                querySnapshot.docs.toList();
-                            DocumentSnapshot dados = urls[indice];
-                           return Image.network(dados["urlGaleria"],
-                             width: 700,
-                             height: 700,
-                           );
-                          }),
+                    return GridView.count(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 3,
+                      crossAxisSpacing: 3,
+                      children: List.generate(
+                          // ignore: missing_return
+                          querySnapshot.docs.length, (indice) {
+                        List<DocumentSnapshot> urls =
+                            querySnapshot.docs.toList();
+                        DocumentSnapshot dados = urls[indice];
+                        return GestureDetector(
+                          child: dados["urlGaleria"] == null
+                              ? Container(
+                                  decoration: BoxDecoration(
+                                      color: Theme.of(context).accentColor),
+                                  child: CircularProgressIndicator(
+                                    backgroundColor:
+                                        Theme.of(context).primaryColor,
+                                  ),
+                                )
+                              : Image.network(
+                                  dados["urlGaleria"],
+                                  fit: BoxFit.cover,
+                                  width: 700,
+                                  height: 700,
+                                ),
+                          onTap: () {},
+                          onLongPress: () {
+                            _apagaImagem(dados.reference.id, dados["path"]);
+                          },
                         );
+                      }),
+                    );
                   }
                   break;
               }
@@ -196,17 +281,19 @@ class _GridState extends State<Grid> {
                     },
                     icon: Icon(Icons.photo_rounded)),
                 Padding(
-                  padding: EdgeInsets.only(left: 15),
-                  child: IconButton(
-                    iconSize: 40,
-                    color: Colors.white,
-                    onPressed: () {
-                      Navigator.pushNamedAndRemoveUntil(
-                          context, "/carrinho", (route) => false);
-                    },
-                    icon: Icon(Icons.arrow_forward),
-                  ),
-                ),
+                    padding: EdgeInsets.only(left: 15),
+                    child: Visibility(
+                      visible: _imagemPerfil,
+                      child: IconButton(
+                        iconSize: 40,
+                        color: Colors.white,
+                        onPressed: () {
+                          Navigator.pushNamedAndRemoveUntil(
+                              context, "/carrinho", (route) => false);
+                        },
+                        icon: Icon(Icons.arrow_forward),
+                      ),
+                    )),
               ],
             )));
   }

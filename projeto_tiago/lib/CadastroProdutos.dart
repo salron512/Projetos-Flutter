@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 class CadastroProdutos extends StatefulWidget {
@@ -24,8 +25,6 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
       _controller.add(event);
     });
   }
-
-
 
   _editaProduto(String nome, String marca, String id) {
     setState(() {
@@ -100,6 +99,49 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
         });
   }
 
+  _selecaoGaleriaPeril(String dados) {
+    setState(() {});
+    showDialog(
+        context: context,
+        // ignore: missing_return
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Dados do produtos"),
+            content: Container(
+              height: 250,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    height: 100,
+                    width: 100,
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 2),
+                      child: Image.asset("images/solicitacao.png"),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, "/grid", arguments: dados);
+                },
+                child: Text("Perfil"),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, "/gridproduto",
+                      arguments: dados);
+                },
+                child: Text("Galeria"),
+              ),
+            ],
+          );
+        });
+  }
+
   _apagaProduto(String nome, String marca, String id) {
     showDialog(
         context: context,
@@ -139,7 +181,31 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
               TextButton(
                 onPressed: () {
                   FirebaseFirestore db = FirebaseFirestore.instance;
+                  FirebaseStorage storage = FirebaseStorage.instance;
+                  var pastaRaiz = storage.ref();
+                  pastaRaiz.child("produtos").child(id).listAll().then((value) {
+                    for (var item in value.items) {
+                      print("teste for: " + item.fullPath);
+                      pastaRaiz.child(item.fullPath).delete();
+                    }
+                  });
+
                   db.collection("produtos").doc(id).delete();
+                  db
+                      .collection("galeria")
+                      .doc(id)
+                      .collection(id)
+                      .get()
+                      .then((value) {
+                    value.docs.forEach((element) {
+                      db
+                          .collection("galeria")
+                          .doc(id)
+                          .collection(id)
+                          .doc(element.id)
+                          .delete();
+                    });
+                  });
                   Navigator.pop(context);
                 },
                 child: Text("Deletar"),
@@ -202,11 +268,16 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                       color: Colors.grey,
                     ),
                     itemBuilder: (context, indice) {
-                      List<DocumentSnapshot> requisicoes =
+                      List<DocumentSnapshot> listaDados =
                           querySnapshot.docs.toList();
-                      DocumentSnapshot dados = requisicoes[indice];
+                      DocumentSnapshot dados = listaDados[indice];
                       return ListTile(
-                        leading: Image.asset("images/user.png"),
+                        leading: CircleAvatar(
+                            backgroundImage: dados["urlImagem"] != null
+                                ? NetworkImage(dados["urlImagem"])
+                                : null,
+                            //maxRadius: 100,
+                            backgroundColor: Colors.grey),
                         title: Text(
                           "Produto: " + dados["nome"],
                           style: TextStyle(color: Colors.white),
@@ -247,6 +318,9 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                                 }),
                           ],
                         ),
+                        onTap: () {
+                          _selecaoGaleriaPeril(dados.reference.id);
+                        },
                       );
                     },
                   );

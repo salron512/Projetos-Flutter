@@ -420,6 +420,8 @@ class _CarrinhoState extends State<Carrinho> {
         });
   }
 
+  
+
   @override
   void initState() {
     super.initState();
@@ -556,81 +558,9 @@ class _CarrinhoState extends State<Carrinho> {
           ],
         ),
       ),
-      body: Center(
-          //padding: EdgeInsets.all(16),
-          child: StreamBuilder(
-        stream: _controller.stream,
-        // ignore: missing_return
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-            case ConnectionState.waiting:
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            case ConnectionState.active:
-            case ConnectionState.done:
-              QuerySnapshot querySnapshot = snapshot.data;
-              if (querySnapshot.docs.length == 0) {
-                _retorno = false;
-                return Center(
-                  child: Text(
-                    "Sem produtos no carrinho!",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                  ),
-                );
-              } else {
-                _retorno = true;
-                return ListView.separated(
-                  itemCount: querySnapshot.docs.length,
-                  separatorBuilder: (context, indice) => Divider(
-                    height: 2,
-                    color: Colors.grey,
-                  ),
-                  itemBuilder: (context, indice) {
-                    List<DocumentSnapshot> requisicoes =
-                        querySnapshot.docs.toList();
-                    DocumentSnapshot dados = requisicoes[indice];
-                    return ListTile(
-                      title: Text("Produto: " + dados["nome"]),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Marca: " + dados["marca"]),
-                          Text("Quantidade: " + dados["quantidade"]),
-                        ],
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                              icon: Icon(
-                                Icons.edit,
-                                color: Colors.green,
-                              ),
-                              onPressed: () {
-                                _editaProduto(dados["nome"], dados["marca"],
-                                    dados.reference.id);
-                              }),
-                          IconButton(
-                              icon: Icon(
-                                Icons.delete,
-                                color: Colors.red,
-                              ),
-                              onPressed: () {
-                                _apagaProduto(dados["nome"], dados["marca"],
-                                    dados.reference.id);
-                              }),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              }
-              break;
-          }
-        },
-      )),
+      body:Center(
+        child: Text("teste"),
+      ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.local_grocery_store),
         backgroundColor: Color(0xffFF0000),

@@ -111,7 +111,8 @@ class _CadastroState extends State<Cadastro> {
     FirebaseAuth auth = FirebaseAuth.instance;
     auth
         .createUserWithEmailAndPassword(
-            email: usuario.email, password: usuario.senha)
+            email: usuario.email,
+        password: usuario.senha)
         .then((firebase) async {
       FirebaseFirestore db = FirebaseFirestore.instance;
       // salva dados do usuario no Firebase

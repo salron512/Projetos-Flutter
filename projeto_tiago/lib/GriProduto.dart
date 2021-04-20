@@ -18,8 +18,8 @@ class _GridProdutoState extends State<GridProduto> {
   bool _subindoImagem = false;
   String _urlImagem = "";
   File _imagem;
+  bool _imagemPerfil = false;
   List<String> listaImagens = [];
-
 
   Future _recuperaImagem(bool daCamera) async {
     var picker = ImagePicker();
@@ -49,7 +49,7 @@ class _GridProdutoState extends State<GridProduto> {
     FirebaseStorage storage = FirebaseStorage.instance;
     var pastaRaiz = storage.ref();
     var arquivo =
-        pastaRaiz.child("produtos").child("perfil").child(widget.id + ".jpg");
+        pastaRaiz.child("produtos").child(widget.id).child("perfil" + ".jpg");
     UploadTask task = arquivo.putFile(_imagem);
     task.snapshotEvents.listen((TaskSnapshot storageTaskEvent) {
       if (storageTaskEvent.state == TaskState.running) {
@@ -64,6 +64,9 @@ class _GridProdutoState extends State<GridProduto> {
     });
     //recupera a url da imagem
     task.whenComplete(() {}).then((snapshot) {
+      setState(() {
+        _imagemPerfil = true;
+      });
       _recuperarUrlImagem(snapshot);
     });
   }
@@ -83,9 +86,22 @@ class _GridProdutoState extends State<GridProduto> {
     db.collection("produtos").doc(widget.id).update(dadosAtualizar);
   }
 
+  _recuperaImagemPeril() async {
+    FirebaseFirestore db = FirebaseFirestore.instance;
+
+    var snap = await db.collection("produtos").doc(widget.id).get();
+
+    Map<String, dynamic> dadosRecuperados = snap.data();
+
+    setState(() {
+      _urlImagem = dadosRecuperados["urlImagem"];
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    _recuperaImagemPeril();
   }
 
   @override
@@ -118,7 +134,7 @@ class _GridProdutoState extends State<GridProduto> {
                 padding: EdgeInsets.only(top: 10),
                 child:
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Text("Adicine a foto de perfil do protudo",
+                  Text("Adicine a foto de perfil do produto",
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: 15,
@@ -149,17 +165,20 @@ class _GridProdutoState extends State<GridProduto> {
                   },
                   icon: Icon(Icons.photo_rounded)),
               Padding(
-                padding: EdgeInsets.only(left: 15),
-                child: IconButton(
-                  iconSize: 40,
-                  color: Colors.white,
-                  onPressed: () {
-                    String id =  widget.id;
-                    Navigator.pushNamed(context, "/gridproduto", arguments: id);
-                  },
-                  icon: Icon(Icons.arrow_forward),
-                ),
-              ),
+                  padding: EdgeInsets.only(left: 15),
+                  child: Visibility(
+                    visible: _imagemPerfil,
+                    child: IconButton(
+                      iconSize: 40,
+                      color: Colors.white,
+                      onPressed: () {
+                        String id = widget.id;
+                        Navigator.pushNamed(context, "/gridproduto",
+                            arguments: id);
+                      },
+                      icon: Icon(Icons.arrow_forward),
+                    ),
+                  )),
             ],
           )),
     );
