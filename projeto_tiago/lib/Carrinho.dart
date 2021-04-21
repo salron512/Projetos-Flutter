@@ -221,12 +221,10 @@ class _CarrinhoState extends State<Carrinho> {
                       DocumentSnapshot dados = urls[indice];
                       // ignore: missing_required_param
                       return PhysicalModel(
-                          shape: BoxShape.rectangle,
-                          clipBehavior: Clip.antiAlias,
+                          borderRadius: BorderRadius.circular(32),
                           color: Colors.white,
                           elevation: 8,
                           child: Container(
-                            decoration: BoxDecoration(),
                             padding: EdgeInsets.all(5),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -239,12 +237,13 @@ class _CarrinhoState extends State<Carrinho> {
                                 Expanded(
                                   flex: 40,
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
                                       Padding(
-                                        padding: EdgeInsets.only(top: 5),
+                                        padding:
+                                            EdgeInsets.only(top: 10, left: 15),
                                         child: Text(
                                           dados["nome"],
                                           style: TextStyle(
@@ -253,7 +252,8 @@ class _CarrinhoState extends State<Carrinho> {
                                         ),
                                       ),
                                       Padding(
-                                        padding: EdgeInsets.only(top: 3),
+                                        padding:
+                                            EdgeInsets.only(top: 3, left: 15),
                                         child: Text(
                                           "Marca: " + dados["marca"],
                                           style: TextStyle(
@@ -262,7 +262,8 @@ class _CarrinhoState extends State<Carrinho> {
                                         ),
                                       ),
                                       Padding(
-                                        padding: EdgeInsets.only(top: 3),
+                                        padding:
+                                            EdgeInsets.only(top: 3, left: 15),
                                         child: Text(
                                           "R\$ " + dados["preco"],
                                           style: TextStyle(
