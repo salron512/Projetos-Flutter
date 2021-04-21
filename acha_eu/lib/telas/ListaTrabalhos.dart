@@ -127,86 +127,41 @@ class _ListaTrabalhosState extends State<ListaTrabalhos> {
                         List<DocumentSnapshot> requisicoes =
                             querySnapshot.docs.toList();
                         DocumentSnapshot dados = requisicoes[indice];
-                        return Dismissible(
-                          onDismissed: (direcao) async {
-                            FirebaseFirestore db = FirebaseFirestore.instance;
-                            await db
-                                .collection("solicitacao")
-                                .doc(dados.reference.id)
-                                .update({
-                              "idProfissional": _usuario.idUsuario,
-                              "nomeProfissional": _usuario.nome,
-                              "dataResposta": DateTime.now().toString(),
-                              "status": "Atendido",
-                            });
-                            /*
-                            await db
-                                .collection("solicitacao_atendida")
-                                .doc(dados.reference.id)
-                                .update({
-                              "idSolicitante": _usuario.idUsuario,
-                              "nome": _usuario.nome,
-                              "telefone": _usuario.telefone,
-                              "whatsapp": _usuario.whatsapp,
-                              "cidade": _usuario.cidade,
-                              "categoria": dados["categoria"],
-                              "descricao": dados["descricao"],
-                              "data": DateTime.now().toString(),
-                              "status": "Atendido",
-                            });
-                             */
-                          },
-                          key: Key(
-                              DateTime.now().millisecondsSinceEpoch.toString()),
-                          direction: DismissDirection.endToStart,
-                          background: Container(
-                              padding: EdgeInsets.all(8),
-                              color: Colors.green,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: <Widget>[
-                                  Icon(
-                                    Icons.work,
-                                    color: Colors.white,
-                                  ),
-                                ],
-                              )),
-                          child: Card(
-                            color: Color(0xff37474f),
-                            child: ListTile(
+                        return Card(
+                          color: Color(0xff37474f),
+                          child: ListTile(
                               onTap: (){
                                 Navigator.pushNamed(context, "/detalhesPedidos" , arguments: dados );
                               },
-                                title: Text("Cliente: "+
+                              title: Text("Cliente: "+
                                   dados["nome"],
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                subtitle: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    Text(
-                                      "Tipo do profissional: " +
-                                          dados["categoria"],
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment:
+                                CrossAxisAlignment.stretch,
+                                children: [
+                                  Text(
+                                    "Tipo do profissional: " +
+                                        dados["categoria"],
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 5),
+                                    child: Text(
+                                      "Descrição: " + dados["descricao"],
                                       style: TextStyle(color: Colors.white),
                                     ),
-                                    Padding(
-                                      padding: EdgeInsets.only(top: 5),
-                                      child: Text(
-                                        "Descrição: " + dados["descricao"],
-                                        style: TextStyle(color: Colors.white),
-                                      ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 5),
+                                    child: Text(
+                                      "Data: " + _formatarData(dados["data"]),
+                                      style: TextStyle(color: Colors.white),
                                     ),
-                                    Padding(
-                                      padding: EdgeInsets.only(top: 5),
-                                      child: Text(
-                                        "Data: " + _formatarData(dados["data"]),
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    ),
-                                  ],
-                                )),
-                          ),
+                                  ),
+                                ],
+                              )),
                         );
                       },
                     ),

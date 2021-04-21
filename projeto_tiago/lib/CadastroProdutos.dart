@@ -26,30 +26,23 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
     });
   }
 
-  _editaProduto(String nome, String marca, String id) {
+  _editaProduto(String nome, String marca, String preco, String id) {
     setState(() {
-      _controllerNome.text = nome;
+      _controllerNome.text =  nome;
       _controllerMarca.text = marca;
+      _controllerPreco.text = preco;
     });
     showDialog(
         context: context,
         // ignore: missing_return
         builder: (context) {
           return AlertDialog(
-            title: Text("Dados do produtos"),
+            title: Text("Editar produtos"),
             content: Container(
               height: 250,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Container(
-                    height: 100,
-                    width: 100,
-                    child: Padding(
-                      padding: EdgeInsets.only(bottom: 2),
-                      child: Image.asset("images/solicitacao.png"),
-                    ),
-                  ),
                   TextField(
                     controller: _controllerNome,
                     textCapitalization: TextCapitalization.sentences,
@@ -62,10 +55,18 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                   TextField(
                     controller: _controllerMarca,
                     textCapitalization: TextCapitalization.sentences,
-                    autofocus: true,
                     keyboardType: TextInputType.text,
                     decoration: InputDecoration(
                       labelText: "Marca do produto",
+                    ),
+                  ),
+                  TextField(
+                    controller: _controllerPreco,
+                    textCapitalization: TextCapitalization.sentences,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      prefix: Text("R\$ "),
+                      labelText: "Preço",
                     ),
                   )
                 ],
@@ -305,7 +306,7 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                                 ),
                                 onPressed: () {
                                   _editaProduto(dados["nome"], dados["marca"],
-                                      dados.reference.id);
+                                      dados["preco"], dados.reference.id);
                                 }),
                             IconButton(
                                 icon: Icon(
