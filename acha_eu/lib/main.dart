@@ -24,10 +24,6 @@ void main() async {
   await OneSignal.shared
       .promptUserForPushNotificationPermission(fallbackToSettings: true);
 
-      
-
- 
-
   runApp(MaterialApp(
     // debugShowCheckedModeBanner: false,
     title: "Chama Eu",

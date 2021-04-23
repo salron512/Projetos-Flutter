@@ -5,7 +5,10 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
+
 class ListaCategorias extends StatefulWidget {
+   ListaCategorias({Key key}) : super(key: key);
+  
   @override
   _ListaCategoriasState createState() => _ListaCategoriasState();
 }
@@ -76,12 +79,7 @@ class _ListaCategoriasState extends State<ListaCategorias> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    recebeNot();
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(

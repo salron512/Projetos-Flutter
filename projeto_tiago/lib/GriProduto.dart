@@ -27,13 +27,21 @@ class _GridProdutoState extends State<GridProduto> {
     File imagem;
     if (daCamera) {
       //recupera imagem da camera
-      imagemSelecionada =
-          await picker.getImage(source: ImageSource.camera, imageQuality: 50);
+      imagemSelecionada = await picker.getImage(
+        source: ImageSource.camera,
+        imageQuality: 50,
+       // maxHeight: 500,
+       // maxWidth: 500,
+      );
       imagem = File(imagemSelecionada.path);
     } else {
       //recupera imagem da galeria
-      imagemSelecionada =
-          await picker.getImage(source: ImageSource.gallery, imageQuality: 50);
+      imagemSelecionada = await picker.getImage(
+        source: ImageSource.gallery,
+        imageQuality: 50,
+        //maxHeight: 500,
+      //  maxWidth: 500,
+      );
       imagem = File(imagemSelecionada.path);
     }
     setState(() {

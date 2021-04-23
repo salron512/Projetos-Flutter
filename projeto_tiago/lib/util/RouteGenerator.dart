@@ -9,6 +9,8 @@ import 'package:projeto_tiago/DetalhesProdutos.dart';
 import 'package:projeto_tiago/GriProduto.dart';
 import 'package:projeto_tiago/Grid.dart';
 import 'package:projeto_tiago/Historico.dart';
+import 'package:projeto_tiago/Imagem.dart';
+import 'package:projeto_tiago/ListaCompras.dart';
 import 'package:projeto_tiago/ListaEntregas.dart';
 import 'package:projeto_tiago/ListaPedidos.dart';
 import 'package:projeto_tiago/ListaProdutos.dart';
@@ -96,6 +98,15 @@ class RouteGenerator{
         return MaterialPageRoute(
             builder: (_) => Grid(args)
         );
+         case "/imagem" :
+        return MaterialPageRoute(
+            builder: (_) => Imagem(args)
+        );
+         case "/listaCompras" :
+        return MaterialPageRoute(
+            builder: (_) => ListaCompras(args)
+        );
+        
 
 
       default:

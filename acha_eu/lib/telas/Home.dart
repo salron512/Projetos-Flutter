@@ -1,9 +1,9 @@
+
 import 'package:acha_eu/model/Usuario.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
-import 'dart:async';
 
 class Home extends StatefulWidget {
   Home({Key key}) : super(key: key);
@@ -77,17 +77,17 @@ class _HomeState extends State<Home> {
     });
   }
 
-  Future _verificaUsuarioLogado() async {
+  _verificaUsuarioLogado() async {
     FirebaseAuth auth = FirebaseAuth.instance;
     //auth.signOut();
-    var usuariologado = auth.currentUser;
+    var usuariologado = await auth.currentUser;
 
     if (usuariologado != null) {
-      Navigator.popAndPushNamed(context, "/listacategorias");
+      Navigator.pushNamedAndRemoveUntil(
+          context, "/listacategorias", (route) => false);
+      //Navigator.popAndPushNamed(context, "/listacategorias");
     }
   }
-
- 
 
   @override
   void initState() {

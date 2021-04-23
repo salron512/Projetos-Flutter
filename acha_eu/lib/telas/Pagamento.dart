@@ -13,20 +13,25 @@ class Pagamento extends StatefulWidget {
 }
 
 class _PagamentoState extends State<Pagamento> {
-  var _mascaraCartao = new MaskTextInputFormatter(
+  var _mascaraCartao = MaskTextInputFormatter(
       mask: '#### #### #### ####', filter: {"#": RegExp(r'[0-9]')});
+
   var _mascaraCodigo =
       new MaskTextInputFormatter(mask: '###', filter: {"#": RegExp(r'[0-9]')});
-  var _mascaraVencimento = new MaskTextInputFormatter(
-      mask: '##/##', filter: {"#": RegExp(r'[0-9]')});
+  var _mascaraVencimento =
+      MaskTextInputFormatter(mask: '##/##', filter: {"#": RegExp(r'[0-9]')});
+
+  var _mascaraCpf = MaskTextInputFormatter(
+      mask: '###.###.###-##', filter: {"#": RegExp(r'[0-9]')});
 
   TextEditingController _controllerCartao = TextEditingController();
   TextEditingController _controllerCodigoSeguracao = TextEditingController();
   TextEditingController _controllerNomeCartao = TextEditingController();
   TextEditingController _controllerCartaoVencimento = TextEditingController();
   TextEditingController _controllerCPF = TextEditingController();
-  String _mensagemErro = "Realize o pagamento"
+  String _mensagem = "Realize o pagamento"
       " para se tornar um anúnciante em sua cidade ";
+  String _mensagemErro = "";
 
   /*
     DateTime pagamentoDia = DateTime(anoPagamento, mesPagamento, diaPagamento);
@@ -66,31 +71,31 @@ class _PagamentoState extends State<Pagamento> {
     DocumentSnapshot snapshot = await db.collection("usuarios").doc(id).get();
     Map<String, dynamic> dadosUsuario = snapshot.data();
     Usuario usuario = Usuario();
-    usuario.nome = dadosUsuario["nome"];
+    usuario.nome = _controllerNomeCartao.text;
     usuario.email = dadosUsuario["email"];
-    usuario.telefone =  _mascaraCartao.unmaskText(dadosUsuario["telefone"]);
-    usuario.whatsapp =  _mascaraCartao.unmaskText(dadosUsuario["whatsapp"]);
+    usuario.telefone = _mascaraCartao.unmaskText(dadosUsuario["telefone"]);
+    usuario.whatsapp = _mascaraCartao.unmaskText(dadosUsuario["whatsapp"]);
     //String test = _mascaraCartao.unmaskText(usuario.whatsapp);
     //print("teste marcara: " +test);
 
     var corpo = json.encode({
       "api_key": "ak_live_Km1jt6ZkY3RnXEf4imoenyC5hYK3mD",
-      "amount": 21000,
+      "amount": 1000,
       "card_number": _mascaraCartao.unmaskText(numeroCartao),
-      "card_cvv":  _mascaraCartao.unmaskText(numeroCodigoSeguracao),
-      "card_expiration_date":  _mascaraCartao.unmaskText(vencimento),
+      "card_cvv": _mascaraCartao.unmaskText(numeroCodigoSeguracao),
+      "card_expiration_date": _mascaraCartao.unmaskText(vencimento),
       "card_holder_name": nomeCartao,
       "customer": {
         "external_id": id,
-        "name": usuario.nome,
+        "name":nomeCartao,
         "type": "individual",
         "country": "br",
         "email": usuario.email,
         "documents": [
-          {"type": "cpf", "number": cpf}
+          {"type": "cpf", "number": _mascaraCpf.unmaskText(cpf)}
         ],
         "phone_numbers": ["+55" + usuario.telefone, "+55" + usuario.whatsapp],
-        "birthday": "1965-01-01"
+        "birthday": "1972-01-08"
       },
       "billing": {
         "name": "André Ricardo Vicensotti",
@@ -108,7 +113,7 @@ class _PagamentoState extends State<Pagamento> {
         {
           "id": "r123",
           "title": "Serviço de marketing",
-          "unit_price": 10000,
+          "unit_price": 1000,
           "quantity": 1,
           "tangible": false
         }
@@ -120,6 +125,30 @@ class _PagamentoState extends State<Pagamento> {
 
     print("status code: " + response.statusCode.toString());
     print("status code: " + response.body.toString());
+    Map<String, dynamic> dados = json.decode(response.body);
+    String status = dados["status"];
+    print("Status " + status);
+
+    if (response.statusCode == 200 && status != "refused") {
+      FirebaseFirestore db = FirebaseFirestore.instance;
+
+      db.collection("ultimoPagamento").doc(id).set({
+        "diaPagamento": DateTime.now().day,
+        "mesPagamento": DateTime.now().month,
+        "anoPagamento": DateTime.now().year,
+      });
+
+      db.collection("pagamento").doc(id).collection(id).doc().set({
+        "dataPagamento": DateTime.now().toString(),
+      });
+       setState(() {
+        _mensagemErro = "Pagamento altorizado";
+      });
+    } else {
+      setState(() {
+        _mensagemErro = "Pagamento não altorizado";
+      });
+    }
   }
 
   @override
@@ -148,7 +177,7 @@ class _PagamentoState extends State<Pagamento> {
                       padding: EdgeInsets.only(bottom: 8),
                       child: Center(
                           child: Text(
-                        _mensagemErro,
+                        _mensagem,
                         style: TextStyle(
                           color: Colors.red,
                           fontSize: 20,
@@ -260,12 +289,23 @@ class _PagamentoState extends State<Pagamento> {
                     padding: EdgeInsets.only(bottom: 8),
                     child: TextField(
                       keyboardType: TextInputType.number,
+                      inputFormatters: [_mascaraCpf],
                       style: TextStyle(
                         fontSize: 20,
                       ),
                       decoration: InputDecoration(
                           labelText: "Digite o seu CPF apenas números",
                           contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              Icons.clear,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _controllerCPF.clear();
+                              });
+                            },
+                          ),
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(
@@ -273,6 +313,16 @@ class _PagamentoState extends State<Pagamento> {
                       controller: _controllerCPF,
                     ),
                   ),
+                  Padding(
+                      padding: EdgeInsets.only(bottom: 8),
+                      child: Center(
+                          child: Text(
+                        _mensagemErro,
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 20,
+                        ),
+                      ))),
                   Padding(
                     padding: EdgeInsets.only(bottom: 8),
                     child: ElevatedButton(

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class Carrinho extends StatefulWidget {
   @override
@@ -10,7 +10,12 @@ class Carrinho extends StatefulWidget {
 }
 
 class _CarrinhoState extends State<Carrinho> {
+  var _mascaraQtd = new MaskTextInputFormatter(
+      mask: '##########', filter: {"#": RegExp(r'[0-9]')});
   StreamController _controller = StreamController.broadcast();
+  TextEditingController _controllerQtd = TextEditingController();
+  TextEditingController _controllerResultado = TextEditingController(text: "0");
+  List<dynamic> _listaCompras = [];
   bool _adm = false;
   String _nome = "";
 
@@ -20,6 +25,13 @@ class _CarrinhoState extends State<Carrinho> {
     String idUsuario = auth.currentUser.uid;
     var snap = await db.collection("usuarios").doc(idUsuario).get();
     Map<String, dynamic> dados = snap.data();
+
+    var retorno = await db.collection("listaPendente").doc(idUsuario).get();
+
+    if (retorno.exists) {
+      var dados = retorno.data();
+      _listaCompras = dados["listaCompras"];
+    }
 
     setState(() {
       _nome = dados["nome"];
@@ -42,6 +54,121 @@ class _CarrinhoState extends State<Carrinho> {
     FirebaseAuth auth = FirebaseAuth.instance;
     auth.signOut();
     Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
+  }
+
+  _addItem(String nome, String marca, String preco, String urlImagem) {
+    String precoTotal = preco;
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        // ignore: missing_return
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Digite a quantidade"),
+            content: Container(
+              height: 350,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    height: 100,
+                    width: 100,
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 2),
+                      child: Image.asset("images/cart.png"),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 5),
+                    child: Text(
+                      "Produto: " + nome,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 5),
+                    child: Text(
+                      "Valor unitario R\$ " + preco,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  TextField(
+                    autofocus: true,
+                    controller: _controllerQtd,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [_mascaraQtd],
+                    decoration: InputDecoration(
+                        labelText: "Digite a quantidade",
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.clear),
+                          onPressed: () {
+                            setState(() {
+                              _controllerQtd.clear();
+                            });
+                          },
+                        )),
+                    onChanged: (valor) {
+                      String valorSemMascara = _mascaraQtd.unmaskText(valor);
+                      print("valor" + valor);
+                      double precoCompra = double.tryParse(preco).toDouble();
+                      double qtdcoCompra =
+                          double.tryParse(valorSemMascara).toDouble();
+                      double resultado = precoCompra * qtdcoCompra;
+                      print("res" + resultado.toString());
+                      precoTotal = resultado.toString();
+                      setState(() {
+                        _controllerResultado.text = precoTotal;
+                      });
+                    },
+                  ),
+                  TextField(
+                      readOnly: true,
+                      controller: _controllerResultado,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                          labelText: "Valor total", prefix: Text("R\$ "))),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _controllerResultado.clear();
+                    _controllerQtd.clear();
+                  },
+                  child: Text("Cancelar")),
+              TextButton(
+                child: Text("Confirmar"),
+                onPressed: () {
+                  Map<String, dynamic> carinhoDeCompra = {
+                    "nome": nome,
+                    "marca": marca,
+                    "quantidade": _controllerQtd.text,
+                    "precoUnitario": preco,
+                    "precoTotal": precoTotal,
+                    "urlimagem": urlImagem,
+                  };
+                  _listaCompras.add(carinhoDeCompra);
+                  FirebaseAuth auth = FirebaseAuth.instance;
+                  FirebaseFirestore db = FirebaseFirestore.instance;
+                  String uid = auth.currentUser.uid;
+                  db
+                      .collection("listaPendente")
+                      .doc(uid)
+                      .set({"idUsuario": uid, "listaCompras": _listaCompras});
+                  _controllerQtd.clear();
+                  _controllerResultado.clear();
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        });
   }
 
   @override
@@ -225,14 +352,16 @@ class _CarrinhoState extends State<Carrinho> {
                           color: Colors.white,
                           elevation: 8,
                           child: Container(
-                            padding: EdgeInsets.all(5),
+                            padding: EdgeInsets.all(10),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 Expanded(
                                   flex: 60,
-                                  child: Image.network(dados["urlImagem"]),
+                                  child: Image.network(
+                                    dados["urlImagem"],
+                                  ),
                                 ),
                                 Expanded(
                                   flex: 40,
@@ -243,7 +372,7 @@ class _CarrinhoState extends State<Carrinho> {
                                     children: [
                                       Padding(
                                         padding:
-                                            EdgeInsets.only(top: 10, left: 15),
+                                            EdgeInsets.only(top: 3, left: 15),
                                         child: Text(
                                           dados["nome"],
                                           style: TextStyle(
@@ -270,6 +399,53 @@ class _CarrinhoState extends State<Carrinho> {
                                               fontSize: 15,
                                               fontWeight: FontWeight.bold),
                                         ),
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                                top: 5, left: 5),
+                                            child: ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        32))),
+                                                child: Text("Imagens"),
+                                                onPressed: () {
+                                                  Navigator.pushNamed(
+                                                      context, "/gridproduto",
+                                                      arguments:
+                                                          dados.reference.id);
+                                                }),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                                top: 5, left: 32),
+                                            child: ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                    primary: Theme.of(context)
+                                                        .primaryColor,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        32))),
+                                                child: Text("Comprar"),
+                                                onPressed: () {
+                                                  _addItem(
+                                                      dados["nome"],
+                                                      dados["marca"],
+                                                      dados["preco"],
+                                                      dados["urlImagem"]);
+                                                }),
+                                          )
+                                        ],
                                       )
                                     ],
                                   ),
@@ -288,7 +464,10 @@ class _CarrinhoState extends State<Carrinho> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.local_grocery_store),
         backgroundColor: Color(0xffFF0000),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pushNamed(context, "/listaCompras",
+              arguments: _listaCompras);
+        },
       ),
     );
   }

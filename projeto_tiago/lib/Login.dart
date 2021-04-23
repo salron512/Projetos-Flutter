@@ -64,12 +64,13 @@ class _LoginState extends State<Login> {
     });
   }
 
-  Future _verificaUsuarioLogado() async {
+  _verificaUsuarioLogado() async {
     FirebaseAuth auth = FirebaseAuth.instance;
-    var usuariologado = auth.currentUser;
+    var usuariologado = await auth.currentUser;
 
     if (usuariologado != null) {
-      Navigator.popAndPushNamed(context, "/carrinho");
+      Navigator.pushNamedAndRemoveUntil(context, "/carrinho", (route) => false);
+      // Navigator.popAndPushNamed(context, "/carrinho");
     }
   }
 
