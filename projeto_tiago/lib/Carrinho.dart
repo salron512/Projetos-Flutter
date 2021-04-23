@@ -25,14 +25,6 @@ class _CarrinhoState extends State<Carrinho> {
     String idUsuario = auth.currentUser.uid;
     var snap = await db.collection("usuarios").doc(idUsuario).get();
     Map<String, dynamic> dados = snap.data();
-
-    var retorno = await db.collection("listaPendente").doc(idUsuario).get();
-
-    if (retorno.exists) {
-      var dados = retorno.data();
-      _listaCompras = dados["listaCompras"];
-    }
-
     setState(() {
       _nome = dados["nome"];
       _adm = dados["adm"];
@@ -445,7 +437,8 @@ class _CarrinhoState extends State<Carrinho> {
                                                       dados["marca"],
                                                       dados["preco"],
                                                       dados["urlImagem"]);
-                                                }),
+                                                }
+                                                ),
                                           )
                                         ],
                                       )
