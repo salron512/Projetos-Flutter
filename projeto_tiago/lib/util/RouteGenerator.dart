@@ -104,7 +104,7 @@ class RouteGenerator{
         );
          case "/listaCompras" :
         return MaterialPageRoute(
-            builder: (_) => ListaCompras(args)
+            builder: (_) => ListaCompras()
         );
         
 

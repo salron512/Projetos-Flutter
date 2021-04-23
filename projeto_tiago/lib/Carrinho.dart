@@ -145,22 +145,24 @@ class _CarrinhoState extends State<Carrinho> {
               TextButton(
                 child: Text("Confirmar"),
                 onPressed: () {
-                  Map<String, dynamic> carinhoDeCompra = {
-                    "nome": nome,
-                    "marca": marca,
-                    "quantidade": _controllerQtd.text,
-                    "precoUnitario": preco,
-                    "precoTotal": precoTotal,
-                    "urlimagem": urlImagem,
-                  };
-                  _listaCompras.add(carinhoDeCompra);
                   FirebaseAuth auth = FirebaseAuth.instance;
                   FirebaseFirestore db = FirebaseFirestore.instance;
                   String uid = auth.currentUser.uid;
                   db
                       .collection("listaPendente")
                       .doc(uid)
-                      .set({"idUsuario": uid, "listaCompras": _listaCompras});
+                      .collection(uid)
+                      .doc()
+                      .set({
+                    "idUsuario": uid,
+                    "nome": nome,
+                    "marca": marca,
+                    "quantidade": _controllerQtd.text,
+                    "precoUnitario": preco,
+                    "precoTotal": precoTotal,
+                    "urlimagem": urlImagem,
+                  });
+
                   _controllerQtd.clear();
                   _controllerResultado.clear();
                   Navigator.pop(context);
@@ -465,8 +467,10 @@ class _CarrinhoState extends State<Carrinho> {
         child: Icon(Icons.local_grocery_store),
         backgroundColor: Color(0xffFF0000),
         onPressed: () {
-          Navigator.pushNamed(context, "/listaCompras",
-              arguments: _listaCompras);
+          Navigator.pushNamed(
+            context,
+            "/listaCompras",
+          );
         },
       ),
     );
