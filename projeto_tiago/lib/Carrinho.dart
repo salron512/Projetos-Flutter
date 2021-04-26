@@ -210,7 +210,7 @@ class _CarrinhoState extends State<Carrinho> {
                 ),
               ),
               decoration: BoxDecoration(
-                color: Color(0xffFF0000),
+                color:Theme.of(context).primaryColor,
               ),
             ),
             Visibility(
@@ -326,7 +326,7 @@ class _CarrinhoState extends State<Carrinho> {
                 if (querySnapshot.docs.length == 0) {
                   return Center(
                     child: Text(
-                      "Sem imagens na galeria",
+                      "Sem produtos cadastrados",
                       style: TextStyle(fontSize: 15, color: Colors.white),
                     ),
                   );

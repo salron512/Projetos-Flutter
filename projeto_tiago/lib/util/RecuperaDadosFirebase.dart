@@ -1,8 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
+
 
 class RecuperaDadosFirebase {
+  // ignore: non_constant_identifier_names
   static RECUPERAUSUARIO() {
     FirebaseAuth auth = FirebaseAuth.instance;
     String uid = auth.currentUser.uid;

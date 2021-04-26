@@ -9,13 +9,9 @@ class DetalhesEntrega extends StatefulWidget {
 }
 
 class _DetalhesEntregaState extends State<DetalhesEntrega> {
-
-
-
   @override
   void initState() {
     super.initState();
-
   }
 
   @override
@@ -25,22 +21,51 @@ class _DetalhesEntregaState extends State<DetalhesEntrega> {
         title: Text("Detalhes da entrega"),
       ),
       body: Container(
+        decoration: BoxDecoration(color: Theme.of(context).accentColor),
         child: ListView.separated(
           itemCount: widget.dados.length,
           separatorBuilder: (context, indice) => Divider(
-            height: 2,
+            height: 4,
             color: Colors.grey,
           ),
           itemBuilder: (context, indice) {
             var requisicoes = widget.dados;
             var dados = requisicoes[indice];
             return ListTile(
-              title: Text("Produto: " + dados["nome"] ),
+              leading: Image.network(dados["urlimagem"]),
+              title: Text(
+                "Produto: " + dados["nome"],
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Marca: " + dados["marca"]),
-                  Text("quantidade: " + dados["quantidade"])
+                  Text(
+                    "Marca: " + dados["marca"],
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    "quantidade: " + dados["quantidade"],
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    "Preço unitario: R\$: " + dados["precoUnitario"],
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    "Preço total: R\$: " + dados["precoTotal"],
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  )
                 ],
               ),
             );

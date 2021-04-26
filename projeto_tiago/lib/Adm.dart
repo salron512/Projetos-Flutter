@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 
 import 'model/Usuario.dart';
 
-
-
 class Adm extends StatefulWidget {
   @override
   _AdmState createState() => _AdmState();
@@ -21,7 +19,7 @@ class _AdmState extends State<Adm> {
     for (var item in snapshot.docs) {
       Map<String, dynamic> dados = item.data();
       Usuario usuario = Usuario();
-      if(dados["nome"] == "adm")continue;
+      if (dados["nome"] == "adm") continue;
       usuario.adm = dados["adm"];
       usuario.nome = dados["nome"];
       usuario.senha = dados["idUsuario"];
@@ -33,41 +31,48 @@ class _AdmState extends State<Adm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("lista usuário"),
-      ),
-      body: FutureBuilder(
-          future: _recuperaUsuarios(),
-          // ignore: missing_return
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            } else {
-              List<Usuario> dados = snapshot.data;
-              return ListView.builder(
-                itemCount: dados.length,
-                // ignore: missing_return
-                itemBuilder: (context, indice) {
-                  var item = dados[indice];
-                  return CheckboxListTile(
-                    value: item.adm,
-                    title: Text(item.nome),
-                    onChanged: (value) {
-                      FirebaseFirestore db = FirebaseFirestore.instance;
-                      db.collection("usuarios").doc(item.senha).update({
-                        "adm": value,
-                      });
-                      setState(() {
-                        item.adm = value;
-                      });
+        appBar: AppBar(
+          title: Text("lista usuário"),
+        ),
+        body: Container(
+          decoration: BoxDecoration(color: Theme.of(context).accentColor),
+          child: FutureBuilder(
+              future: _recuperaUsuarios(),
+              // ignore: missing_return
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else {
+                  List<Usuario> dados = snapshot.data;
+                  return ListView.builder(
+                    itemCount: dados.length,
+                    // ignore: missing_return
+                    itemBuilder: (context, indice) {
+                      var item = dados[indice];
+                      
+                      return CheckboxListTile(
+                        activeColor: Theme.of(context).primaryColor,
+                        value: item.adm,
+                        title: Text(
+                          item.nome,
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        onChanged: (value) {
+                          FirebaseFirestore db = FirebaseFirestore.instance;
+                          db.collection("usuarios").doc(item.senha).update({
+                            "adm": value,
+                          });
+                          setState(() {
+                            item.adm = value;
+                          });
+                        },
+                      );
                     },
                   );
-                },
-              );
-            }
-          }),
-    );
+                }
+              }),
+        ));
   }
 }

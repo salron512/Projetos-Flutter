@@ -99,7 +99,6 @@ class _DetalhesProdutosState extends State<DetalhesProdutos> {
                   ),
                   decoration: InputDecoration(
                       contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                      //hintText: "Nome do produto",
                       labelText: "Marca do produto",
                       filled: true,
                       fillColor: Colors.white,

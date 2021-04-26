@@ -66,7 +66,7 @@ class _LoginState extends State<Login> {
 
   _verificaUsuarioLogado() async {
     FirebaseAuth auth = FirebaseAuth.instance;
-    var usuariologado = await auth.currentUser;
+    var usuariologado =  auth.currentUser;
 
     if (usuariologado != null) {
       Navigator.pushNamedAndRemoveUntil(context, "/carrinho", (route) => false);

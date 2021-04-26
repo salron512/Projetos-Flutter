@@ -218,7 +218,6 @@ class _ListaComprasState extends State<ListaCompras> {
   }
 
   _mostraErro(String erro) {
-    setState(() {});
     showDialog(
         barrierDismissible: false,
         context: context,
@@ -268,6 +267,7 @@ class _ListaComprasState extends State<ListaCompras> {
         });
   }
 
+  // ignore: non_constant_identifier_names
   _SelecionaFormaPagamento() {
     showDialog(
         barrierDismissible: true,
@@ -300,7 +300,7 @@ class _ListaComprasState extends State<ListaCompras> {
                     child: Text("Dinheiro"),
                     onPressed: () {
                       Navigator.pop(context);
-                      _salvaPedido("dinheiro");
+                      _salvaPedido("Dinheiro");
                     },
                   )),
               Padding(
@@ -309,7 +309,7 @@ class _ListaComprasState extends State<ListaCompras> {
                   child: Text("Cartão debito"),
                   onPressed: () {
                     Navigator.pop(context);
-                    _salvaPedido("debito");
+                    _salvaPedido("Cartão debito");
                   },
                 ),
               ),
@@ -319,7 +319,7 @@ class _ListaComprasState extends State<ListaCompras> {
                     child: Text("Cartão crédito"),
                     onPressed: () {
                       Navigator.pop(context);
-                      _salvaPedido("credito");
+                      _salvaPedido("Cartão crédito");
                     },
                   ))
             ],
@@ -328,7 +328,7 @@ class _ListaComprasState extends State<ListaCompras> {
   }
 
   _salvaPedido(String formaPagamento) {
-    if (formaPagamento == "dinheiro") {
+    if (formaPagamento == "Dinheiro") {
       showDialog(
           barrierDismissible: false,
           context: context,
@@ -338,7 +338,7 @@ class _ListaComprasState extends State<ListaCompras> {
               title: Text("Finalizar compra"),
               content: Container(
                 width: 150,
-                height: 250,
+                height: 280,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -363,6 +363,10 @@ class _ListaComprasState extends State<ListaCompras> {
                         ),
                       ),
                     ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 5, bottom: 5),
+                      child: Text("Total compra: " + _totalCompra),
+                    ),
                     TextField(
                       controller: _controllerTroco,
                       textCapitalization: TextCapitalization.sentences,
@@ -384,75 +388,78 @@ class _ListaComprasState extends State<ListaCompras> {
                     child: Text("Cancelar")),
                 TextButton(
                   onPressed: () async {
-                    FirebaseFirestore db = FirebaseFirestore.instance;
-                    String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
-                    var dadosUsuario =
-                        await db.collection("usuarios").doc(uid).get();
-                    Map<String, dynamic> mapUsuario = dadosUsuario.data();
+                    double totalCompra =
+                        double.tryParse(_totalCompra).toDouble();
+                    double troco =
+                        double.tryParse(_controllerTroco.text).toDouble();
+                    String trocoSalvar = "0";
+                    double trocoFinal = troco - totalCompra;
+                    trocoSalvar = trocoFinal.toString();
+                    print("troco " + trocoFinal.toString());
+                    print("totalCompra " + totalCompra.toString());
 
-                    var snap = db
-                        .collection("listaPendente")
-                        .doc(uid)
-                        .collection(uid)
-                        .orderBy("nome", descending: false)
-                        .get();
-                    snap.then((event) async {
-                      List<dynamic> listaCompras = [];
-                      for (var item in event.docs) {
-                        Map<String, dynamic> map = item.data();
-                        listaCompras.add(map);
-                      }
-                      double totalCompra =
-                          double.tryParse(_totalCompra).toDouble();
-                      double troco =
-                          double.tryParse(_controllerTroco.text).toDouble();
-                      String trocoSalvar = "0";
+                    if (trocoFinal < 0) {
+                      _mostraErro("Troco inválido");
+                    } else {
+                      FirebaseFirestore db = FirebaseFirestore.instance;
+                      String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
+                      var dadosUsuario =
+                          await db.collection("usuarios").doc(uid).get();
+                      Map<String, dynamic> mapUsuario = dadosUsuario.data();
 
-                      
-                      if (totalCompra < troco) {
-                        _mostraErro("Troco inválido");
-                      }
-                        troco = totalCompra - troco;
-                        setState(() {
-                          trocoSalvar = troco.toString();
-                        });
-                      await db.collection("listaCompra").doc().set({
-                        "dataCompra": DateTime.now().toString(),
-                        "status": "pendente",
-                        "nome": mapUsuario["nome"],
-                        "telefone": mapUsuario["telefone"],
-                        "whatsapp": mapUsuario["whatsapp"],
-                        "endereco": mapUsuario["endereco"],
-                        "cidade": mapUsuario["cidade"],
-                        "bairro": mapUsuario["bairro"],
-                        "prontoReferencia": mapUsuario["pontoReferencia"],
-                        "idUsuario": uid,
-                        "listaProdutos": listaCompras,
-                        "totalCompra": _totalCompra,
-                        "troco": trocoSalvar
-                      }).then((value) {
-                        db
-                            .collection("listaPendente")
-                            .doc(uid)
-                            .collection(uid)
-                            .get()
-                            .then((value) {
-                          value.docs.forEach((element) async {
-                            db
-                                .collection("listaPendente")
-                                .doc(uid)
-                                .collection(uid)
-                                .doc(element.reference.id)
-                                .delete()
-                                .then((value) {
-                              setState(() {
-                                _totalCompra = "0";
+                      var snap = db
+                          .collection("listaPendente")
+                          .doc(uid)
+                          .collection(uid)
+                          .orderBy("nome", descending: false)
+                          .get();
+                      snap.then((event) async {
+                        List<dynamic> listaCompras = [];
+                        for (var item in event.docs) {
+                          Map<String, dynamic> map = item.data();
+                          listaCompras.add(map);
+                        }
+                        await db.collection("listaCompra").doc().set({
+                          "dataCompra": DateTime.now().toString(),
+                          "status": "Pendente",
+                          "nome": mapUsuario["nome"],
+                          "telefone": mapUsuario["telefone"],
+                          "whatsapp": mapUsuario["whatsapp"],
+                          "endereco": mapUsuario["endereco"],
+                          "cidade": mapUsuario["cidade"],
+                          "bairro": mapUsuario["bairro"],
+                          "prontoReferencia": mapUsuario["pontoReferencia"],
+                          "idUsuario": uid,
+                          "listaProdutos": listaCompras,
+                          "totalCompra": _totalCompra,
+                          "formaPagamento": formaPagamento,
+                          "troco": trocoSalvar
+                        }).then((value) {
+                          db
+                              .collection("listaPendente")
+                              .doc(uid)
+                              .collection(uid)
+                              .get()
+                              .then((value) {
+                            value.docs.forEach((element) async {
+                              db
+                                  .collection("listaPendente")
+                                  .doc(uid)
+                                  .collection(uid)
+                                  .doc(element.reference.id)
+                                  .delete()
+                                  .then((value) {
+                                setState(() {
+                                  _totalCompra = "0";
+                                });
                               });
                             });
+                            Navigator.pop(context);
+                            Navigator.pushNamed(context, "/pedidousuario");
                           });
                         });
                       });
-                    });
+                    }
                   },
                   child: Text("Confirmar"),
                 ),
@@ -525,7 +532,7 @@ class _ListaComprasState extends State<ListaCompras> {
                       }
                       await db.collection("listaCompra").doc().set({
                         "dataCompra": DateTime.now().toString(),
-                        "status": "pendente",
+                        "status": "Pendente",
                         "nome": mapUsuario["nome"],
                         "telefone": mapUsuario["telefone"],
                         "whatsapp": mapUsuario["whatsapp"],
@@ -536,6 +543,7 @@ class _ListaComprasState extends State<ListaCompras> {
                         "idUsuario": uid,
                         "listaProdutos": listaCompras,
                         "totalCompra": _totalCompra,
+                        "formaPagamento": formaPagamento,
                         "troco": "0"
                       }).then((value) {
                         db
@@ -595,7 +603,6 @@ class _ListaComprasState extends State<ListaCompras> {
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.none:
-
                     case ConnectionState.waiting:
                       return Center(
                         child: CircularProgressIndicator(

@@ -264,7 +264,7 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                   return ListView.separated(
                     itemCount: querySnapshot.docs.length,
                     separatorBuilder: (context, indice) => Divider(
-                      height: 2,
+                      height: 4,
                       color: Colors.grey,
                     ),
                     itemBuilder: (context, indice) {
@@ -272,12 +272,9 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                           querySnapshot.docs.toList();
                       DocumentSnapshot dados = listaDados[indice];
                       return ListTile(
-                        leading: CircleAvatar(
-                            backgroundImage: dados["urlImagem"] != null
-                                ? NetworkImage(dados["urlImagem"])
-                                : null,
-                            //maxRadius: 100,
-                            backgroundColor: Colors.grey),
+                        leading:  dados["urlImagem"] == null ?
+                         Image.asset("images/gear.png") :
+                         Image.network(dados["urlImagem"]),
                         title: Text(
                           "Produto: " + dados["nome"],
                           style: TextStyle(color: Colors.white),

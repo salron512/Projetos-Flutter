@@ -121,14 +121,23 @@ class _GridProdutoState extends State<GridProduto> {
       body: Container(
           padding: EdgeInsets.all(10),
           decoration: BoxDecoration(color: Theme.of(context).accentColor),
+     
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              CircleAvatar(
-                  backgroundImage:
-                      _urlImagem != null ? NetworkImage(_urlImagem) : null,
-                  maxRadius: 100,
-                  backgroundColor: Colors.grey),
+              Container(
+                width: 150,
+                height: 150,
+                child: _urlImagem ==null ?
+                Image.asset("images/gear.png",
+               
+                )
+                :
+                Image.network(_urlImagem,
+               
+                )
+              ),
               Padding(
                 padding: EdgeInsets.all(10),
                 child: Visibility(
@@ -150,7 +159,9 @@ class _GridProdutoState extends State<GridProduto> {
                 ]),
               ),
             ],
-          )),
+          ),
+          ),
+      
       bottomNavigationBar: BottomAppBar(
           color: Theme.of(context).primaryColor,
           child: Row(

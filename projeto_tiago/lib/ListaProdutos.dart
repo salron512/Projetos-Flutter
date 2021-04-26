@@ -13,8 +13,7 @@ class ListaProdutos extends StatefulWidget {
 }
 
 class _ListaProdutosState extends State<ListaProdutos> {
-
-  _auteraStatus() async{
+  _auteraStatus() async {
     FirebaseFirestore db = FirebaseFirestore.instance;
     FirebaseAuth auth = FirebaseAuth.instance;
     String idUsuario = auth.currentUser.uid;
@@ -22,7 +21,7 @@ class _ListaProdutosState extends State<ListaProdutos> {
     Map<String, dynamic> map = snapshot.data();
     var dados = widget.documentSnapshot[0];
     String id = dados["idUsuario"];
-    print("id " + id );
+    print("id " + id);
     db.collection("pedido").doc(id).update({
       "idEntregador": map["idUsuario"],
       "nomeEntregador": map["nome"],
@@ -31,7 +30,6 @@ class _ListaProdutosState extends State<ListaProdutos> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,6 +37,9 @@ class _ListaProdutosState extends State<ListaProdutos> {
         title: Text("Lista pedido"),
       ),
       body: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).accentColor,
+        ),
         child: ListView.separated(
           itemCount: widget.documentSnapshot.length,
           separatorBuilder: (context, indice) => Divider(
@@ -58,13 +59,12 @@ class _ListaProdutosState extends State<ListaProdutos> {
                     Text("Quantidade: " + dados["quantidade"]),
                   ],
                 ),
-                value:  dados["estado"],
+                value: dados["estado"],
                 onChanged: (valor) {
                   setState(() {
                     dados["estado"] = valor;
                   });
-                }
-                );
+                });
           },
         ),
       ),
@@ -77,12 +77,12 @@ class _ListaProdutosState extends State<ListaProdutos> {
                 "Confirmar Pedido",
                 style: TextStyle(color: Colors.white, fontSize: 20),
               ),
-             style: ElevatedButton.styleFrom(
+              style: ElevatedButton.styleFrom(
                 primary: Color(0xffFF0000),
-              padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15)),
-             ),
+                padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15)),
+              ),
               onPressed: () {
                 _auteraStatus();
                 Navigator.pushNamed(context, "/listaentregas");
@@ -90,7 +90,6 @@ class _ListaProdutosState extends State<ListaProdutos> {
             ),
           ],
         )
-
       ],
     );
   }
