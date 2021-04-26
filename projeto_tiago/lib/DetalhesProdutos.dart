@@ -27,6 +27,7 @@ class _DetalhesProdutosState extends State<DetalhesProdutos> {
             "nome": _controllerNome.text,
             "marca": _controllerMarca.text,
             "preco": _controllerPreco.text,
+            "urlImagem": null,
             // ignore: missing_return
           });
           Navigator.pushNamed(context, "/grid", arguments: id);

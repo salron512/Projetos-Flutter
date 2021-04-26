@@ -301,8 +301,9 @@ class _CarrinhoState extends State<Carrinho> {
         ),
       ),
       body: Container(
+        
         decoration: BoxDecoration(color: Theme.of(context).accentColor),
-        padding: EdgeInsets.only(right: 8, left: 8),
+        padding: EdgeInsets.all(5),
         child: StreamBuilder(
           stream: _controller.stream,
           // ignore: missing_return
@@ -346,6 +347,7 @@ class _CarrinhoState extends State<Carrinho> {
                           color: Colors.white,
                           elevation: 8,
                           child: Container(
+
                             padding: EdgeInsets.all(10),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -353,7 +355,11 @@ class _CarrinhoState extends State<Carrinho> {
                               children: [
                                 Expanded(
                                   flex: 60,
-                                  child: Image.network(
+                                  child: dados["urlImagem"] == null ?
+                                Center(child:
+                                Text("produto sem imagem")
+                                 ,) :
+                                   Image.network(
                                     dados["urlImagem"],
                                   ),
                                 ),

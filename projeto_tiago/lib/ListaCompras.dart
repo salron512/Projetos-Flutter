@@ -46,11 +46,10 @@ class _ListaComprasState extends State<ListaCompras> {
         dados = element.data();
         print("preco total " + dados["precoTotal"]);
         // _listaCompras.add(dados["precoTotal"]);
-        setState(() {
+       
           _totalCesta =
               _totalCesta + double.tryParse(dados["precoTotal"]).toDouble();
           _totalCompra = _totalCesta.toString();
-        });
       });
       if (_totalCesta > 0) {
         setState(() {
@@ -136,14 +135,14 @@ class _ListaComprasState extends State<ListaCompras> {
                 child: Text("Cancelar"),
               ),
               TextButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_controllerQtd.text == "0" ||
                       _controllerQtd.text.isEmpty) {
                     _mostraErro("Insira a quantidade correta");
                   } else {
                     String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
                     FirebaseFirestore db = FirebaseFirestore.instance;
-                    db
+                  await  db
                         .collection("listaPendente")
                         .doc(uid)
                         .collection(uid)
@@ -194,10 +193,10 @@ class _ListaComprasState extends State<ListaCompras> {
                 child: Text("Cancelar"),
               ),
               TextButton(
-                onPressed: () {
+                onPressed: () async {
                   String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
                   FirebaseFirestore db = FirebaseFirestore.instance;
-                  db
+                  await db
                       .collection("listaPendente")
                       .doc(uid)
                       .collection(uid)
@@ -434,15 +433,15 @@ class _ListaComprasState extends State<ListaCompras> {
                           "totalCompra": _totalCompra,
                           "formaPagamento": formaPagamento,
                           "troco": trocoSalvar
-                        }).then((value) {
-                          db
+                        }).then((value) async {
+                        await  db
                               .collection("listaPendente")
                               .doc(uid)
                               .collection(uid)
                               .get()
                               .then((value) {
                             value.docs.forEach((element) async {
-                              db
+                            await  db
                                   .collection("listaPendente")
                                   .doc(uid)
                                   .collection(uid)

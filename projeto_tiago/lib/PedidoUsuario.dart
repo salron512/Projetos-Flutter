@@ -12,6 +12,8 @@ class PedidoUsuario extends StatefulWidget {
 
 class _PedidoUsuarioState extends State<PedidoUsuario> {
   StreamController _controller = StreamController.broadcast();
+
+  
   _recuperaPedidos() {
     FirebaseFirestore db = FirebaseFirestore.instance;
     String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();

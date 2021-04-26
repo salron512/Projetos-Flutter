@@ -30,8 +30,8 @@ class _GridProdutoState extends State<GridProduto> {
       imagemSelecionada = await picker.getImage(
         source: ImageSource.camera,
         imageQuality: 50,
-       // maxHeight: 500,
-       // maxWidth: 500,
+        // maxHeight: 500,
+        // maxWidth: 500,
       );
       imagem = File(imagemSelecionada.path);
     } else {
@@ -40,7 +40,7 @@ class _GridProdutoState extends State<GridProduto> {
         source: ImageSource.gallery,
         imageQuality: 50,
         //maxHeight: 500,
-      //  maxWidth: 500,
+        //  maxWidth: 500,
       );
       imagem = File(imagemSelecionada.path);
     }
@@ -121,23 +121,24 @@ class _GridProdutoState extends State<GridProduto> {
       body: Container(
           padding: EdgeInsets.all(10),
           decoration: BoxDecoration(color: Theme.of(context).accentColor),
-     
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
-                width: 150,
-                height: 150,
-                child: _urlImagem ==null ?
-                Image.asset("images/gear.png",
-               
-                )
-                :
-                Image.network(_urlImagem,
-               
-                )
+                width: 250,
+                height: 250,
+                child: _urlImagem == null
+                    ? Image.network("images/error.png")
+                    : Image.network(_urlImagem),
               ),
+              /*
+              CircleAvatar(
+                  backgroundImage:
+                      _urlImagem != null ? NetworkImage(_urlImagem) : null,
+                  maxRadius: 100,
+                  backgroundColor: Colors.grey),
+                  */
               Padding(
                 padding: EdgeInsets.all(10),
                 child: Visibility(
@@ -159,9 +160,7 @@ class _GridProdutoState extends State<GridProduto> {
                 ]),
               ),
             ],
-          ),
-          ),
-      
+          )),
       bottomNavigationBar: BottomAppBar(
           color: Theme.of(context).primaryColor,
           child: Row(
