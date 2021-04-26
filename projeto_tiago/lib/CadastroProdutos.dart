@@ -101,7 +101,6 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
   }
 
   _selecaoGaleriaPeril(String dados) {
-    setState(() {});
     showDialog(
         context: context,
         // ignore: missing_return

@@ -39,6 +39,7 @@ dependencies:
   firebase_core : ^ 1.0.2
   mask_text_input_formatter : ^ 1.1.0
   onesignal_flutter : ^ 2.0.0
+  flutter_slidable: ^0.6.0
   intl : 0.17.0
 
 
@@ -71,6 +72,8 @@ flutter:
     - images/usericon.png
     - images/fpassword.png
     - images/error.png
+    - images/cartao.png
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

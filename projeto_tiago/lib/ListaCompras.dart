@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:projeto_tiago/util/RecuperaDadosFirebase.dart';
 
 class ListaCompras extends StatefulWidget {
@@ -16,6 +17,7 @@ class _ListaComprasState extends State<ListaCompras> {
   StreamController _streamController = StreamController.broadcast();
   TextEditingController _controllerQtd = TextEditingController();
   TextEditingController _controllerPrecoTotal = TextEditingController();
+  TextEditingController _controllerTroco = TextEditingController();
   String _totalCompra = "0";
   bool _mostraBottomBar = false;
   double _totalCesta = 0;
@@ -88,8 +90,6 @@ class _ListaComprasState extends State<ListaCompras> {
                     keyboardType: TextInputType.number,
                     onChanged: (valor) {
                       if (valor != "0" || valor.isNotEmpty || valor != null) {
-                        //  _totalCesta = 0;
-                        //_totalCompra = "0";
                         double qtdProduto = double.tryParse(valor).toDouble();
                         double precoTotal = double.tryParse(preco).toDouble();
                         double resultado = precoTotal * qtdProduto;
@@ -204,6 +204,10 @@ class _ListaComprasState extends State<ListaCompras> {
                       .doc(id)
                       .delete();
 
+                  setState(() {
+                    _totalCompra = "0";
+                  });
+
                   Navigator.pop(context);
                 },
                 child: Text("Confirmar"),
@@ -264,18 +268,17 @@ class _ListaComprasState extends State<ListaCompras> {
         });
   }
 
-  _salvaPedido() {
-    setState(() {});
+  _SelecionaFormaPagamento() {
     showDialog(
-        barrierDismissible: false,
+        barrierDismissible: true,
         context: context,
         // ignore: missing_return
         builder: (context) {
           return AlertDialog(
-            title: Text("Finalizar compra"),
+            title: Text("Selecione a forma de pagamento"),
             content: Container(
               width: 150,
-              height: 250,
+              height: 160,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -284,89 +287,288 @@ class _ListaComprasState extends State<ListaCompras> {
                     width: 150,
                     child: Padding(
                       padding: EdgeInsets.only(bottom: 2),
-                      child: Image.asset("images/cart.png"),
+                      child: Image.asset("images/cartao.png"),
                     ),
                   ),
-                  Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(5),
-                      child: Text(
-                        "Confirmar compra?",
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                      ),
-                    ),
-                  )
                 ],
               ),
             ),
             actions: [
-              TextButton(
-                onPressed: () {
-                  FirebaseFirestore db = FirebaseFirestore.instance;
-                  String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
-                  Map<String, dynamic> map;
-                  List<QueryDocumentSnapshot> query = [];
-                  var stream = db
-                      .collection("listaPendente")
-                      .doc(uid)
-                      .collection(uid)
-                      .orderBy("nome", descending: false)
-                      .get();
+              Padding(
+                  padding: EdgeInsets.only(top: 5),
+                  child: TextButton(
+                    child: Text("Dinheiro"),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _salvaPedido("dinheiro");
+                    },
+                  )),
+              Padding(
+                padding: EdgeInsets.only(top: 5),
+                child: TextButton(
+                  child: Text("Cartão debito"),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _salvaPedido("debito");
+                  },
+                ),
+              ),
+              Padding(
+                  padding: EdgeInsets.only(top: 5),
+                  child: TextButton(
+                    child: Text("Cartão crédito"),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _salvaPedido("credito");
+                    },
+                  ))
+            ],
+          );
+        });
+  }
 
-                  stream.then((event) {
-                    List<dynamic> listaCompras = [];
-                    for (var item in event.docs) {
-                      Map<String, dynamic> map = item.data();
-                      listaCompras.add(map);
-                    }
+  _salvaPedido(String formaPagamento) {
+    if (formaPagamento == "dinheiro") {
+      showDialog(
+          barrierDismissible: false,
+          context: context,
+          // ignore: missing_return
+          builder: (context) {
+            return AlertDialog(
+              title: Text("Finalizar compra"),
+              content: Container(
+                width: 150,
+                height: 250,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Container(
+                      height: 150,
+                      width: 150,
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: 2),
+                        child: Image.asset("images/cart.png"),
+                      ),
+                    ),
+                    Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(5),
+                        child: Text(
+                          "Confirmar compra?",
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    ),
+                    TextField(
+                      controller: _controllerTroco,
+                      textCapitalization: TextCapitalization.sentences,
+                      autofocus: true,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: "Digite o troco",
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _controllerTroco.clear();
+                    },
+                    child: Text("Cancelar")),
+                TextButton(
+                  onPressed: () async {
+                    FirebaseFirestore db = FirebaseFirestore.instance;
+                    String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
+                    var dadosUsuario =
+                        await db.collection("usuarios").doc(uid).get();
+                    Map<String, dynamic> mapUsuario = dadosUsuario.data();
 
-                    db.collection("listaCompra").doc().set({
-                      "dataCompra": DateTime.now().toString(),
-                      "idUsuario": uid,
-                      "listaProdutos": listaCompras,
-                    }).then((value) {
-                      db
-                          .collection("listaPendente")
-                          .doc(uid)
-                          .collection(uid)
-                          .get()
-                          .then((value) {
-                        value.docs.forEach((element) {
-                          db
-                              .collection("listaPendente")
-                              .doc(uid)
-                              .collection(uid)
-                              .doc(element.reference.id)
-                              .delete()
-                              .then((value) {
-                            setState(() {
-                              _totalCompra = "0";
+                    var snap = db
+                        .collection("listaPendente")
+                        .doc(uid)
+                        .collection(uid)
+                        .orderBy("nome", descending: false)
+                        .get();
+                    snap.then((event) async {
+                      List<dynamic> listaCompras = [];
+                      for (var item in event.docs) {
+                        Map<String, dynamic> map = item.data();
+                        listaCompras.add(map);
+                      }
+                      double totalCompra =
+                          double.tryParse(_totalCompra).toDouble();
+                      double troco =
+                          double.tryParse(_controllerTroco.text).toDouble();
+                      String trocoSalvar = "0";
+
+                      
+                      if (totalCompra < troco) {
+                        _mostraErro("Troco inválido");
+                      }
+                        troco = totalCompra - troco;
+                        setState(() {
+                          trocoSalvar = troco.toString();
+                        });
+                      await db.collection("listaCompra").doc().set({
+                        "dataCompra": DateTime.now().toString(),
+                        "status": "pendente",
+                        "nome": mapUsuario["nome"],
+                        "telefone": mapUsuario["telefone"],
+                        "whatsapp": mapUsuario["whatsapp"],
+                        "endereco": mapUsuario["endereco"],
+                        "cidade": mapUsuario["cidade"],
+                        "bairro": mapUsuario["bairro"],
+                        "prontoReferencia": mapUsuario["pontoReferencia"],
+                        "idUsuario": uid,
+                        "listaProdutos": listaCompras,
+                        "totalCompra": _totalCompra,
+                        "troco": trocoSalvar
+                      }).then((value) {
+                        db
+                            .collection("listaPendente")
+                            .doc(uid)
+                            .collection(uid)
+                            .get()
+                            .then((value) {
+                          value.docs.forEach((element) async {
+                            db
+                                .collection("listaPendente")
+                                .doc(uid)
+                                .collection(uid)
+                                .doc(element.reference.id)
+                                .delete()
+                                .then((value) {
+                              setState(() {
+                                _totalCompra = "0";
+                              });
                             });
                           });
                         });
                       });
                     });
-                  });
-                  setState(() {
-                    _totalCompra = "0";
-                  });
-
-                  Navigator.pop(context);
-                },
-                child: Text("Confirmar"),
-              ),
-              TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
                   },
-                  child: Text("Cancelar"))
-            ],
-          );
-        });
+                  child: Text("Confirmar"),
+                ),
+              ],
+            );
+          });
+    } else {
+      showDialog(
+          barrierDismissible: false,
+          context: context,
+          // ignore: missing_return
+          builder: (context) {
+            return AlertDialog(
+              title: Text("Finalizar compra"),
+              content: Container(
+                width: 150,
+                height: 250,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Container(
+                      height: 150,
+                      width: 150,
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: 2),
+                        child: Image.asset("images/cart.png"),
+                      ),
+                    ),
+                    Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(5),
+                        child: Text(
+                          "Confirmar compra?",
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text("Cancelar")),
+                TextButton(
+                  onPressed: () async {
+                    FirebaseFirestore db = FirebaseFirestore.instance;
+                    String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
+                    var dadosUsuario =
+                        await db.collection("usuarios").doc(uid).get();
+                    Map<String, dynamic> mapUsuario = dadosUsuario.data();
+
+                    var snap = db
+                        .collection("listaPendente")
+                        .doc(uid)
+                        .collection(uid)
+                        .orderBy("nome", descending: false)
+                        .get();
+                    snap.then((event) async {
+                      List<dynamic> listaCompras = [];
+                      for (var item in event.docs) {
+                        Map<String, dynamic> map = item.data();
+                        listaCompras.add(map);
+                      }
+                      await db.collection("listaCompra").doc().set({
+                        "dataCompra": DateTime.now().toString(),
+                        "status": "pendente",
+                        "nome": mapUsuario["nome"],
+                        "telefone": mapUsuario["telefone"],
+                        "whatsapp": mapUsuario["whatsapp"],
+                        "endereco": mapUsuario["endereco"],
+                        "cidade": mapUsuario["cidade"],
+                        "bairro": mapUsuario["bairro"],
+                        "prontoReferencia": mapUsuario["pontoReferencia"],
+                        "idUsuario": uid,
+                        "listaProdutos": listaCompras,
+                        "totalCompra": _totalCompra,
+                        "troco": "0"
+                      }).then((value) {
+                        db
+                            .collection("listaPendente")
+                            .doc(uid)
+                            .collection(uid)
+                            .get()
+                            .then((value) {
+                          value.docs.forEach((element) async {
+                            db
+                                .collection("listaPendente")
+                                .doc(uid)
+                                .collection(uid)
+                                .doc(element.reference.id)
+                                .delete()
+                                .then((value) {
+                              setState(() {
+                                _totalCompra = "0";
+                              });
+                            });
+                          });
+                        });
+                      });
+                    });
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, "/pedidousuario");
+                  },
+                  child: Text("Confirmar"),
+                ),
+              ],
+            );
+          });
+    }
   }
 
   @override
@@ -406,7 +608,13 @@ class _ListaComprasState extends State<ListaCompras> {
                       QuerySnapshot querySnapshot = snapshot.data;
                       if (querySnapshot.docs.length == 0) {
                         return Center(
-                          child: Text("Sem produtos"),
+                          child: Text(
+                            "Sem produtos",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
+                          ),
                         );
                       } else {
                         return ListView.builder(
@@ -415,67 +623,52 @@ class _ListaComprasState extends State<ListaCompras> {
                             List<DocumentSnapshot> listaDoc =
                                 querySnapshot.docs.toList();
                             DocumentSnapshot dados = listaDoc[indice];
-                            return Card(
-                                elevation: 8,
-                                child: ListTile(
-                                  leading: Image.network(
-                                    dados["urlimagem"],
-                                    width: 50,
-                                    height: 80,
-                                  ),
-                                  title: Text(dados["nome"]),
-                                  subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text("Marca: " + dados["marca"]),
-                                      Text(
-                                          "Quantidade: " + dados["quantidade"]),
-                                      Text("Preço unit R\$: " +
-                                          dados["precoUnitario"]),
-                                      Text("Preço total R\$: " +
-                                          dados["precoTotal"]),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              32))),
-                                              child: Text("Editar"),
-                                              onPressed: () {
-                                                _editaProduto(
-                                                    dados["quantidade"],
-                                                    dados["precoUnitario"],
-                                                    dados["precoTotal"],
-                                                    dados.reference.id);
-                                              }),
-                                          Padding(
-                                            padding: EdgeInsets.all(5),
-                                            child: ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                    primary: Theme.of(context)
-                                                        .primaryColor,
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        32))),
-                                                child: Text("Excluir"),
-                                                onPressed: () {
-                                                  _apagaProduto(
-                                                      dados.reference.id);
-                                                }),
-                                          )
-                                        ],
-                                      )
-                                    ],
-                                  ),
-                                ));
+
+                            return Slidable(
+                              actionPane: SlidableDrawerActionPane(),
+                              actionExtentRatio: 0.25,
+                              secondaryActions: [
+                                IconSlideAction(
+                                  caption: "Editar",
+                                  color: Colors.green,
+                                  icon: Icons.edit,
+                                  onTap: () => _editaProduto(
+                                      dados["quantidade"],
+                                      dados["precoUnitario"],
+                                      dados["precoTotal"],
+                                      dados.reference.id),
+                                ),
+                                IconSlideAction(
+                                    caption: "Excluir",
+                                    color: Theme.of(context).primaryColor,
+                                    icon: Icons.delete,
+                                    onTap: () =>
+                                        _apagaProduto(dados.reference.id))
+                              ],
+                              child: Card(
+                                  elevation: 8,
+                                  child: ListTile(
+                                    leading: Image.network(
+                                      dados["urlimagem"],
+                                      width: 50,
+                                      height: 80,
+                                    ),
+                                    title: Text(dados["nome"]),
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text("Marca: " + dados["marca"]),
+                                        Text("Quantidade: " +
+                                            dados["quantidade"]),
+                                        Text("Preço unit R\$: " +
+                                            dados["precoUnitario"]),
+                                        Text("Preço total R\$: " +
+                                            dados["precoTotal"]),
+                                      ],
+                                    ),
+                                  )),
+                            );
                           },
                         );
                       }
@@ -518,7 +711,7 @@ class _ListaComprasState extends State<ListaCompras> {
                                 borderRadius: BorderRadius.circular(15)),
                           ),
                           onPressed: () {
-                            _salvaPedido();
+                            _SelecionaFormaPagamento();
                           },
                         )
                       ],

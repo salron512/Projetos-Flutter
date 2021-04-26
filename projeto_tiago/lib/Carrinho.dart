@@ -15,7 +15,7 @@ class _CarrinhoState extends State<Carrinho> {
   StreamController _controller = StreamController.broadcast();
   TextEditingController _controllerQtd = TextEditingController();
   TextEditingController _controllerResultado = TextEditingController(text: "0");
-  List<dynamic> _listaCompras = [];
+ 
   bool _adm = false;
   String _nome = "";
 
