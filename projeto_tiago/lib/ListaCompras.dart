@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:projeto_tiago/util/RecuperaDadosFirebase.dart';
@@ -24,9 +23,8 @@ class _ListaComprasState extends State<ListaCompras> {
   String _msgErro = "";
 
   _recuperaLista() {
-    FirebaseAuth auth = FirebaseAuth.instance;
     FirebaseFirestore db = FirebaseFirestore.instance;
-    String uid = auth.currentUser.uid;
+    String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
     List<QueryDocumentSnapshot> snapshot;
     Map<String, dynamic> dados;
 
@@ -38,18 +36,20 @@ class _ListaComprasState extends State<ListaCompras> {
         .snapshots();
 
     stream.listen((event) {
-      _totalCompra = "0";
-      _totalCesta = 0;
       _streamController.add(event);
+      setState(() {
+        _totalCompra = "0";
+        _totalCesta = 0;
+      });
       snapshot = event.docs;
       snapshot.forEach((element) {
         dados = element.data();
         print("preco total " + dados["precoTotal"]);
         // _listaCompras.add(dados["precoTotal"]);
-       
-          _totalCesta =
-              _totalCesta + double.tryParse(dados["precoTotal"]).toDouble();
-          _totalCompra = _totalCesta.toString();
+
+        _totalCesta =
+            _totalCesta + double.tryParse(dados["precoTotal"]).toDouble();
+        _totalCompra = _totalCesta.toString();
       });
       if (_totalCesta > 0) {
         setState(() {
@@ -142,7 +142,7 @@ class _ListaComprasState extends State<ListaCompras> {
                   } else {
                     String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
                     FirebaseFirestore db = FirebaseFirestore.instance;
-                  await  db
+                    await db
                         .collection("listaPendente")
                         .doc(uid)
                         .collection(uid)
@@ -154,6 +154,7 @@ class _ListaComprasState extends State<ListaCompras> {
                     Navigator.pop(context);
                     _controllerPrecoTotal.clear();
                     _controllerQtd.clear();
+                    _recuperaLista();
                   }
                 },
                 child: Text("Salvar"),
@@ -208,6 +209,7 @@ class _ListaComprasState extends State<ListaCompras> {
                   });
 
                   Navigator.pop(context);
+                  _recuperaLista();
                 },
                 child: Text("Confirmar"),
               ),
@@ -267,7 +269,7 @@ class _ListaComprasState extends State<ListaCompras> {
   }
 
   // ignore: non_constant_identifier_names
-  _SelecionaFormaPagamento() {
+  _selecionaFormaPagamento() {
     showDialog(
         barrierDismissible: true,
         context: context,
@@ -412,13 +414,13 @@ class _ListaComprasState extends State<ListaCompras> {
                           .collection(uid)
                           .orderBy("nome", descending: false)
                           .get();
-                      snap.then((event) async {
+                      snap.then((event) {
                         List<dynamic> listaCompras = [];
                         for (var item in event.docs) {
                           Map<String, dynamic> map = item.data();
                           listaCompras.add(map);
                         }
-                        await db.collection("listaCompra").doc().set({
+                        db.collection("listaCompra").doc().set({
                           "dataCompra": DateTime.now().toString(),
                           "status": "Pendente",
                           "nome": mapUsuario["nome"],
@@ -433,15 +435,15 @@ class _ListaComprasState extends State<ListaCompras> {
                           "totalCompra": _totalCompra,
                           "formaPagamento": formaPagamento,
                           "troco": trocoSalvar
-                        }).then((value) async {
-                        await  db
+                        }).then((value) {
+                          db
                               .collection("listaPendente")
                               .doc(uid)
                               .collection(uid)
                               .get()
                               .then((value) {
-                            value.docs.forEach((element) async {
-                            await  db
+                            value.docs.forEach((element) {
+                              db
                                   .collection("listaPendente")
                                   .doc(uid)
                                   .collection(uid)
@@ -577,12 +579,19 @@ class _ListaComprasState extends State<ListaCompras> {
           });
     }
   }
+  @override
+  void dispose() {
+    super.dispose();
+    _streamController.close();
+  }
 
   @override
   void initState() {
     super.initState();
     _recuperaLista();
   }
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -717,7 +726,7 @@ class _ListaComprasState extends State<ListaCompras> {
                                 borderRadius: BorderRadius.circular(15)),
                           ),
                           onPressed: () {
-                            _SelecionaFormaPagamento();
+                            _selecionaFormaPagamento();
                           },
                         )
                       ],

@@ -52,7 +52,7 @@ class _LoginState extends State<Login> {
             email: usuario.email, password: usuario.senha)
         .then((firebaseUser) {
       _recuperaIdNotificacao();
-      Navigator.popAndPushNamed(context, "/carrinho");
+      Navigator.popAndPushNamed(context, "/listacategorias");
     }).catchError((error) {
       setState(() {
         _mensagemErro =
@@ -70,7 +70,7 @@ class _LoginState extends State<Login> {
     var usuariologado = await  auth.currentUser;
 
     if (usuariologado != null) {
-      Navigator.pushNamedAndRemoveUntil(context, "/carrinho", (route) => false);
+      Navigator.pushNamedAndRemoveUntil(context,"/listacategorias", (route) => false);
       // Navigator.popAndPushNamed(context, "/carrinho");
     }
   }

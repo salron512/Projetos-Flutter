@@ -21,7 +21,6 @@ class _MinhasEntregasState extends State<MinhasEntregas> {
         .collection("pedidosRealizados")
         .where("idUsuario", isEqualTo: id)
          .limit(10)
-        //.orderBy("dataCompra", descending: true)
         .snapshots();
     stream.listen((event) {
       _controller.add(event);

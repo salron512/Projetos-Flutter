@@ -1,9 +1,6 @@
-
 import 'package:acha_eu/model/Usuario.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 class Home extends StatefulWidget {
   Home({Key key}) : super(key: key);
@@ -52,8 +49,7 @@ class _HomeState extends State<Home> {
         .signInWithEmailAndPassword(
             email: usuario.email, password: usuario.senha)
         .then((firebaseUser) {
-      _recuperaIdNotificacao();
-      Navigator.popAndPushNamed(context, "/listacategorias");
+      Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
     }).catchError((error) {
       setState(() {
         _mensagemErro = "Erro ao autenticar o usuário, verifique e-mail e"
@@ -66,17 +62,7 @@ class _HomeState extends State<Home> {
     });
   }
 
-  _recuperaIdNotificacao() async {
-    var status = await OneSignal.shared.getPermissionSubscriptionState();
-    var playerId = status.subscriptionStatus.userId;
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    FirebaseAuth auth = FirebaseAuth.instance;
-    String id = auth.currentUser.uid;
-    db.collection("usuarios").doc(id).update({
-      "playerId": playerId,
-    });
-  }
-
+/*
   _verificaUsuarioLogado() async {
     FirebaseAuth auth = FirebaseAuth.instance;
     //auth.signOut();
@@ -88,11 +74,11 @@ class _HomeState extends State<Home> {
       //Navigator.popAndPushNamed(context, "/listacategorias");
     }
   }
+  */
 
   @override
   void initState() {
     super.initState();
-    _verificaUsuarioLogado();
   }
 
   @override

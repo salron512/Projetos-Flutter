@@ -23,7 +23,7 @@ Future<void> main() async {
   //Remove this method to stop OneSignal Debugging
   OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
 
-  OneSignal.shared.init("98b0698b-f0a2-4843-be0a-fd358da3bda1", iOSSettings: {
+  OneSignal.shared.init("ab58bbf0-b659-4ebf-8a66-ca62a3c4c68b", iOSSettings: {
     OSiOSSettings.autoPrompt: false,
     OSiOSSettings.inAppLaunchUrl: false
   });

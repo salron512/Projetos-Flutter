@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 class Carrinho extends StatefulWidget {
   @override
@@ -15,21 +16,8 @@ class _CarrinhoState extends State<Carrinho> {
   StreamController _controller = StreamController.broadcast();
   TextEditingController _controllerQtd = TextEditingController();
   TextEditingController _controllerResultado = TextEditingController(text: "0");
- 
-  bool _adm = false;
-  String _nome = "";
 
-  _recuperaUsuario() async {
-    FirebaseAuth auth = FirebaseAuth.instance;
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    String idUsuario = auth.currentUser.uid;
-    var snap = await db.collection("usuarios").doc(idUsuario).get();
-    Map<String, dynamic> dados = snap.data();
-    setState(() {
-      _nome = dados["nome"];
-      _adm = dados["adm"];
-    });
-  }
+ 
 
   _recuperaProdutos() {
     FirebaseFirestore db = FirebaseFirestore.instance;
@@ -42,11 +30,7 @@ class _CarrinhoState extends State<Carrinho> {
     });
   }
 
-  _deslogar() {
-    FirebaseAuth auth = FirebaseAuth.instance;
-    auth.signOut();
-    Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
-  }
+ 
 
   _addItem(String nome, String marca, String preco, String urlImagem) {
     String precoTotal = preco;
@@ -165,11 +149,22 @@ class _CarrinhoState extends State<Carrinho> {
         });
   }
 
+  _recebeNot() {
+    OneSignal.shared.setNotificationOpenedHandler(
+        (OSNotificationOpenedResult result) async {
+      // será chamado sempre que uma notificação for aberta / botão pressionado.
+      if (result != null) {
+        print("ok");
+        Navigator.pushNamed(context, "/listaorcamento");
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    _recebeNot();
     _recuperaProdutos();
-    _recuperaUsuario();
   }
 
   @override
@@ -184,124 +179,8 @@ class _CarrinhoState extends State<Carrinho> {
       appBar: AppBar(
         title: Text("Catálogo"),
       ),
-      drawer: Drawer(
-        child: ListView(
-          // Important: Remove any padding from the ListView.
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              child: Container(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    Container(
-                      width: 100,
-                      height: 100,
-                      child: Image.asset("images/usericon.png"),
-                    ),
-                    Text(
-                      _nome,
-                      style: TextStyle(
-                          fontSize: 15,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              decoration: BoxDecoration(
-                color:Theme.of(context).primaryColor,
-              ),
-            ),
-            Visibility(
-              visible: _adm,
-              child: ListTile(
-                leading: Icon(Icons.people_alt),
-                title: Text('Cadastrar Adm'),
-                onTap: () {
-                  Navigator.pushNamed(context, "/adm");
-                },
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.account_box_outlined),
-              title: Text("Alterar cadastro"),
-              onTap: () {
-                //Navigator.push(context, MaterialPageRoute(builder: (context) => SegundaTela()));
-                setState(() {
-                  Navigator.pushNamed(context, "/config");
-                });
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.access_alarms_outlined),
-              title: Text("Pedido em andamento"),
-              onTap: () {
-                //Navigator.push(context, MaterialPageRoute(builder: (context) => SegundaTela()));
-                setState(() {
-                  Navigator.pushNamed(context, "/pedidousuario");
-                });
-              },
-            ),
-            Visibility(
-              visible: _adm,
-              child: ListTile(
-                leading: Icon(Icons.add),
-                title: Text('Cadastro de produtos'),
-                onTap: () {
-                  Navigator.pushNamed(context, "/produtos");
-                },
-              ),
-            ),
-            Visibility(
-              visible: _adm,
-              child: ListTile(
-                leading: Icon(Icons.update),
-                title: Text('Pedidos pendentes'),
-                onTap: () {
-                  Navigator.pushNamed(context, "/listapedidos");
-                },
-              ),
-            ),
-            Visibility(
-              visible: _adm,
-              child: ListTile(
-                leading: Icon(Icons.delivery_dining),
-                title: Text('Entregas em andamento'),
-                onTap: () {
-                  Navigator.pushNamed(context, "/listaentregas");
-                },
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.shopping_cart),
-              title: Text('Meus pedidos'),
-              onTap: () {
-                Navigator.pushNamed(context, "/minhasentregas");
-              },
-            ),
-            Visibility(
-              visible: _adm,
-              child: ListTile(
-                leading: Icon(Icons.assignment_outlined),
-                title: Text('Histórico'),
-                onTap: () {
-                  Navigator.pushNamed(context, "/historico");
-                },
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.exit_to_app),
-              title: Text('Sair'),
-              onTap: () {
-                _deslogar();
-              },
-            ),
-          ],
-        ),
-      ),
+      
       body: Container(
-        
         decoration: BoxDecoration(color: Theme.of(context).accentColor),
         padding: EdgeInsets.all(5),
         child: StreamBuilder(
@@ -347,7 +226,6 @@ class _CarrinhoState extends State<Carrinho> {
                           color: Colors.white,
                           elevation: 8,
                           child: Container(
-
                             padding: EdgeInsets.all(10),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -355,13 +233,13 @@ class _CarrinhoState extends State<Carrinho> {
                               children: [
                                 Expanded(
                                   flex: 60,
-                                  child: dados["urlImagem"] == null ?
-                                Center(child:
-                                Text("produto sem imagem")
-                                 ,) :
-                                   Image.network(
-                                    dados["urlImagem"],
-                                  ),
+                                  child: dados["urlImagem"] == null
+                                      ? Center(
+                                          child: Text("produto sem imagem"),
+                                        )
+                                      : Image.network(
+                                          dados["urlImagem"],
+                                        ),
                                 ),
                                 Expanded(
                                   flex: 40,
@@ -443,8 +321,7 @@ class _CarrinhoState extends State<Carrinho> {
                                                       dados["marca"],
                                                       dados["preco"],
                                                       dados["urlImagem"]);
-                                                }
-                                                ),
+                                                }),
                                           )
                                         ],
                                       )

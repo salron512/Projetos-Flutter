@@ -13,6 +13,20 @@ class _DetalhesProdutosState extends State<DetalhesProdutos> {
   TextEditingController _controllerMarca = TextEditingController();
   TextEditingController _controllerPreco = TextEditingController();
   String _msgErro = "";
+  List<String> _listaCategoria = [];
+  String _categoriaSelecionada = "";
+
+  _recuperaCategoria() async {
+    FirebaseFirestore db = FirebaseFirestore.instance;
+
+    var snapshot = await db.collection("categorias").get();
+
+    for (var item in snapshot.docs) {
+      Map<String, dynamic> docs = item.data();
+      _listaCategoria.add(docs["categoria"]);
+    }
+    return _listaCategoria;
+  }
 
   _verificaCampos() async {
     // ignore: unused_local_variable
@@ -20,20 +34,27 @@ class _DetalhesProdutosState extends State<DetalhesProdutos> {
     if (_controllerNome.text.isNotEmpty) {
       if (_controllerMarca.text.isNotEmpty) {
         if (_controllerPreco.text.isNotEmpty) {
-          FirebaseFirestore db = FirebaseFirestore.instance;
-          String id = DateTime.now().microsecondsSinceEpoch.toString();
-          await db.collection("produtos").doc(id).set({
-            "id": id,
-            "nome": _controllerNome.text,
-            "marca": _controllerMarca.text,
-            "preco": _controllerPreco.text,
-            "urlImagem": null,
-            // ignore: missing_return
-          });
-          Navigator.pushNamed(context, "/grid", arguments: id);
-          _controllerMarca.clear();
-          _controllerNome.clear();
-          _controllerPreco.clear();
+          if (_categoriaSelecionada.isNotEmpty) {
+            FirebaseFirestore db = FirebaseFirestore.instance;
+            String id = DateTime.now().microsecondsSinceEpoch.toString();
+            await db.collection("produtos").doc(id).set({
+              "id": id,
+              "categoria": _categoriaSelecionada,
+              "nome": _controllerNome.text,
+              "marca": _controllerMarca.text,
+              "preco": _controllerPreco.text,
+              "urlImagem": null,
+              // ignore: missing_return
+            });
+            Navigator.pushNamed(context, "/grid", arguments: id);
+            _controllerMarca.clear();
+            _controllerNome.clear();
+            _controllerPreco.clear();
+          } else {
+            setState(() {
+              _msgErro = "Por favor selecione uma categoria";
+            });
+          }
         } else {
           setState(() {
             _msgErro = "Por favor preencha o campo preço";
@@ -49,6 +70,54 @@ class _DetalhesProdutosState extends State<DetalhesProdutos> {
         _msgErro = "Por favor preencha o campo nome";
       });
     }
+  }
+
+  _alertCategoria() {
+    showDialog(
+      barrierDismissible: false,
+        context: context,
+        // ignore: missing_return
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Cadastro da categoria"),
+            content: Container(
+                height: 150,
+                child: ListView.separated(
+                  itemCount: _listaCategoria.length,
+                  separatorBuilder: (context, indice) => Divider(
+                    height: 4,
+                    color: Colors.grey,
+                  ),
+                  // ignore: missing_return
+                  itemBuilder: (context, indice) {
+                    var dados = _listaCategoria[indice];
+                    return ListTile(
+                      title: Text(dados),
+                      onTap: () {
+                        Navigator.pop(context);
+                        _categoriaSelecionada = dados;
+                      },
+                    );
+                  },
+                )),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _controllerNome.clear();
+                  _controllerMarca..clear();
+                },
+                child: Text("Cancelar"),
+              ),
+            ],
+          );
+        });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _recuperaCategoria();
   }
 
   @override
@@ -126,6 +195,21 @@ class _DetalhesProdutosState extends State<DetalhesProdutos> {
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15))),
                   controller: _controllerPreco,
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(bottom: 30),
+                child: GestureDetector(
+                  child: Text(
+                    "Selecionar categoria",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 25,
+                    ),
+                  ),
+                  onTap: () {
+                    _alertCategoria();
+                  },
                 ),
               ),
               Padding(

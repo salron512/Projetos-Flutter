@@ -2,6 +2,7 @@ import 'package:acha_eu/model/Usuario.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:whatsapp_unilink/whatsapp_unilink.dart';
 
 //tela de contado do profissional
 // ignore: must_be_immutable
@@ -50,20 +51,21 @@ class _DetalhesContadoState extends State<DetalhesContado> {
     }
   }
 
-  _abrirWhatsApp() async {
-    String telefone = widget.usuario.whatsapp;
-    var whatsappUrl = "whatsapp://send?phone=+55$telefone=Olá,tudo bem ?";
+ 
 
-    if (await canLaunch(whatsappUrl)) {
-      await launch(whatsappUrl);
-    } else {
-      throw 'Could not launch $whatsappUrl';
-    }
-  }
+  _abrirWhatsApp() async {
+     String telefone = widget.usuario.whatsapp;
+  final link = WhatsAppUnilink(
+    phoneNumber: '+55$telefone',
+    text: 
+    "Encontrei seu contato pelo app Chama Eu e desejo solicitar um orçamento.",
+  );
+  await launch('$link');
+}
 
   _abrirTelefone() async {
     String telefone = widget.usuario.telefone;
-    var telefoneUrl = "tel:$telefone";
+    String telefoneUrl = "tel:$telefone";
 
     if (await canLaunch(telefoneUrl)) {
       await launch(telefoneUrl);

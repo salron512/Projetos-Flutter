@@ -18,7 +18,7 @@ class _DetalhesEntregaState extends State<DetalhesEntrega> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Detalhes da entrega"),
+        title: Text("Detalhes da pedido"),
       ),
       body: Container(
         decoration: BoxDecoration(color: Theme.of(context).accentColor),

@@ -35,7 +35,7 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
     return dataFormatada;
   }
 
-  _apagaSolcilidacao(String id, String status) {
+  _apagaSolcilitacao(String id, String status) {
     if (status == "pendente") {
       showDialog(
           context: context,
@@ -148,7 +148,7 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
                                 : Theme.of(context).primaryColor,
                             child: ListTile(
                                 onLongPress: () {
-                                  _apagaSolcilidacao(
+                                  _apagaSolcilitacao(
                                       dados.reference.id, dados["status"]);
                                 },
                                 onTap: () {

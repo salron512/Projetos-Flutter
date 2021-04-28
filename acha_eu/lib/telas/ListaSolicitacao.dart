@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 class ListaSolicitacao extends StatefulWidget {
   @override
@@ -175,30 +174,7 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
       "telefoneProfissional": " ",
       "nomeProfissional": " ",
       "dataResposta": " "
-    }).then((value) {
-      _postaNotificao(_usuario.cidade);
     });
-  }
-
-  _postaNotificao(String cidade) async {
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    List<String> list = [];
-    var snapshot = await db
-        .collection("usuarios")
-        .where("cidade", isEqualTo: cidade)
-        .where("categoria", isEqualTo: _escolhaCategoria)
-        .get();
-
-    for (var item in snapshot.docs) {
-      Map<String, dynamic> map = item.data();
-      String idUsuarioNotigicacao = map["playerId"];
-      list.add(idUsuarioNotigicacao);
-    }
-    OneSignal.shared.postNotification(OSCreateNotification(
-      playerIds: list,
-      heading: "Novo trabalho",
-      content: "Você tem uma nova prostosta de trabalho!",
-    ));
   }
 
   _formatarData(String data) {
@@ -272,7 +248,6 @@ class _ListaSolicitacaoState extends State<ListaSolicitacao> {
         });
   }
 
- 
   @override
   void initState() {
     super.initState();

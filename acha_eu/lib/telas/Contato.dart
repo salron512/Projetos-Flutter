@@ -48,7 +48,7 @@ class _ContatoState extends State<Contato> {
                       width: 200, height: 150),
                 ),
                 Text(
-                  "Faça seu anuncio no nosso app entre em contato nas opções abaixo",
+                  "Faça seu anúncio no nosso app entre em contato nas opções abaixo",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 Padding(

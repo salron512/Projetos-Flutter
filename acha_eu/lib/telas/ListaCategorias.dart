@@ -1,26 +1,29 @@
 import 'package:acha_eu/model/Categorias.dart';
+import 'package:acha_eu/util/Localizacao.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
-
+import 'package:geolocator/geolocator.dart';
 
 class ListaCategorias extends StatefulWidget {
-   ListaCategorias({Key key}) : super(key: key);
-  
+  ListaCategorias({Key key}) : super(key: key);
+
   @override
   _ListaCategoriasState createState() => _ListaCategoriasState();
 }
 
 class _ListaCategoriasState extends State<ListaCategorias> {
   List<String> itensMenu = ["Perfil", "Sair", "Anúncie"];
+  bool _mostraMenu = false;
 
   Future _recuperaCategorias() async {
     // ignore: deprecated_member_use
     List<Categorias> listacategoria = List<Categorias>();
     FirebaseFirestore db = FirebaseFirestore.instance;
     FirebaseStorage storage = FirebaseStorage.instance;
+
     QuerySnapshot snapshot = await db
         .collection("categorias")
         .orderBy("categoria", descending: false)
@@ -35,11 +38,10 @@ class _ListaCategoriasState extends State<ListaCategorias> {
       var imagem = storage.ref("imagensCategoria/" + categorias.idImagem);
       String url = await imagem.getDownloadURL();
       categorias.urlImagem = url;
-      //print("categorias: " + categorias.nome);
-      //print("url: " + categorias.urlImagem);
       listacategoria.add(categorias);
     }
     return listacategoria;
+    // ignore: dead_code
   }
 
   _escolhaMenuItem(String itemEscolhido) {
@@ -56,49 +58,58 @@ class _ListaCategoriasState extends State<ListaCategorias> {
     }
   }
 
-  _deslogarUsuario() async {
+  _deslogarUsuario() {
     FirebaseAuth auth = FirebaseAuth.instance;
-    await auth.signOut();
-    Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
-  }
-
-  recebeNot() {
-    OneSignal.shared.setNotificationOpenedHandler(
-        (OSNotificationOpenedResult result) async {
-      // será chamado sempre que uma notificação for aberta / botão pressionado.
-      if (result != null) {
-        FirebaseFirestore db = FirebaseFirestore.instance;
-        FirebaseAuth auth = FirebaseAuth.instance;
-        String id = auth.currentUser.uid;
-        var dados = await db.collection("usuarios").doc(id).get();
-        Map<String, dynamic> map = dados.data();
-        String categoria = map["categoria"];
-        print("teste ok!");
-        Navigator.pushNamed(context, "/listaPedidos", arguments: categoria);
-      }
+    auth.signOut().then((value) {
+      setState(() {
+        _mostraMenu = false;
+      });
     });
   }
 
-  
+  _recuperaUsuario() {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    User user = auth.currentUser;
+    if (user != null) {
+      setState(() {
+        _mostraMenu = true;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _recuperaUsuario();
+    Localizacao.verificaLocalizacao();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Categorias"),
         actions: [
-          PopupMenuButton<String>(
-            color: Color(0xff37474f),
-            onSelected: _escolhaMenuItem,
-            // ignore: missing_return
-            itemBuilder: (context) {
-              return itensMenu.map((String item) {
-                return PopupMenuItem<String>(
-                  value: item,
-                  child: Text(item, style: TextStyle(color: Colors.white)),
-                );
-              }).toList();
-            },
-          )
+          IconButton(
+              icon: Icon(Icons.login),
+              onPressed: () {
+                Navigator.pushNamed(context, "/login");
+              }),
+          Visibility(
+              visible: _mostraMenu,
+              child: PopupMenuButton<String>(
+                color: Color(0xff37474f),
+                onSelected: _escolhaMenuItem,
+                // ignore: missing_return
+                itemBuilder: (context) {
+                  return itensMenu.map((String item) {
+                    return PopupMenuItem<String>(
+                      value: item,
+                      child: Text(item, style: TextStyle(color: Colors.white)),
+                    );
+                  }).toList();
+                },
+              )),
         ],
       ),
       body: Column(
@@ -257,9 +268,18 @@ class _ListaCategoriasState extends State<ListaCategorias> {
                             width: 100,
                             height: 100,
                             child: GestureDetector(
-                              onTap: () {
-                                Navigator.pushNamed(context, "/listaservicos",
-                                    arguments: dados);
+                              onTap: () async {
+                                LocationPermission permission =
+                                    await Geolocator.checkPermission();
+                                if (permission == LocationPermission.denied ||
+                                    permission ==
+                                        LocationPermission.deniedForever) {
+                                  Navigator.pushNamedAndRemoveUntil(
+                                      context, "/erro", (route) => false);
+                                } else {
+                                  Navigator.pushNamed(context, "/listaservicos",
+                                      arguments: dados);
+                                }
                               },
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -293,12 +313,12 @@ class _ListaCategoriasState extends State<ListaCategorias> {
         ],
       ),
       // floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+      /*
       floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
             Navigator.pushNamed(context, "/listaSolicitacao");
           },
           label: Text("Solicite um profissional")),
-      /*
       bottomNavigationBar: BottomAppBar(
         color:Color(0xffDCDCDC),
         child:   SingleChildScrollView(

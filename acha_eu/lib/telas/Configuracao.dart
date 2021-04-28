@@ -48,12 +48,16 @@ class _ConfiguracaoState extends State<Configuracao> {
       //recupera imagem da camera
       imagemSelecionada =
           await picker.getImage(source: ImageSource.camera, imageQuality: 50);
-      imagem = File(imagemSelecionada.path);
+      if (imagemSelecionada != null) {
+         imagem = File(imagemSelecionada.path);
+      }
     } else {
       //recupera imagem da galeria
       imagemSelecionada =
           await picker.getImage(source: ImageSource.gallery, imageQuality: 50);
-      imagem = File(imagemSelecionada.path);
+      if (imagemSelecionada != null) {
+         imagem = File(imagemSelecionada.path);
+      }
     }
     setState(() {
       _imagem = imagem;
@@ -143,7 +147,7 @@ class _ConfiguracaoState extends State<Configuracao> {
                       .update(dadosAtualizar);
 
                   Navigator.pushNamedAndRemoveUntil(
-                      context, "/listacategorias", (route) => false);
+                      context, "/", (route) => false);
                   setState(() {
                     _mensagemErro = "";
                   });
@@ -250,7 +254,7 @@ class _ConfiguracaoState extends State<Configuracao> {
         .collection("categorias")
         .orderBy("categoria", descending: false)
         .get();
-    List<String> listarecuperada =[];
+    List<String> listarecuperada = [];
     for (var item in snapshot.docs) {
       Map<String, dynamic> dados = item.data();
       if (dados["categoria"] == "Cliente") continue;
@@ -365,7 +369,7 @@ class _ConfiguracaoState extends State<Configuracao> {
         .where("estado", isEqualTo: _scolhaEstado)
         .get();
 
-    List<String> listaCidadesRecuperadas =[];
+    List<String> listaCidadesRecuperadas = [];
     for (var item in dados.docs) {
       var dados = item.data();
       print("teste for: " + dados["cidade"].toString());
@@ -487,47 +491,6 @@ class _ConfiguracaoState extends State<Configuracao> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Perfil"),
-        actions: [
-  //  /*
-          IconButton(
-            icon: Icon(
-              Icons.account_balance_sharp,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              Navigator.pushNamed(
-                context,
-                "/pagamento",
-              );
-            },
-          ),
-     //*/
-          
-          _mostraPagamento != false
-              ? IconButton(
-                  icon: Icon(
-                    Icons.work,
-                    color: Colors.white,
-                  ),
-                  onPressed: () {
-                    Navigator.pushNamed(context, "/listaTrabalho",
-                        arguments: _escolhaCategoria);
-                  },
-                )
-              : Container(),
-          _mostraPagamento != false
-              ? IconButton(
-                  icon: Icon(
-                    Icons.storage,
-                    color: Colors.white,
-                  ),
-                  onPressed: () {
-                    Navigator.pushNamed(context, "/listaPedidos",
-                        arguments: _escolhaCategoria);
-                  },
-                )
-              : Container()
-        ],
       ),
       body: cond == null
           ? Center(
@@ -940,12 +903,12 @@ class _ConfiguracaoState extends State<Configuracao> {
                             "Salvar",
                             style: TextStyle(color: Colors.white, fontSize: 20),
                           ),
-                        style: ElevatedButton.styleFrom(
+                          style: ElevatedButton.styleFrom(
                             primary: Color(0xff37474f),
-                          padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(32)),
-                        ),
+                            padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(32)),
+                          ),
                           onPressed: () {
                             _atualizarNomeFirestore();
                           },
@@ -963,9 +926,9 @@ class _ConfiguracaoState extends State<Configuracao> {
                             ),
                             style: ElevatedButton.styleFrom(
                               primary: Color(0xff37474f),
-                            padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(32)),
+                              padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(32)),
                             ),
                             onPressed: () {
                               Navigator.pushNamed(context, "/adm");

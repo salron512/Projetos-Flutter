@@ -13,6 +13,7 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
   TextEditingController _controllerNome = TextEditingController();
   TextEditingController _controllerMarca = TextEditingController();
   TextEditingController _controllerPreco = TextEditingController();
+  TextEditingController _controllerCategoria = TextEditingController();
 
   // ignore: missing_return
   Stream _recuperaProdutos() {
@@ -26,9 +27,60 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
     });
   }
 
+  _salvaCategoria() {
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    String categoria = _controllerCategoria.text;
+    db.collection("categorias").doc().set({"categoria": categoria});
+  }
+
+  _alertCategoria() {
+    showDialog(
+        context: context,
+        // ignore: missing_return
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Cadastro da categoria"),
+            content: Container(
+              height: 150,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextField(
+                    controller: _controllerCategoria,
+                    textCapitalization: TextCapitalization.sentences,
+                    autofocus: true,
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(
+                      labelText: "Nome da categoria",
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _controllerNome.clear();
+                  _controllerMarca..clear();
+                },
+                child: Text("Cancelar"),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _salvaCategoria();
+                },
+                child: Text("Salvar"),
+              ),
+            ],
+          );
+        });
+  }
+
   _editaProduto(String nome, String marca, String preco, String id) {
     setState(() {
-      _controllerNome.text =  nome;
+      _controllerNome.text = nome;
       _controllerMarca.text = marca;
       _controllerPreco.text = preco;
     });
@@ -236,97 +288,96 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
         title: Text("Produtos"),
       ),
       body: Container(
-        decoration: BoxDecoration(color: Theme.of(context).accentColor),
-        child: Center(
-            //padding: EdgeInsets.all(16),
-            child: StreamBuilder(
-          stream: _controller.stream,
-          // ignore: missing_return
-          builder: (context, snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.none:
-              case ConnectionState.waiting:
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              case ConnectionState.active:
-              case ConnectionState.done:
-                QuerySnapshot querySnapshot = snapshot.data;
-                if (querySnapshot.docs.length == 0) {
+          decoration: BoxDecoration(color: Theme.of(context).accentColor),
+          //padding: EdgeInsets.all(16),
+          child: StreamBuilder(
+            stream: _controller.stream,
+            // ignore: missing_return
+            builder: (context, snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.none:
+                case ConnectionState.waiting:
                   return Center(
-                    child: Text(
-                      "Sem produtos cadastrados!",
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
+                    child: CircularProgressIndicator(),
                   );
-                } else {
-                  return ListView.separated(
-                    itemCount: querySnapshot.docs.length,
-                    separatorBuilder: (context, indice) => Divider(
-                      height: 4,
-                      color: Colors.grey,
-                    ),
-                    itemBuilder: (context, indice) {
-                      List<DocumentSnapshot> listaDados =
-                          querySnapshot.docs.toList();
-                      DocumentSnapshot dados = listaDados[indice];
-                      return ListTile(
-                        leading:  dados["urlImagem"] == null ?
-                         Image.asset("images/gear.png") :
-                         Image.network(dados["urlImagem"]),
-                        title: Text(
-                          "Produto: " + dados["nome"],
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Marca: " + dados["marca"],
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            Text(
-                              "Preço: " + "R\$ " + dados["preco"],
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ],
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                                icon: Icon(
-                                  Icons.edit,
-                                  color: Colors.green,
-                                ),
-                                onPressed: () {
-                                  _editaProduto(dados["nome"], dados["marca"],
-                                      dados["preco"], dados.reference.id);
-                                }),
-                            IconButton(
-                                icon: Icon(
-                                  Icons.delete,
-                                  color: Colors.red,
-                                ),
-                                onPressed: () {
-                                  _apagaProduto(dados["nome"], dados["marca"],
-                                      dados.reference.id);
-                                }),
-                          ],
-                        ),
-                        onTap: () {
-                          _selecaoGaleriaPeril(dados.reference.id);
-                        },
-                      );
-                    },
-                  );
-                }
-                break;
-            }
-          },
-        )),
-      ),
+                case ConnectionState.active:
+                case ConnectionState.done:
+                  QuerySnapshot querySnapshot = snapshot.data;
+                  if (querySnapshot.docs.length == 0) {
+                    return Center(
+                      child: Text(
+                        "Sem produtos cadastrados!",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    );
+                  } else {
+                    return ListView.separated(
+                      itemCount: querySnapshot.docs.length,
+                      separatorBuilder: (context, indice) => Divider(
+                        height: 4,
+                        color: Colors.grey,
+                      ),
+                      itemBuilder: (context, indice) {
+                        List<DocumentSnapshot> listaDados =
+                            querySnapshot.docs.toList();
+                        DocumentSnapshot dados = listaDados[indice];
+                        return ListTile(
+                          leading: dados["urlImagem"] == null
+                              ? Image.asset("images/gear.png")
+                              : Image.network(dados["urlImagem"]),
+                          title: Text(
+                            "Produto: " + dados["nome"],
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Marca: " + dados["marca"],
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Text(
+                                "Preço: " + "R\$ " + dados["preco"],
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                  icon: Icon(
+                                    Icons.edit,
+                                    color: Colors.green,
+                                  ),
+                                  onPressed: () {
+                                    _editaProduto(dados["nome"], dados["marca"],
+                                        dados["preco"], dados.reference.id);
+                                  }),
+                              IconButton(
+                                  icon: Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  ),
+                                  onPressed: () {
+                                    _apagaProduto(dados["nome"], dados["marca"],
+                                        dados.reference.id);
+                                  }),
+                            ],
+                          ),
+                          onTap: () {
+                            _selecaoGaleriaPeril(dados.reference.id);
+                          },
+                        );
+                      },
+                    );
+                  }
+                  break;
+              }
+            },
+          )),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         backgroundColor: Color(0xffFF0000),
@@ -334,6 +385,29 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
           // _cadastrarProdutos();
           Navigator.pushNamed(context, "/produto");
         },
+      ),
+      bottomNavigationBar: BottomAppBar(
+        shape: CircularNotchedRectangle(),
+        color: Theme.of(context).primaryColor,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    primary: Theme.of(context).accentColor,
+                    padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                  ),
+                  onPressed: () {
+                    _alertCategoria();
+                  },
+                  child: Text("Cadastrar categoria")),
+            ),
+          ],
+        ),
       ),
     );
   }
