@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:projeto_tiago/util/RecuperaDadosFirebase.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ListaEntregas extends StatefulWidget {
@@ -12,15 +14,39 @@ class ListaEntregas extends StatefulWidget {
 
 class _ListaEntregasState extends State<ListaEntregas> {
   StreamController _controller = StreamController.broadcast();
-  _recuperaPedidos() {
+  StreamController _streamControllerEntrega = StreamController.broadcast();
+
+  bool _adm = false;
+  String _nomeEntregador;
+
+  _recuperaPedidos() async {
+    String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
+    Map<String, dynamic> dadosUsuario;
     FirebaseFirestore db = FirebaseFirestore.instance;
-    var stream = db
-        .collection("listaCompra")
-        .where("status", isEqualTo: "Recebido")
-        .snapshots();
-    stream.listen((event) {
-      _controller.add(event);
-    });
+    DocumentSnapshot snapshot = await db.collection("usuarios").doc(uid).get();
+    dadosUsuario = snapshot.data();
+    _adm = dadosUsuario["adm"];
+    _nomeEntregador = dadosUsuario["nome"];
+
+    if (_adm) {
+      var stream = db
+          .collection("listaCompra")
+          .where("status", isEqualTo: "Recebido")
+          .snapshots();
+      stream.listen((event) {
+        _controller.add(event);
+      });
+    } else {
+      String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
+      var stream = db
+          .collection("listaCompra")
+          .where("idEntregador", isEqualTo: uid)
+          .where("status", isEqualTo: "Recebido")
+          .snapshots();
+      stream.listen((event) {
+        _controller.add(event);
+      });
+    }
   }
 
   _formatarData(String data) {
@@ -72,9 +98,17 @@ class _ListaEntregasState extends State<ListaEntregas> {
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
+                  _streamControllerEntrega.close();
                   _cancelarEntrega(dados);
                 },
                 child: Text("Cancelar entrega"),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _obtemLocalizacao(dados: dados, entrega: true);
+                },
+                child: Text("Iniciar entrega"),
               ),
               TextButton(
                 onPressed: () {
@@ -223,13 +257,30 @@ class _ListaEntregasState extends State<ListaEntregas> {
                 onPressed: () {
                   FirebaseFirestore db = FirebaseFirestore.instance;
                   db.collection("listaCompra").doc(dados.reference.id).delete();
-                  Navigator.pushNamedAndRemoveUntil(
-                      context, "/carrinho", (route) => false);
+                  Navigator.pop(context);
                 },
               ),
             ],
           );
         });
+  }
+
+  _obtemLocalizacao({DocumentSnapshot dados, bool entrega}) {
+    String idEntrega = dados.reference.id;
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    double latitude;
+    double longitude;
+    var stream = Geolocator.getPositionStream();
+    stream.listen((event) {
+      _streamControllerEntrega.add(event);
+      latitude = event.latitude;
+      longitude = event.longitude;
+      db.collection("localizacaoEntregador").doc(idEntrega).set({
+        "nomeEntregador": _nomeEntregador,
+        "latitude": latitude,
+        "longitude": longitude
+      });
+    });
   }
 
   @override
@@ -241,7 +292,7 @@ class _ListaEntregasState extends State<ListaEntregas> {
   @override
   void dispose() {
     super.dispose();
-    _controller.close();
+    // _controller.close();
   }
 
   @override
@@ -347,7 +398,7 @@ class _ListaEntregasState extends State<ListaEntregas> {
                                     Padding(
                                       padding: EdgeInsets.only(top: 5),
                                       child: Text(
-                                        "Ponto de refrência: " +
+                                        "Ponto de refêrencia: " +
                                             dados["prontoReferencia"],
                                         style: TextStyle(color: Colors.white),
                                       ),
@@ -370,14 +421,6 @@ class _ListaEntregasState extends State<ListaEntregas> {
                                     Padding(
                                       padding: EdgeInsets.only(top: 5),
                                       child: Text(
-                                        "Forma de pagamento: " +
-                                            dados["formaPagamento"],
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(top: 5),
-                                      child: Text(
                                         "Status: " + dados["status"],
                                         style: TextStyle(color: Colors.white),
                                       ),
@@ -390,6 +433,23 @@ class _ListaEntregasState extends State<ListaEntregas> {
                                         style: TextStyle(color: Colors.white),
                                       ),
                                     ),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 5),
+                                      child: Text(
+                                        "Entregador: " +
+                                            dados["nomeEntregador"],
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 5),
+                                      child: Text(
+                                        "Data de saída: " +
+                                            _formatarData(
+                                                dados["dataRecebimento"]),
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
                                   ],
                                 )),
                           );
@@ -399,7 +459,6 @@ class _ListaEntregasState extends State<ListaEntregas> {
                     break;
                 }
               }),
-        )
-        );
+        ));
   }
 }

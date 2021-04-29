@@ -1,48 +1,38 @@
 import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
-class CadastroProdutos extends StatefulWidget {
+class Categorias extends StatefulWidget {
   @override
-  _CadastroProdutosState createState() => _CadastroProdutosState();
+  _CategoriasState createState() => _CategoriasState();
 }
 
-class _CadastroProdutosState extends State<CadastroProdutos> {
+class _CategoriasState extends State<Categorias> {
   StreamController _controller = StreamController.broadcast();
   TextEditingController _controllerNome = TextEditingController();
-  TextEditingController _controllerMarca = TextEditingController();
-  TextEditingController _controllerPreco = TextEditingController();
-  
 
   // ignore: missing_return
-  Stream _recuperaProdutos() {
+  Stream _recuperaCategorias() {
     FirebaseFirestore db = FirebaseFirestore.instance;
     var stream = db
-        .collection("produtos")
-        .orderBy("nome", descending: false)
+        .collection("categorias")
+        .orderBy("categoria", descending: false)
         .snapshots();
     stream.listen((event) {
       _controller.add(event);
     });
   }
 
- 
-
- 
-
-  _editaProduto(String nome, String marca, String preco, String id) {
-    setState(() {
+  _editaCategoria(String nome, String id) {
       _controllerNome.text = nome;
-      _controllerMarca.text = marca;
-      _controllerPreco.text = preco;
-    });
     showDialog(
         context: context,
         // ignore: missing_return
         builder: (context) {
           return AlertDialog(
-            title: Text("Editar produtos"),
+            title: Text("Editar categoria"),
             content: Container(
               height: 250,
               child: Column(
@@ -54,26 +44,9 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                     autofocus: true,
                     keyboardType: TextInputType.text,
                     decoration: InputDecoration(
-                      labelText: "Nome do produto",
+                      labelText: "Nome da categoria",
                     ),
                   ),
-                  TextField(
-                    controller: _controllerMarca,
-                    textCapitalization: TextCapitalization.sentences,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(
-                      labelText: "Marca do produto",
-                    ),
-                  ),
-                  TextField(
-                    controller: _controllerPreco,
-                    textCapitalization: TextCapitalization.sentences,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      prefix: Text("R\$ "),
-                      labelText: "Preço",
-                    ),
-                  )
                 ],
               ),
             ),
@@ -82,21 +55,17 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                 onPressed: () {
                   Navigator.pop(context);
                   _controllerNome.clear();
-                  _controllerMarca..clear();
                 },
                 child: Text("Cancelar"),
               ),
               TextButton(
                 onPressed: () {
                   FirebaseFirestore db = FirebaseFirestore.instance;
-                  db.collection("produtos").doc(id).update({
-                    "nome": _controllerNome.text,
-                    "marca": _controllerMarca.text,
-                    "preco": _controllerPreco.text,
+                  db.collection("categorias").doc(id).update({
+                    "categoria": _controllerNome.text,
                   });
                   Navigator.pop(context);
                   _controllerNome.clear();
-                  _controllerMarca..clear();
                 },
                 child: Text("Salvar"),
               ),
@@ -105,55 +74,13 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
         });
   }
 
-  _selecaoGaleriaPeril(String dados) {
+  _apagaCategoria(String nome, String id) {
     showDialog(
         context: context,
         // ignore: missing_return
         builder: (context) {
           return AlertDialog(
-            title: Text("Dados do produtos"),
-            content: Container(
-              height: 250,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Container(
-                    height: 100,
-                    width: 100,
-                    child: Padding(
-                      padding: EdgeInsets.only(bottom: 2),
-                      child: Image.asset("images/solicitacao.png"),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, "/grid", arguments: dados);
-                },
-                child: Text("Perfil"),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, "/gridproduto",
-                      arguments: dados);
-                },
-                child: Text("Galeria"),
-              ),
-            ],
-          );
-        });
-  }
-
-  _apagaProduto(String nome, String marca, String id) {
-    showDialog(
-        context: context,
-        // ignore: missing_return
-        builder: (context) {
-          return AlertDialog(
-            title: Text("Excluir produtos"),
+            title: Text("Excluir categoria"),
             content: Container(
               height: 190,
               child: Column(
@@ -169,11 +96,7 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                   ),
                   Padding(
                     padding: EdgeInsets.only(top: 5),
-                    child: Text("Produto: " + nome),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 5),
-                    child: Text("Marca: " + marca),
+                    child: Text("Categoria: " + nome),
                   ),
                 ],
               ),
@@ -188,29 +111,19 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                   FirebaseFirestore db = FirebaseFirestore.instance;
                   FirebaseStorage storage = FirebaseStorage.instance;
                   var pastaRaiz = storage.ref();
-                  pastaRaiz.child("produtos").child(id).listAll().then((value) {
+                  pastaRaiz
+                      .child("categorias")
+                      .child(id)
+                      .listAll()
+                      .then((value) {
                     for (var item in value.items) {
-                      print("teste for: " + item.fullPath);
                       pastaRaiz.child(item.fullPath).delete();
                     }
                   });
 
-                  db.collection("produtos").doc(id).delete();
-                  db
-                      .collection("galeria")
-                      .doc(id)
-                      .collection(id)
-                      .get()
-                      .then((value) {
-                    value.docs.forEach((element) {
-                      db
-                          .collection("galeria")
-                          .doc(id)
-                          .collection(id)
-                          .doc(element.id)
-                          .delete();
-                    });
-                  });
+                  db.collection("categorias").doc(id).delete();
+                  db.collection("galeria").doc(id).delete();
+
                   Navigator.pop(context);
                 },
                 child: Text("Deletar"),
@@ -223,9 +136,8 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
   @override
   void initState() {
     super.initState();
-    _recuperaProdutos();
+    _recuperaCategorias();
     _controllerNome.clear();
-    _controllerMarca.clear();
   }
 
   @override
@@ -241,6 +153,7 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
         title: Text("Produtos"),
       ),
       body: Container(
+        padding: EdgeInsets.only(top: 10),
           decoration: BoxDecoration(color: Theme.of(context).accentColor),
           //padding: EdgeInsets.all(16),
           child: StreamBuilder(
@@ -259,7 +172,7 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                   if (querySnapshot.docs.length == 0) {
                     return Center(
                       child: Text(
-                        "Sem produtos cadastrados!",
+                        "Sem categorias cadastradas!",
                         style: TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold),
                       ),
@@ -280,21 +193,8 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                               ? Image.asset("images/gear.png")
                               : Image.network(dados["urlImagem"]),
                           title: Text(
-                            "Produto: " + dados["nome"],
+                            "Produto: " + dados["categoria"],
                             style: TextStyle(color: Colors.white),
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Marca: " + dados["marca"],
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              Text(
-                                "Preço: " + "R\$ " + dados["preco"],
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ],
                           ),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -305,8 +205,8 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                                     color: Colors.green,
                                   ),
                                   onPressed: () {
-                                    _editaProduto(dados["nome"], dados["marca"],
-                                        dados["preco"], dados.reference.id);
+                                    _editaCategoria(
+                                        dados["categoria"], dados.reference.id);
                                   }),
                               IconButton(
                                   icon: Icon(
@@ -314,14 +214,16 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                                     color: Colors.red,
                                   ),
                                   onPressed: () {
-                                    _apagaProduto(dados["nome"], dados["marca"],
-                                        dados.reference.id);
+                                    _apagaCategoria(
+                                        dados["categoria"], dados.reference.id);
                                   }),
                             ],
                           ),
+                   
                           onTap: () {
-                            _selecaoGaleriaPeril(dados.reference.id);
+                            Navigator.pushNamed(context, "/perfilcategoria",arguments: dados.reference.id);
                           },
+                   
                         );
                       },
                     );
@@ -330,37 +232,13 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
               }
             },
           )),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         backgroundColor: Color(0xffFF0000),
         onPressed: () {
           // _cadastrarProdutos();
-          Navigator.pushNamed(context, "/produto");
+          Navigator.pushNamed(context, "/cadastracategorias");
         },
-      ),
-      bottomNavigationBar: BottomAppBar(
-        shape: CircularNotchedRectangle(),
-        color: Theme.of(context).primaryColor,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).accentColor,
-                    padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15)),
-                  ),
-                  onPressed: () {
-                    Navigator.pushNamed(context, "/cadastracategorias");
-                  },
-                  child: Text("Cadastrar categoria")),
-            ),
-          ],
-        ),
       ),
     );
   }

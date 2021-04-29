@@ -65,7 +65,7 @@ class _ConfiguracaoUsuarioState extends State<ConfiguracaoUsuario> {
                     "pontoReferencia": _controllerPontoReferencia.text,
                   });
                   Navigator.pushNamedAndRemoveUntil(
-                      context, "/carrinho", (route) => false);
+                      context, "/listacategorias", (route) => false);
                 } else {
                   setState(() {
                     _mensagemErro = "Preencha o campo whatsapp";

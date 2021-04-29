@@ -12,7 +12,8 @@ class ListaCategorias extends StatefulWidget {
 class _ListaCategoriasState extends State<ListaCategorias> {
   StreamController _streamController = StreamController.broadcast();
   bool _adm = false;
-  String _nome ="";
+  bool _entregador = false;
+  String _nome = "";
 
   _recuperaListaCategorias() {
     FirebaseFirestore db = FirebaseFirestore.instance;
@@ -30,7 +31,13 @@ class _ListaCategoriasState extends State<ListaCategorias> {
     setState(() {
       _nome = dados["nome"];
       _adm = dados["adm"];
+      _entregador = dados["entregador"];
     });
+    if (_adm) {
+      setState(() {
+        _entregador = true;
+      });
+    }
   }
 
   _deslogar() {
@@ -85,9 +92,19 @@ class _ListaCategoriasState extends State<ListaCategorias> {
               visible: _adm,
               child: ListTile(
                 leading: Icon(Icons.people_alt),
-                title: Text('Cadastrar Adm'),
+                title: Text('Cadastro Adm'),
                 onTap: () {
                   Navigator.pushNamed(context, "/adm");
+                },
+              ),
+            ),
+            Visibility(
+              visible: _adm,
+              child: ListTile(
+                leading: Icon(Icons.work_outline),
+                title: Text('Cadastro entregador'),
+                onTap: () {
+                  Navigator.pushNamed(context, "/entregador");
                 },
               ),
             ),
@@ -132,6 +149,16 @@ class _ListaCategoriasState extends State<ListaCategorias> {
             Visibility(
               visible: _adm,
               child: ListTile(
+                leading: Icon(Icons.add_circle),
+                title: Text('Cadastro de categorias'),
+                onTap: () {
+                  Navigator.pushNamed(context, "/categoria");
+                },
+              ),
+            ),
+            Visibility(
+              visible: _adm,
+              child: ListTile(
                 leading: Icon(Icons.miscellaneous_services),
                 title: Text("Lista serviços"),
                 onTap: () {
@@ -140,7 +167,7 @@ class _ListaCategoriasState extends State<ListaCategorias> {
               ),
             ),
             Visibility(
-              visible: _adm,
+              visible: _entregador,
               child: ListTile(
                 leading: Icon(Icons.update),
                 title: Text('Pedidos pendentes'),
@@ -150,7 +177,7 @@ class _ListaCategoriasState extends State<ListaCategorias> {
               ),
             ),
             Visibility(
-              visible: _adm,
+              visible: _entregador,
               child: ListTile(
                 leading: Icon(Icons.delivery_dining),
                 title: Text('Entregas em andamento'),
@@ -198,9 +225,7 @@ class _ListaCategoriasState extends State<ListaCategorias> {
       ),
       body: Container(
         padding: EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: Theme.of(context).accentColor
-        ),
+        decoration: BoxDecoration(color: Theme.of(context).accentColor),
         child: StreamBuilder(
           stream: _streamController.stream,
           // ignore: missing_return
@@ -219,33 +244,74 @@ class _ListaCategoriasState extends State<ListaCategorias> {
                 QuerySnapshot querySnapshot = snapshot.data;
                 if (querySnapshot.docs.length == 0) {
                   return Center(
-                    child: Text("Sem categorias cadastradas"),
+                    child: Text(
+                      "Sem categorias cadastradas",
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
                   );
                 } else {
-                  return ListView.builder(
-                      itemCount: querySnapshot.docs.length,
-                      // ignore: missing_return
-                      itemBuilder: (context, indice) {
-                        List<QueryDocumentSnapshot> lista =
-                            querySnapshot.docs.toList();
-                        QueryDocumentSnapshot dados = lista[indice];
-                        return Card(
-                          shape: RoundedRectangleBorder(
-                            side: BorderSide(
-                              width: 3,
-                              color: Theme.of(context).primaryColor),
-                            borderRadius: BorderRadius.circular(15)
-                          ),
-                          elevation: 8,
-                          child: ListTile(
-                            title: Text(dados["categoria"],
-                            style: TextStyle(
-                              fontSize: 18,
+                  return GridView.count(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 6,
+                    crossAxisSpacing: 6,
+                    children: List.generate(
+                        // ignore: missing_return
+                        querySnapshot.docs.length, (indice) {
+                      List<DocumentSnapshot> urls = querySnapshot.docs.toList();
+                      DocumentSnapshot dados = urls[indice];
+                      // ignore: missing_required_param
+                      return PhysicalModel(
+                        borderRadius: BorderRadius.circular(32),
+                        color: Colors.white,
+                        elevation: 8,
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, "/carrinho",
+                                arguments: dados["categoria"]);
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(
+                                  flex: 60,
+                                  child: dados["urlImagem"] == null
+                                      ? Center(
+                                          child: Text("produto sem imagem"),
+                                        )
+                                      : Image.network(
+                                          dados["urlImagem"],
+                                        ),
+                                ),
+                                Expanded(
+                                  flex: 40,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            EdgeInsets.only(top: 3, left: 15),
+                                        child: Text(
+                                          dados["categoria"],
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              ],
                             ),
-                            ),
                           ),
-                        );
-                      });
+                        ),
+                      );
+                    }),
+                  );
                 }
                 break;
             }

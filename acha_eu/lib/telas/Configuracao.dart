@@ -49,14 +49,14 @@ class _ConfiguracaoState extends State<Configuracao> {
       imagemSelecionada =
           await picker.getImage(source: ImageSource.camera, imageQuality: 50);
       if (imagemSelecionada != null) {
-         imagem = File(imagemSelecionada.path);
+        imagem = File(imagemSelecionada.path);
       }
     } else {
       //recupera imagem da galeria
       imagemSelecionada =
           await picker.getImage(source: ImageSource.gallery, imageQuality: 50);
       if (imagemSelecionada != null) {
-         imagem = File(imagemSelecionada.path);
+        imagem = File(imagemSelecionada.path);
       }
     }
     setState(() {
@@ -362,21 +362,23 @@ class _ConfiguracaoState extends State<Configuracao> {
         });
   }
 
-  _recuperaListaCidades() async {
+  _recuperaListaCidades() {
     FirebaseFirestore db = FirebaseFirestore.instance;
-    var dados = await db
+    db
         .collection("cidades")
         .where("estado", isEqualTo: _scolhaEstado)
-        .get();
-
-    List<String> listaCidadesRecuperadas = [];
-    for (var item in dados.docs) {
-      var dados = item.data();
-      print("teste for: " + dados["cidade"].toString());
-      listaCidadesRecuperadas.add(dados["cidade"]);
-    }
-    setState(() {
-      _listaCidades = listaCidadesRecuperadas;
+        .orderBy("cidade", descending: false)
+        .snapshots()
+        .listen((event) {
+      List<String> listaCidadesRecuperadas = [];
+      for (var item in event.docs) {
+        var dados = item.data();
+        print("teste for: " + dados["cidade"].toString());
+        listaCidadesRecuperadas.add(dados["cidade"]);
+      }
+      setState(() {
+        _listaCidades = listaCidadesRecuperadas;
+      });
     });
   }
 

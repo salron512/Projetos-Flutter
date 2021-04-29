@@ -6,31 +6,38 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 class Carrinho extends StatefulWidget {
+  String categoria;
+  Carrinho(this.categoria);
   @override
   _CarrinhoState createState() => _CarrinhoState();
 }
 
 class _CarrinhoState extends State<Carrinho> {
+  String _nomeAppBar = " Produtos";
   var _mascaraQtd = new MaskTextInputFormatter(
       mask: '##########', filter: {"#": RegExp(r'[0-9]')});
   StreamController _controller = StreamController.broadcast();
   TextEditingController _controllerQtd = TextEditingController();
   TextEditingController _controllerResultado = TextEditingController(text: "0");
 
- 
+  _recebeNomeAppBar() {
+    setState(() {
+      _nomeAppBar = widget.categoria;
+    });
+  }
 
   _recuperaProdutos() {
+    String categoria = widget.categoria;
     FirebaseFirestore db = FirebaseFirestore.instance;
     db
         .collection("produtos")
-        .orderBy("nome", descending: false)
+        .where("categoria", isEqualTo: categoria)
+        // .orderBy("nome", descending: false)
         .snapshots()
         .listen((event) {
       _controller.add(event);
     });
   }
-
- 
 
   _addItem(String nome, String marca, String preco, String urlImagem) {
     String precoTotal = preco;
@@ -163,6 +170,7 @@ class _CarrinhoState extends State<Carrinho> {
   @override
   void initState() {
     super.initState();
+    _recebeNomeAppBar();
     _recebeNot();
     _recuperaProdutos();
   }
@@ -177,9 +185,8 @@ class _CarrinhoState extends State<Carrinho> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Catálogo"),
+        title: Text("Produtos"),
       ),
-      
       body: Container(
         decoration: BoxDecoration(color: Theme.of(context).accentColor),
         padding: EdgeInsets.all(5),

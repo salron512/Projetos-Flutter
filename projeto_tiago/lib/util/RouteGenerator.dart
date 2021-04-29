@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:projeto_tiago/Adm.dart';
+import 'package:projeto_tiago/AdmEntregador.dart';
+import 'package:projeto_tiago/CadastraCategorias.dart';
 import 'package:projeto_tiago/Carrinho.dart';
+import 'package:projeto_tiago/Categorias.dart';
 import 'package:projeto_tiago/ConfiguracaoUsuario.dart';
 import 'package:projeto_tiago/DetalhesEntrega.dart';
 import 'package:projeto_tiago/DetalhesProdutos.dart';
@@ -16,6 +19,7 @@ import 'package:projeto_tiago/ListaPedidos.dart';
 import 'package:projeto_tiago/ListaProdutos.dart';
 import 'package:projeto_tiago/MinhasEntregas.dart';
 import 'package:projeto_tiago/PedidoUsuario.dart';
+import 'package:projeto_tiago/PerfilCategoria.dart';
 import 'package:projeto_tiago/servicos/ListaOrcamentos.dart';
 import 'package:projeto_tiago/servicos/ListaReparosFinalizados.dart';
 import 'package:projeto_tiago/servicos/SolicitaReparo.dart';
@@ -36,7 +40,7 @@ class RouteGenerator {
       case "/cadastro":
         return MaterialPageRoute(builder: (_) => Cadastro());
       case "/carrinho":
-        return MaterialPageRoute(builder: (_) => Carrinho());
+        return MaterialPageRoute(builder: (_) => Carrinho(args));
       case "/recuperasenha":
         return MaterialPageRoute(builder: (_) => RecuperaSenha());
       case "/produtos":
@@ -77,6 +81,15 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => ListaReparosFinalizados());
          case "/listacategorias":
         return MaterialPageRoute(builder: (_) => ListaCategorias());
+          case "/cadastracategorias":
+        return MaterialPageRoute(builder: (_) => CadastraCategoias());
+           case "/perfilcategoria":
+        return MaterialPageRoute(builder: (_) => PerfilCategoria(args));
+           case "/categoria":
+        return MaterialPageRoute(builder: (_) => Categorias());
+           case "/entregador":
+        return MaterialPageRoute(builder: (_) => AdmEntregador());
+
 
       default:
         _erroRota();

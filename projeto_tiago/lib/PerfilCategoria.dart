@@ -1,20 +1,19 @@
-import 'dart:async';
 import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 // ignore: must_be_immutable
-class GridProduto extends StatefulWidget {
+class PerfilCategoria extends StatefulWidget {
   String id;
-  GridProduto(this.id);
-
+  PerfilCategoria(this.id);
   @override
-  _GridProdutoState createState() => _GridProdutoState();
+  _PerfilCategoriaState createState() => _PerfilCategoriaState();
 }
 
-class _GridProdutoState extends State<GridProduto> {
+class _PerfilCategoriaState extends State<PerfilCategoria> {
   bool _subindoImagem = false;
   String _urlImagem = "";
   File _imagem;
@@ -57,7 +56,7 @@ class _GridProdutoState extends State<GridProduto> {
     FirebaseStorage storage = FirebaseStorage.instance;
     var pastaRaiz = storage.ref();
     var arquivo =
-        pastaRaiz.child("produtos").child(widget.id).child("perfil" + ".jpg");
+        pastaRaiz.child("categorias").child(widget.id).child("perfil" + ".jpg");
     UploadTask task = arquivo.putFile(_imagem);
     task.snapshotEvents.listen((TaskSnapshot storageTaskEvent) {
       if (storageTaskEvent.state == TaskState.running) {
@@ -91,13 +90,13 @@ class _GridProdutoState extends State<GridProduto> {
   _atualizarUrlIamgemFirestore(String url) {
     Map<String, dynamic> dadosAtualizar = {"urlImagem": url};
     FirebaseFirestore db = FirebaseFirestore.instance;
-    db.collection("produtos").doc(widget.id).update(dadosAtualizar);
+    db.collection("categorias").doc(widget.id).update(dadosAtualizar);
   }
 
   _recuperaImagemPeril() async {
     FirebaseFirestore db = FirebaseFirestore.instance;
 
-    var snap = await db.collection("produtos").doc(widget.id).get();
+    var snap = await db.collection("categorias").doc(widget.id).get();
 
     Map<String, dynamic> dadosRecuperados = snap.data();
 
@@ -129,8 +128,11 @@ class _GridProdutoState extends State<GridProduto> {
                 width: 250,
                 height: 250,
                 child: _urlImagem == null
-                    ? Image.network("images/error.png")
-                    : Image.network(_urlImagem),
+                    ? Image.asset("images/error.png")
+                    : Image.network(
+                        _urlImagem,
+                        scale: 2,
+                      ),
               ),
               /*
               CircleAvatar(
@@ -152,7 +154,7 @@ class _GridProdutoState extends State<GridProduto> {
                 padding: EdgeInsets.only(top: 10),
                 child:
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Text("Adicine a foto de perfil",
+                  Text("Adicione a foto de perfil",
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: 15,
@@ -190,9 +192,10 @@ class _GridProdutoState extends State<GridProduto> {
                       iconSize: 40,
                       color: Colors.white,
                       onPressed: () {
-                        String id = widget.id;
-                        Navigator.pushNamed(context, "/gridproduto",
-                            arguments: id);
+                        Navigator.pushNamed(
+                          context,
+                          "/listacategorias",
+                        );
                       },
                       icon: Icon(Icons.arrow_forward),
                     ),

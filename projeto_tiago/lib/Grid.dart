@@ -314,7 +314,7 @@ class _GridState extends State<Grid> {
                       color: Colors.white,
                       onPressed: () {
                         Navigator.pushNamedAndRemoveUntil(
-                            context, "/carrinho", (route) => false);
+                            context, "/listacategorias", (route) => false);
                       },
                       icon: Icon(Icons.arrow_forward),
                     ),

@@ -6,7 +6,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
-
 class Cadastro extends StatefulWidget {
   @override
   _CadastroState createState() => _CadastroState();
@@ -111,8 +110,7 @@ class _CadastroState extends State<Cadastro> {
     FirebaseAuth auth = FirebaseAuth.instance;
     auth
         .createUserWithEmailAndPassword(
-            email: usuario.email,
-        password: usuario.senha)
+            email: usuario.email, password: usuario.senha)
         .then((firebase) async {
       FirebaseFirestore db = FirebaseFirestore.instance;
       // salva dados do usuario no Firebase
@@ -125,10 +123,8 @@ class _CadastroState extends State<Cadastro> {
           .collection("usuarios")
           .doc(firebase.user.uid)
           .update({"idUsuario": firebase.user.uid});
-     
 
-      Navigator.pushNamedAndRemoveUntil(
-          context, "/", (_) => false);
+      Navigator.pushNamedAndRemoveUntil(context, "/", (_) => false);
     }).catchError((error) {
       setState(() {
         _mensagemErro =
@@ -180,21 +176,25 @@ class _CadastroState extends State<Cadastro> {
         });
   }
 
-  _recuperaListaCidade(String estado) async {
+  _recuperaListaCidade(String estado) {
     FirebaseFirestore db = FirebaseFirestore.instance;
-    var dados =
-        await db.collection("cidades").where("estado", isEqualTo: estado).get();
-
-    List<String> listaCidadesRecuperadas = [];
-    for (var item in dados.docs) {
-      var dados = item.data();
-      print("teste for: " + dados["cidade"].toString());
-      listaCidadesRecuperadas.add(dados["cidade"]);
-    }
-    setState(() {
-      _listaCidades = listaCidadesRecuperadas;
+    db
+        .collection("cidades")
+        .where("estado", isEqualTo: estado)
+        .orderBy("cidade", descending: false)
+        .snapshots()
+        .listen((event) {
+      List<String> listaCidadesRecuperadas = [];
+      for (var item in event.docs) {
+        var dados = item.data();
+        print("teste for: " + dados["cidade"].toString());
+        listaCidadesRecuperadas.add(dados["cidade"]);
+      }
+      setState(() {
+        _listaCidades = listaCidadesRecuperadas;
+      });
+      _mostraListaCidade();
     });
-    _mostraListaCidade();
   }
 
   _mostraListaCidade() {
@@ -451,12 +451,12 @@ class _CadastroState extends State<Cadastro> {
                         "Cadastrar",
                         style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
-                     style: ElevatedButton.styleFrom(
+                      style: ElevatedButton.styleFrom(
                         primary: Colors.green,
-                      padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(32)),
-                     ),
+                        padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(32)),
+                      ),
                       onPressed: () {
                         _validarCampos();
                       },

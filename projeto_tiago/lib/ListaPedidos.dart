@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:projeto_tiago/util/RecuperaDadosFirebase.dart';
 
 class ListaPedidos extends StatefulWidget {
   @override
@@ -11,6 +12,19 @@ class ListaPedidos extends StatefulWidget {
 
 class _ListaPedidosState extends State<ListaPedidos> {
   StreamController _controller = StreamController.broadcast();
+  String _nomeUsuario;
+  String _idUsuario;
+
+  _recuperaUsuario() async {
+    String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
+    Map<String, dynamic> dadosUsuario;
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    DocumentSnapshot snapshot = await db.collection("usuarios").doc(uid).get();
+    dadosUsuario = snapshot.data();
+    _idUsuario = dadosUsuario["idUsuario"];
+    _nomeUsuario = dadosUsuario["nome"];
+  }
+
   _recuperaPedidos() {
     FirebaseFirestore db = FirebaseFirestore.instance;
     var stream = db
@@ -79,10 +93,12 @@ class _ListaPedidosState extends State<ListaPedidos> {
               TextButton(
                 onPressed: () {
                   FirebaseFirestore db = FirebaseFirestore.instance;
-                  db
-                      .collection("listaCompra")
-                      .doc(idDocumento)
-                      .update({"status": "Recebido"});
+                  db.collection("listaCompra").doc(idDocumento).update({
+                    "idEntregador": _idUsuario,
+                    "nomeEntregador": _nomeUsuario,
+                    "dataRecebimento": DateTime.now().toString(),
+                    "status": "Recebido"
+                  });
                   Navigator.pop(context);
                 },
                 child: Text("Confirmar"),
@@ -95,6 +111,7 @@ class _ListaPedidosState extends State<ListaPedidos> {
   @override
   void initState() {
     super.initState();
+    _recuperaUsuario();
     _recuperaPedidos();
   }
 

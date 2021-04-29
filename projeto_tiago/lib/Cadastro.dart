@@ -150,9 +150,11 @@ class _CadastroState extends State<Cadastro> {
         "bairro": usuario.bairro,
         "cidade": usuario.cidade,
         "pontoReferencia": usuario.pontoReferencia,
+        "entregador": false,
         "adm": false,
       });
-      Navigator.popAndPushNamed(context, "/carrinho");
+      Navigator.pushNamedAndRemoveUntil(
+          context, "/listacategorias", (route) => false);
     }).catchError((erro) {
       setState(() {
         _mensagemErro =
@@ -173,9 +175,7 @@ class _CadastroState extends State<Cadastro> {
         title: Text("Cadastro"),
       ),
       body: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).accentColor 
-        ),
+        decoration: BoxDecoration(color: Theme.of(context).accentColor),
         child: Center(
           child: SingleChildScrollView(
             padding: EdgeInsets.all(16),
@@ -418,12 +418,12 @@ class _CadastroState extends State<Cadastro> {
                         "Cadastrar",
                         style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
-                    style: ElevatedButton.styleFrom(
+                      style: ElevatedButton.styleFrom(
                         primary: Color(0xffFF0000),
-                      padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)),
-                    ),
+                        padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15)),
+                      ),
                       onPressed: () {
                         _validarCampos();
                       },
