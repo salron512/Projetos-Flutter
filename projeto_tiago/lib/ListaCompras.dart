@@ -545,7 +545,8 @@ class _ListaComprasState extends State<ListaCompras> {
                         "listaProdutos": listaCompras,
                         "totalCompra": _totalCompra,
                         "formaPagamento": formaPagamento,
-                        "troco": "0"
+                        "troco": "0",
+                        "entrega": "pendente"
                       }).then((value) {
                         db
                             .collection("listaPendente")

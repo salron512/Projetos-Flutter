@@ -35,6 +35,7 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
     return dataFormatada;
   }
 
+  // ignore: unused_element
   _apagaSolcilitacao(String id, String status) {
     if (status == "Pendente") {
       showDialog(
@@ -262,16 +263,24 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
                                                   color: Colors.white),
                                             ),
                                           ),
-                                          TextButton(
-                                              onPressed: () {}, 
-                                              child: Text("Acompanhar entrega",
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-
-                                              ),
-                                              ),)
+                                          dados["entrega"] == "iniciada"
+                                              ? TextButton(
+                                                  onPressed: () {},
+                                                  child: Text(
+                                                    "Acompanhar entrega",
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 20,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                )
+                                              : Padding(
+                                                  padding: EdgeInsets.all(2),
+                                                  child: Text(" "),
+                                                  
+                                                  ),
                                         ],
                                       )),
                                 )

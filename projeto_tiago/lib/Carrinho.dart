@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
+// ignore: must_be_immutable
 class Carrinho extends StatefulWidget {
   String categoria;
   Carrinho(this.categoria);
@@ -13,6 +14,7 @@ class Carrinho extends StatefulWidget {
 }
 
 class _CarrinhoState extends State<Carrinho> {
+  // ignore: unused_field
   String _nomeAppBar = " Produtos";
   var _mascaraQtd = new MaskTextInputFormatter(
       mask: '##########', filter: {"#": RegExp(r'[0-9]')});

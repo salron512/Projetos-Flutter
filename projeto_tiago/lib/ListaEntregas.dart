@@ -1,7 +1,7 @@
 import 'dart:async';
+import 'package:carp_background_location/carp_background_location.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:projeto_tiago/util/RecuperaDadosFirebase.dart';
@@ -15,6 +15,8 @@ class ListaEntregas extends StatefulWidget {
 class _ListaEntregasState extends State<ListaEntregas> {
   StreamController _controller = StreamController.broadcast();
   StreamController _streamControllerEntrega = StreamController.broadcast();
+  StreamSubscription<LocationDto> _dtoSubscription;
+  LocationManager _locationManager = LocationManager.instance;
 
   bool _adm = false;
   String _nomeEntregador;
@@ -185,6 +187,12 @@ class _ListaEntregasState extends State<ListaEntregas> {
                     "dataEntrega": DateTime.now().toString(),
                     "dataCompra": dados["dataCompra"],
                     "troco": dados["troco"]
+                  }).then((value) async {
+                    _dtoSubscription.cancel();
+                    db
+                        .collection("localizacaoEntregador")
+                        .doc(dados.reference.id)
+                        .delete();
                   });
                   db.collection("listaCompra").doc(dados.reference.id).delete();
                   Navigator.pushNamedAndRemoveUntil(
@@ -256,7 +264,18 @@ class _ListaEntregasState extends State<ListaEntregas> {
                 child: Text("Sim"),
                 onPressed: () {
                   FirebaseFirestore db = FirebaseFirestore.instance;
-                  db.collection("listaCompra").doc(dados.reference.id).delete();
+                  db
+                      .collection("listaCompra")
+                      .doc(dados.reference.id)
+                      .delete()
+                      .then((value) async {
+                    _dtoSubscription.cancel();
+                    // await _locationManager.stop();
+                    db
+                        .collection("localizacaoEntregador")
+                        .doc(dados.reference.id)
+                        .delete();
+                  });
                   Navigator.pop(context);
                 },
               ),
@@ -265,14 +284,19 @@ class _ListaEntregasState extends State<ListaEntregas> {
         });
   }
 
-  _obtemLocalizacao({DocumentSnapshot dados, bool entrega}) {
+  _obtemLocalizacao({DocumentSnapshot dados, bool entrega}) async {
+    Stream<LocationDto> dtoStream;
+
     String idEntrega = dados.reference.id;
     FirebaseFirestore db = FirebaseFirestore.instance;
     double latitude;
     double longitude;
-    var stream = Geolocator.getPositionStream();
-    stream.listen((event) {
-      _streamControllerEntrega.add(event);
+    db.collection("listaCompra").doc(idEntrega).update({"entrega": "iniciada"});
+
+    await _locationManager.start();
+
+    dtoStream = _locationManager.dtoStream;
+    _dtoSubscription = dtoStream.listen((event) {
       latitude = event.latitude;
       longitude = event.longitude;
       db.collection("localizacaoEntregador").doc(idEntrega).set({
@@ -408,6 +432,14 @@ class _ListaEntregasState extends State<ListaEntregas> {
                                       child: Text(
                                         "Valor total: R\$ " +
                                             dados["totalCompra"],
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 5),
+                                      child: Text(
+                                        "Forma de pagamento: " +
+                                            dados["formaPagamento"],
                                         style: TextStyle(color: Colors.white),
                                       ),
                                     ),
