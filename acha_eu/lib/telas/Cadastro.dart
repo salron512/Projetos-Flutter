@@ -178,23 +178,23 @@ class _CadastroState extends State<Cadastro> {
 
   _recuperaListaCidade(String estado) {
     FirebaseFirestore db = FirebaseFirestore.instance;
-    db
-        .collection("cidades")
-        .where("estado", isEqualTo: estado)
-        .orderBy("cidade", descending: false)
-        .snapshots()
-        .listen((event) {
+    Query query =
+        FirebaseFirestore.instance.collection("cidades");
+
+    query.orderBy("cidade", descending: false).where("estado", isEqualTo: estado).get().then((event) {
       List<String> listaCidadesRecuperadas = [];
       for (var item in event.docs) {
         var dados = item.data();
-        print("teste for: " + dados["cidade"].toString());
+        print("teste for: " + dados["cidade"]);
         listaCidadesRecuperadas.add(dados["cidade"]);
       }
       setState(() {
         _listaCidades = listaCidadesRecuperadas;
       });
       _mostraListaCidade();
+
     });
+
   }
 
   _mostraListaCidade() {

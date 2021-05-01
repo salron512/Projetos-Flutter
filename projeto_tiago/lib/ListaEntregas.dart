@@ -189,6 +189,7 @@ class _ListaEntregasState extends State<ListaEntregas> {
                     "troco": dados["troco"]
                   }).then((value) async {
                     _dtoSubscription.cancel();
+                    await _locationManager.stop();
                     db
                         .collection("localizacaoEntregador")
                         .doc(dados.reference.id)
@@ -270,7 +271,7 @@ class _ListaEntregasState extends State<ListaEntregas> {
                       .delete()
                       .then((value) async {
                     _dtoSubscription.cancel();
-                    // await _locationManager.stop();
+                    await _locationManager.stop();
                     db
                         .collection("localizacaoEntregador")
                         .doc(dados.reference.id)
@@ -316,7 +317,7 @@ class _ListaEntregasState extends State<ListaEntregas> {
   @override
   void dispose() {
     super.dispose();
-    // _controller.close();
+     _controller.close();
   }
 
   @override
@@ -367,9 +368,9 @@ class _ListaEntregasState extends State<ListaEntregas> {
                           DocumentSnapshot dados = requisicoes[indice];
                           return Card(
                             elevation: 8,
-                            color: dados["status"] == "Recebido"
-                                ? Colors.green
-                                : Theme.of(context).primaryColor,
+                            color: dados["entrega"] == "iniciada"
+                                ? Theme.of(context).accentColor
+                                : Colors.green,
                             child: ListTile(
                                 onLongPress: () {
                                   _mostraMsg(dados);

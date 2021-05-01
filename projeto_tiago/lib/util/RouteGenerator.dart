@@ -17,6 +17,7 @@ import 'package:projeto_tiago/ListaCompras.dart';
 import 'package:projeto_tiago/ListaEntregas.dart';
 import 'package:projeto_tiago/ListaPedidos.dart';
 import 'package:projeto_tiago/ListaProdutos.dart';
+import 'package:projeto_tiago/Mapa.dart';
 import 'package:projeto_tiago/MinhasEntregas.dart';
 import 'package:projeto_tiago/PedidoUsuario.dart';
 import 'package:projeto_tiago/PerfilCategoria.dart';
@@ -89,6 +90,8 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => Categorias());
            case "/entregador":
         return MaterialPageRoute(builder: (_) => AdmEntregador());
+          case "/mapa":
+        return MaterialPageRoute(builder: (_) => Mapa(args));
 
 
       default:

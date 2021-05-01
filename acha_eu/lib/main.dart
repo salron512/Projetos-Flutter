@@ -16,7 +16,6 @@ void main() async {
 
 
   runApp(MaterialApp(
-    // debugShowCheckedModeBanner: false,
     title: "Chama Eu",
     theme: temaPadrao,
     debugShowCheckedModeBanner: false,

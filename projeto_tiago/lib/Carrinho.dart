@@ -30,11 +30,11 @@ class _CarrinhoState extends State<Carrinho> {
 
   _recuperaProdutos() {
     String categoria = widget.categoria;
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    db
-        .collection("produtos")
+    var stream = FirebaseFirestore.instance.collection("produtos");
+
+    stream
+        .orderBy("nome", descending: false)
         .where("categoria", isEqualTo: categoria)
-        // .orderBy("nome", descending: false)
         .snapshots()
         .listen((event) {
       _controller.add(event);
@@ -50,73 +50,75 @@ class _CarrinhoState extends State<Carrinho> {
         builder: (context) {
           return AlertDialog(
             title: Text("Digite a quantidade"),
-            content: Container(
-              height: 350,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Container(
-                    height: 100,
-                    width: 100,
-                    child: Padding(
-                      padding: EdgeInsets.only(bottom: 2),
-                      child: Image.asset("images/cart.png"),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 5),
-                    child: Text(
-                      "Produto: " + nome,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
+            content: SingleChildScrollView(
+              child: Container(
+                height: 300,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Container(
+                      height: 100,
+                      width: 100,
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: 2),
+                        child: Image.asset("images/cart.png"),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 5),
-                    child: Text(
-                      "Valor unitario R\$ " + preco,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 5),
+                      child: Text(
+                        "Produto: " + nome,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-                  TextField(
-                    autofocus: true,
-                    controller: _controllerQtd,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [_mascaraQtd],
-                    decoration: InputDecoration(
-                        labelText: "Digite a quantidade",
-                        suffixIcon: IconButton(
-                          icon: Icon(Icons.clear),
-                          onPressed: () {
-                            setState(() {
-                              _controllerQtd.clear();
-                            });
-                          },
-                        )),
-                    onChanged: (valor) {
-                      String valorSemMascara = _mascaraQtd.unmaskText(valor);
-                      print("valor" + valor);
-                      double precoCompra = double.tryParse(preco).toDouble();
-                      double qtdcoCompra =
-                          double.tryParse(valorSemMascara).toDouble();
-                      double resultado = precoCompra * qtdcoCompra;
-                      print("res" + resultado.toString());
-                      precoTotal = resultado.toString();
-                      setState(() {
-                        _controllerResultado.text = precoTotal;
-                      });
-                    },
-                  ),
-                  TextField(
-                      readOnly: true,
-                      controller: _controllerResultado,
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 5),
+                      child: Text(
+                        "Valor unitario R\$ " + preco,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    TextField(
+                      autofocus: true,
+                      controller: _controllerQtd,
                       keyboardType: TextInputType.number,
+                      inputFormatters: [_mascaraQtd],
                       decoration: InputDecoration(
-                          labelText: "Valor total", prefix: Text("R\$ "))),
-                ],
+                          labelText: "Digite a quantidade",
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.clear),
+                            onPressed: () {
+                              setState(() {
+                                _controllerQtd.clear();
+                              });
+                            },
+                          )),
+                      onChanged: (valor) {
+                        String valorSemMascara = _mascaraQtd.unmaskText(valor);
+                        print("valor" + valor);
+                        double precoCompra = double.tryParse(preco).toDouble();
+                        double qtdcoCompra =
+                            double.tryParse(valorSemMascara).toDouble();
+                        double resultado = precoCompra * qtdcoCompra;
+                        print("res" + resultado.toString());
+                        precoTotal = resultado.toString();
+                        setState(() {
+                          _controllerResultado.text = precoTotal;
+                        });
+                      },
+                    ),
+                    TextField(
+                        readOnly: true,
+                        controller: _controllerResultado,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                            labelText: "Valor total", prefix: Text("R\$ "))),
+                  ],
+                ),
               ),
             ),
             actions: [
@@ -128,31 +130,89 @@ class _CarrinhoState extends State<Carrinho> {
                   },
                   child: Text("Cancelar")),
               TextButton(
-                child: Text("Confirmar"),
-                onPressed: () {
-                  FirebaseAuth auth = FirebaseAuth.instance;
-                  FirebaseFirestore db = FirebaseFirestore.instance;
-                  String uid = auth.currentUser.uid;
-                  db
-                      .collection("listaPendente")
-                      .doc(uid)
-                      .collection(uid)
-                      .doc()
-                      .set({
-                    "idUsuario": uid,
-                    "nome": nome,
-                    "marca": marca,
-                    "quantidade": _controllerQtd.text,
-                    "precoUnitario": preco,
-                    "precoTotal": precoTotal,
-                    "urlimagem": urlImagem,
-                  });
+                  child: Text("Confirmar"),
+                  onPressed: () {
+                    if (_controllerQtd.text.isNotEmpty) {
+                        int qtd = 0;
+                        qtd = int.tryParse(_controllerQtd.text).toInt();
+                  if (qtd > 0 || _controllerQtd.text.isEmpty) {
+                    FirebaseAuth auth = FirebaseAuth.instance;
+                    FirebaseFirestore db = FirebaseFirestore.instance;
+                    String uid = auth.currentUser.uid;
+                    db
+                        .collection("listaPendente")
+                        .doc(uid)
+                        .collection(uid)
+                        .doc()
+                        .set({
+                      "idUsuario": uid,
+                      "nome": nome,
+                      "marca": marca,
+                      "quantidade": _controllerQtd.text,
+                      "precoUnitario": preco,
+                      "precoTotal": precoTotal,
+                      "urlimagem": urlImagem,
+                    });
 
-                  _controllerQtd.clear();
-                  _controllerResultado.clear();
-                  Navigator.pop(context);
-                },
+                    _controllerQtd.clear();
+                    _controllerResultado.clear();
+                    Navigator.pop(context);
+                  } else {
+                    _alertErro();
+                  }
+                    } else {
+                      _alertErro();
+                    }
+                  }),
+            ],
+          );
+        });
+  }
+
+  _alertErro() {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        // ignore: missing_return
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Erro"),
+            content: SingleChildScrollView(
+              child: Container(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      height: 100,
+                      width: 100,
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: 2),
+                        child: Image.asset("images/error.png"),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 5),
+                      child: Text(
+                        "Quantidade inválida",
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _controllerResultado.clear();
+                    _controllerQtd.clear();
+                  },
+                  child: Text("Confirmar")),
             ],
           );
         });
@@ -216,7 +276,10 @@ class _CarrinhoState extends State<Carrinho> {
                   return Center(
                     child: Text(
                       "Sem produtos cadastrados",
-                      style: TextStyle(fontSize: 15, color: Colors.white),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: Colors.white),
                     ),
                   );
                 } else {

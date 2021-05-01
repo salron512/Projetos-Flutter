@@ -227,10 +227,10 @@ class _ListaComprasState extends State<ListaCompras> {
           return AlertDialog(
             title: Text("Erro"),
             content: Container(
-              width: 150,
-              height: 250,
+              height: 200,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
                     height: 150,
@@ -389,6 +389,7 @@ class _ListaComprasState extends State<ListaCompras> {
                     child: Text("Cancelar")),
                 TextButton(
                   onPressed: () async {
+                    if(_controllerTroco.text.isNotEmpty){
                     double totalCompra =
                         double.tryParse(_totalCompra).toDouble();
                     double troco =
@@ -399,10 +400,10 @@ class _ListaComprasState extends State<ListaCompras> {
                     print("troco " + trocoFinal.toString());
                     print("totalCompra " + totalCompra.toString());
 
-                    if (trocoFinal < 0) {
-                      _mostraErro("Troco inválido");
-                    } else {
-                      FirebaseFirestore db = FirebaseFirestore.instance;
+                   
+                      if (trocoFinal >=  0) {
+                     
+                       FirebaseFirestore db = FirebaseFirestore.instance;
                       String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
                       var dadosUsuario =
                           await db.collection("usuarios").doc(uid).get();
@@ -434,7 +435,8 @@ class _ListaComprasState extends State<ListaCompras> {
                           "listaProdutos": listaCompras,
                           "totalCompra": _totalCompra,
                           "formaPagamento": formaPagamento,
-                          "troco": trocoSalvar
+                          "troco": trocoSalvar,
+                          "entrega": "pendente"
                         }).then((value) {
                           db
                               .collection("listaPendente")
@@ -460,7 +462,15 @@ class _ListaComprasState extends State<ListaCompras> {
                           });
                         });
                       });
+                    } else {
+                       _mostraErro("Troco inválido");
+                     
                     }
+
+                   }else{
+                      _mostraErro("Troco inválido");
+
+                   }
                   },
                   child: Text("Confirmar"),
                 ),
@@ -476,10 +486,8 @@ class _ListaComprasState extends State<ListaCompras> {
             return AlertDialog(
               title: Text("Finalizar compra"),
               content: Container(
-                width: 150,
-                height: 250,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Container(
                       height: 150,

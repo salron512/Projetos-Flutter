@@ -44,7 +44,7 @@ dependencies:
   geocoding: ^2.0.0
   background_location: ^0.5.0
   carp_background_location: ^1.0.3
-  #geolocator: ^7.0.3
+  geolocator: ^7.0.3
   google_maps_flutter: ^2.0.3
 
 

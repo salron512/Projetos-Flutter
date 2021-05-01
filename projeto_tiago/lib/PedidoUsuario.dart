@@ -14,14 +14,15 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
   StreamController _controller = StreamController.broadcast();
 
   _recuperaPedidos() {
-    FirebaseFirestore db = FirebaseFirestore.instance;
     String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
-    var stream = db
-        .collection("listaCompra")
-        .where("idUsuario", isEqualTo: uid)
+
+    Query stream = FirebaseFirestore.instance.collection("listaCompra");
+
+    stream
         .orderBy("dataCompra", descending: true)
-        .snapshots();
-    stream.listen((event) {
+        .where("idUsuario", isEqualTo: uid)
+        .snapshots()
+        .listen((event) {
       _controller.add(event);
     });
   }
@@ -117,22 +118,14 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
                   case ConnectionState.done:
                     QuerySnapshot querySnapshot = snapshot.data;
                     if (querySnapshot.docs.length == 0) {
-                      return Container(
-                        decoration:
-                            BoxDecoration(color: Theme.of(context).accentColor),
-                        child: Center(
-                            child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Sem pedidos no momento",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        )),
+                      return Center(
+                        child: Text(
+                          "Sem pedidos no momento",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold),
+                        ),
                       );
                     } else {
                       return ListView.builder(
@@ -265,7 +258,12 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
                                           ),
                                           dados["entrega"] == "iniciada"
                                               ? TextButton(
-                                                  onPressed: () {},
+                                                  onPressed: () {
+                                                    Navigator.pushNamed(
+                                                        context, "/mapa",
+                                                        arguments:
+                                                            dados.reference.id);
+                                                  },
                                                   child: Text(
                                                     "Acompanhar entrega",
                                                     style: TextStyle(
@@ -279,8 +277,7 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
                                               : Padding(
                                                   padding: EdgeInsets.all(2),
                                                   child: Text(" "),
-                                                  
-                                                  ),
+                                                ),
                                         ],
                                       )),
                                 )
