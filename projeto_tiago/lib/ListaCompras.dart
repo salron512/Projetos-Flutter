@@ -28,14 +28,14 @@ class _ListaComprasState extends State<ListaCompras> {
     List<QueryDocumentSnapshot> snapshot;
     Map<String, dynamic> dados;
 
-    var stream = db
-        .collection("listaPendente")
+    var stream = FirebaseFirestore.instance.collection("listaPendente");
+
+    stream
         .doc(uid)
         .collection(uid)
         .orderBy("nome", descending: false)
-        .snapshots();
-
-    stream.listen((event) {
+        .snapshots()
+        .listen((event) {
       _streamController.add(event);
       setState(() {
         _totalCompra = "0";
@@ -279,7 +279,7 @@ class _ListaComprasState extends State<ListaCompras> {
             title: Text("Selecione a forma de pagamento"),
             content: Container(
               width: 150,
-              height: 160,
+              height: 250,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -338,8 +338,8 @@ class _ListaComprasState extends State<ListaCompras> {
             return AlertDialog(
               title: Text("Finalizar compra"),
               content: Container(
-                width: 150,
-                height: 280,
+                width: 100,
+                height: 300,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -371,7 +371,6 @@ class _ListaComprasState extends State<ListaCompras> {
                     TextField(
                       controller: _controllerTroco,
                       textCapitalization: TextCapitalization.sentences,
-                      autofocus: true,
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         labelText: "Digite o troco",
@@ -389,88 +388,82 @@ class _ListaComprasState extends State<ListaCompras> {
                     child: Text("Cancelar")),
                 TextButton(
                   onPressed: () async {
-                    if(_controllerTroco.text.isNotEmpty){
-                    double totalCompra =
-                        double.tryParse(_totalCompra).toDouble();
-                    double troco =
-                        double.tryParse(_controllerTroco.text).toDouble();
-                    String trocoSalvar = "0";
-                    double trocoFinal = troco - totalCompra;
-                    trocoSalvar = trocoFinal.toString();
-                    print("troco " + trocoFinal.toString());
-                    print("totalCompra " + totalCompra.toString());
+                    if (_controllerTroco.text.isNotEmpty) {
+                      double totalCompra =
+                          double.tryParse(_totalCompra).toDouble();
+                      double troco =
+                          double.tryParse(_controllerTroco.text).toDouble();
+                      String trocoSalvar = "0";
+                      double trocoFinal = troco - totalCompra;
+                      trocoSalvar = trocoFinal.toString();
+                      print("troco " + trocoFinal.toString());
+                      print("totalCompra " + totalCompra.toString());
+                      if (trocoFinal >= 0) {
+                        FirebaseFirestore db = FirebaseFirestore.instance;
+                        String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
+                        var dadosUsuario =
+                            await db.collection("usuarios").doc(uid).get();
+                        Map<String, dynamic> mapUsuario = dadosUsuario.data();
 
-                   
-                      if (trocoFinal >=  0) {
-                     
-                       FirebaseFirestore db = FirebaseFirestore.instance;
-                      String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
-                      var dadosUsuario =
-                          await db.collection("usuarios").doc(uid).get();
-                      Map<String, dynamic> mapUsuario = dadosUsuario.data();
-
-                      var snap = db
-                          .collection("listaPendente")
-                          .doc(uid)
-                          .collection(uid)
-                          .orderBy("nome", descending: false)
-                          .get();
-                      snap.then((event) {
-                        List<dynamic> listaCompras = [];
-                        for (var item in event.docs) {
-                          Map<String, dynamic> map = item.data();
-                          listaCompras.add(map);
-                        }
-                        db.collection("listaCompra").doc().set({
-                          "dataCompra": DateTime.now().toString(),
-                          "status": "Pendente",
-                          "nome": mapUsuario["nome"],
-                          "telefone": mapUsuario["telefone"],
-                          "whatsapp": mapUsuario["whatsapp"],
-                          "endereco": mapUsuario["endereco"],
-                          "cidade": mapUsuario["cidade"],
-                          "bairro": mapUsuario["bairro"],
-                          "prontoReferencia": mapUsuario["pontoReferencia"],
-                          "idUsuario": uid,
-                          "listaProdutos": listaCompras,
-                          "totalCompra": _totalCompra,
-                          "formaPagamento": formaPagamento,
-                          "troco": trocoSalvar,
-                          "entrega": "pendente"
-                        }).then((value) {
-                          db
-                              .collection("listaPendente")
-                              .doc(uid)
-                              .collection(uid)
-                              .get()
-                              .then((value) {
-                            value.docs.forEach((element) {
-                              db
-                                  .collection("listaPendente")
-                                  .doc(uid)
-                                  .collection(uid)
-                                  .doc(element.reference.id)
-                                  .delete()
-                                  .then((value) {
-                                setState(() {
-                                  _totalCompra = "0";
+                        var snap = db
+                            .collection("listaPendente")
+                            .doc(uid)
+                            .collection(uid)
+                            .orderBy("nome", descending: false)
+                            .get();
+                        snap.then((event) {
+                          List<dynamic> listaCompras = [];
+                          for (var item in event.docs) {
+                            Map<String, dynamic> map = item.data();
+                            listaCompras.add(map);
+                          }
+                          db.collection("listaCompra").doc().set({
+                            "dataCompra": DateTime.now().toString(),
+                            "status": "Pendente",
+                            "nome": mapUsuario["nome"],
+                            "telefone": mapUsuario["telefone"],
+                            "whatsapp": mapUsuario["whatsapp"],
+                            "endereco": mapUsuario["endereco"],
+                            "cidade": mapUsuario["cidade"],
+                            "bairro": mapUsuario["bairro"],
+                            "prontoReferencia": mapUsuario["pontoReferencia"],
+                            "idUsuario": uid,
+                            "listaProdutos": listaCompras,
+                            "totalCompra": _totalCompra,
+                            "formaPagamento": formaPagamento,
+                            "troco": trocoSalvar,
+                            "entrega": "pendente"
+                          }).then((value) {
+                            db
+                                .collection("listaPendente")
+                                .doc(uid)
+                                .collection(uid)
+                                .get()
+                                .then((value) {
+                              value.docs.forEach((element) {
+                                db
+                                    .collection("listaPendente")
+                                    .doc(uid)
+                                    .collection(uid)
+                                    .doc(element.reference.id)
+                                    .delete()
+                                    .then((value) {
+                                  setState(() {
+                                    _totalCompra = "0";
+                                  });
                                 });
                               });
+                              Navigator.pop(context);
+                              Navigator.pushNamed(context, "/pedidousuario");
                             });
-                            Navigator.pop(context);
-                            Navigator.pushNamed(context, "/pedidousuario");
                           });
                         });
-                      });
+                      } else {
+                        _mostraErro("Troco inválido");
+                      }
                     } else {
-                       _mostraErro("Troco inválido");
-                     
-                    }
-
-                   }else{
                       _mostraErro("Troco inválido");
-
-                   }
+                    }
                   },
                   child: Text("Confirmar"),
                 ),
@@ -486,6 +479,8 @@ class _ListaComprasState extends State<ListaCompras> {
             return AlertDialog(
               title: Text("Finalizar compra"),
               content: Container(
+                width: 100,
+                height: 250,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -588,6 +583,7 @@ class _ListaComprasState extends State<ListaCompras> {
           });
     }
   }
+
   @override
   void dispose() {
     super.dispose();
@@ -599,8 +595,6 @@ class _ListaComprasState extends State<ListaCompras> {
     super.initState();
     _recuperaLista();
   }
-
-  
 
   @override
   Widget build(BuildContext context) {

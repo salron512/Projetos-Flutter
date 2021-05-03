@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:carp_background_location/carp_background_location.dart';
+import 'package:background_location/background_location.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -15,8 +15,6 @@ class ListaEntregas extends StatefulWidget {
 class _ListaEntregasState extends State<ListaEntregas> {
   StreamController _controller = StreamController.broadcast();
   StreamController _streamControllerEntrega = StreamController.broadcast();
-  StreamSubscription<LocationDto> _dtoSubscription;
-  LocationManager _locationManager = LocationManager.instance;
 
   bool _adm = false;
   String _nomeEntregador;
@@ -28,24 +26,21 @@ class _ListaEntregasState extends State<ListaEntregas> {
     DocumentSnapshot snapshot = await db.collection("usuarios").doc(uid).get();
     dadosUsuario = snapshot.data();
     _adm = dadosUsuario["adm"];
-    _nomeEntregador = dadosUsuario["nome"];
-
     if (_adm) {
-      var stream = db
-          .collection("listaCompra")
-          .where("status", isEqualTo: "Recebido")
-          .snapshots();
-      stream.listen((event) {
+      var stream = FirebaseFirestore.instance.collection("listaCompra");
+
+      stream.where("status", isEqualTo: "Recebido").snapshots().listen((event) {
         _controller.add(event);
       });
     } else {
       String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
-      var stream = db
-          .collection("listaCompra")
+      var stream = FirebaseFirestore.instance.collection("listaCompra");
+
+      stream
           .where("idEntregador", isEqualTo: uid)
           .where("status", isEqualTo: "Recebido")
-          .snapshots();
-      stream.listen((event) {
+          .snapshots()
+          .listen((event) {
         _controller.add(event);
       });
     }
@@ -169,7 +164,8 @@ class _ListaEntregasState extends State<ListaEntregas> {
               ),
               TextButton(
                 child: Text("Sim"),
-                onPressed: () {
+                onPressed: () async {
+                  BackgroundLocation.stopLocationService();
                   FirebaseFirestore db = FirebaseFirestore.instance;
                   db.collection("pedidosRealizados").doc().set({
                     "idUsuario": dados["idUsuario"],
@@ -187,17 +183,14 @@ class _ListaEntregasState extends State<ListaEntregas> {
                     "dataEntrega": DateTime.now().toString(),
                     "dataCompra": dados["dataCompra"],
                     "troco": dados["troco"]
-                  }).then((value) async {
-                    _dtoSubscription.cancel();
-                    await _locationManager.stop();
-                    db
-                        .collection("localizacaoEntregador")
-                        .doc(dados.reference.id)
-                        .delete();
                   });
+
                   db.collection("listaCompra").doc(dados.reference.id).delete();
-                  Navigator.pushNamedAndRemoveUntil(
-                      context, "/carrinho", (route) => false);
+                  db
+                      .collection("localizacaoEntregador")
+                      .doc(dados.reference.id)
+                      .delete();
+                  Navigator.pop(context);
                 },
               ),
             ],
@@ -263,20 +256,13 @@ class _ListaEntregasState extends State<ListaEntregas> {
               ),
               TextButton(
                 child: Text("Sim"),
-                onPressed: () {
+                onPressed: () async {
+                  BackgroundLocation.stopLocationService();
+                  String id = dados.reference.id;
                   FirebaseFirestore db = FirebaseFirestore.instance;
-                  db
-                      .collection("listaCompra")
-                      .doc(dados.reference.id)
-                      .delete()
-                      .then((value) async {
-                    _dtoSubscription.cancel();
-                    await _locationManager.stop();
-                    db
-                        .collection("localizacaoEntregador")
-                        .doc(dados.reference.id)
-                        .delete();
-                  });
+
+                  db.collection("listaCompra").doc(id).delete();
+                  db.collection("localizacaoEntregador").doc(id).delete();
                   Navigator.pop(context);
                 },
               ),
@@ -286,26 +272,45 @@ class _ListaEntregasState extends State<ListaEntregas> {
   }
 
   _obtemLocalizacao({DocumentSnapshot dados, bool entrega}) async {
-    Stream<LocationDto> dtoStream;
+    BackgroundLocation.startLocationService();
+    BackgroundLocation.startLocationService(distanceFilter: 1);
 
     String idEntrega = dados.reference.id;
     FirebaseFirestore db = FirebaseFirestore.instance;
     double latitude;
     double longitude;
-    db.collection("listaCompra").doc(idEntrega).update({"entrega": "iniciada"});
+    await db
+        .collection("listaCompra")
+        .doc(idEntrega)
+        .update({"entrega": "iniciada"});
+    BackgroundLocation.getLocationUpdates((location) {
+      print(location);
+      latitude = location.latitude;
+      longitude = location.longitude;
+      db
+          .collection("localizacaoEntregador")
+          .doc(idEntrega)
+          .set({"latitude": latitude, "longitude": longitude});
+           print("EXECUTANDO!!!!!");
+    });
 
-    await _locationManager.start();
-
+    /*
+    if (_dtoSubscription != null) {
+       await _dtoSubscription.cancel();
+      await _locationManager.stop();
+    }
     dtoStream = _locationManager.dtoStream;
+    await _locationManager.start();
     _dtoSubscription = dtoStream.listen((event) {
+      print("EXECUTANDO");
       latitude = event.latitude;
       longitude = event.longitude;
-      db.collection("localizacaoEntregador").doc(idEntrega).set({
-        "nomeEntregador": _nomeEntregador,
-        "latitude": latitude,
-        "longitude": longitude
-      });
+      db
+          .collection("localizacaoEntregador")
+          .doc(idEntrega)
+          .set({"latitude": latitude, "longitude": longitude});
     });
+    */
   }
 
   @override
@@ -317,7 +322,7 @@ class _ListaEntregasState extends State<ListaEntregas> {
   @override
   void dispose() {
     super.dispose();
-     _controller.close();
+    _controller.close();
   }
 
   @override
@@ -369,8 +374,8 @@ class _ListaEntregasState extends State<ListaEntregas> {
                           return Card(
                             elevation: 8,
                             color: dados["entrega"] == "iniciada"
-                                ? Theme.of(context).accentColor
-                                : Colors.green,
+                                ? Colors.green
+                                : Theme.of(context).primaryColor,
                             child: ListTile(
                                 onLongPress: () {
                                   _mostraMsg(dados);

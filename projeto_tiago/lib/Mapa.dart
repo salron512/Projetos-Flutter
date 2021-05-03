@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
+
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 // ignore: must_be_immutable
@@ -15,41 +15,44 @@ class Mapa extends StatefulWidget {
 class _MapaState extends State<Mapa> {
   Completer<GoogleMapController> _controller = Completer();
   Set<Marker> _marcadores = {};
-
-  Position _position;
+  Stream<DocumentSnapshot> _query;
   CameraPosition _posicaoCamera =
-      CameraPosition(target: LatLng(-15.679356, -58.095522), zoom: 18);
+      CameraPosition(target: LatLng(0.0, 0.0), zoom: 18);
 
   _onMapCreated(GoogleMapController controller) {
     _controller.complete(controller);
   }
 
-  _adicionarMaracador() async {
-    LatLng latLng;
+  _adicionarMaracador() {
+    Marker marcador;
     double latitude = 0;
     double longitude = 0;
     String idDocumento = widget.idDocumento;
     Map<String, dynamic> dados;
 
-    Stream<DocumentSnapshot> query = FirebaseFirestore.instance
+    _query = FirebaseFirestore.instance
         .collection("localizacaoEntregador")
         .doc(idDocumento)
         .snapshots();
-    query.listen((event) {
+    _query.listen((event) {
       dados = event.data();
       latitude = dados["latitude"];
       longitude = dados["longitude"];
-      latLng = LatLng(latitude, longitude);
       print("latitude" + dados["latitude"].toString());
-      Marker marcador = Marker(
-          markerId: MarkerId("marcador-${latLng.latitude}-${latLng.longitude}"),
-          position: LatLng(latitude, longitude),
-          infoWindow: InfoWindow(title: dados["nomeEntregador"]));
-      setState(() {
-        _marcadores.add(marcador);
-        _posicaoCamera =
-            CameraPosition(target: LatLng(latitude, longitude), zoom: 18);
-      });
+      if (event.exists) {
+        setState(() {
+            _marcadores.clear();
+          marcador = Marker(
+              markerId: MarkerId("entregador"),
+              position: LatLng(latitude, longitude),
+              infoWindow: InfoWindow(title: "Entregador"));
+          _marcadores.add(marcador);
+          _posicaoCamera =
+              CameraPosition(target: LatLng(latitude, longitude), zoom: 18);
+        });
+      } else {
+        Navigator.pop(context);
+      }
       _movimentarCamera();
     });
   }
@@ -60,21 +63,21 @@ class _MapaState extends State<Mapa> {
         .animateCamera(CameraUpdate.newCameraPosition(_posicaoCamera));
   }
 
-  _localizacaoInicial() async {
-    double latitude = _position.altitude;
-    double longitude = _position.longitude;
-    setState(() async {
-      _position = await Geolocator.getCurrentPosition();
-      _posicaoCamera =
-          CameraPosition(target: LatLng(latitude, longitude), zoom: 18);
-    });
+  _fechaMapa() async {
+    GoogleMapController googleMapController = await _controller.future;
+    googleMapController.dispose();
   }
 
   @override
   void initState() {
     super.initState();
-    _localizacaoInicial();
     _adicionarMaracador();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _fechaMapa();
   }
 
   @override
@@ -89,7 +92,7 @@ class _MapaState extends State<Mapa> {
             initialCameraPosition: _posicaoCamera,
             onMapCreated: _onMapCreated,
             mapType: MapType.hybrid,
-            myLocationEnabled: true,
+            //  myLocationEnabled: true,
           ),
         ));
   }
