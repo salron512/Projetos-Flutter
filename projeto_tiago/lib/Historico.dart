@@ -22,7 +22,9 @@ class _HistoricoState extends State<Historico> {
         .orderBy("dataCompra", descending: true)
         .snapshots();
     stream.listen((event) {
-      _controller.add(event);
+      if (mounted) {
+         _controller.add(event);
+      }
     });
   }
 

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:projeto_tiago/util/RecuperaDadosFirebase.dart';
 
 class ListaCompras extends StatefulWidget {
@@ -13,6 +14,8 @@ class ListaCompras extends StatefulWidget {
 }
 
 class _ListaComprasState extends State<ListaCompras> {
+  var _mascaraQtd = MaskTextInputFormatter(
+      mask: '##########', filter: {"#": RegExp(r'[0-9]')});
   StreamController _streamController = StreamController.broadcast();
   TextEditingController _controllerQtd = TextEditingController();
   TextEditingController _controllerPrecoTotal = TextEditingController();
@@ -22,40 +25,45 @@ class _ListaComprasState extends State<ListaCompras> {
   double _totalCesta = 0;
   String _msgErro = "";
 
-  _recuperaLista() {
-    FirebaseFirestore db = FirebaseFirestore.instance;
+  _recuperaLista() async {
     String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
     List<QueryDocumentSnapshot> snapshot;
     Map<String, dynamic> dados;
 
-    var stream = FirebaseFirestore.instance.collection("listaPendente");
+    var dadosFirebase =
+         FirebaseFirestore.instance.collection("listaPendente");
 
-    stream
+    var stream = dadosFirebase
         .doc(uid)
         .collection(uid)
         .orderBy("nome", descending: false)
-        .snapshots()
-        .listen((event) {
-      _streamController.add(event);
-      setState(() {
-        _totalCompra = "0";
-        _totalCesta = 0;
-      });
+        .snapshots();
+
+    stream.listen((event) {
+      if (mounted) {
+         _streamController.add(event);
+      }
       snapshot = event.docs;
+      if (mounted) {
+        setState(() {
+          _totalCompra = "0";
+          _totalCesta = 0;
+        });
+      }
       snapshot.forEach((element) {
         dados = element.data();
         print("preco total " + dados["precoTotal"]);
-        // _listaCompras.add(dados["precoTotal"]);
-
         _totalCesta =
             _totalCesta + double.tryParse(dados["precoTotal"]).toDouble();
-        _totalCompra = _totalCesta.toString();
+        _totalCompra = _totalCesta.toStringAsFixed(2);
+        if (mounted) {
+          if (_totalCesta > 0) {
+            setState(() {
+              _mostraBottomBar = true;
+            });
+          }
+        }
       });
-      if (_totalCesta > 0) {
-        setState(() {
-          _mostraBottomBar = true;
-        });
-      }
     });
   }
 
@@ -84,6 +92,7 @@ class _ListaComprasState extends State<ListaCompras> {
                     ),
                   ),
                   TextField(
+                    inputFormatters: [_mascaraQtd],
                     controller: _controllerQtd,
                     textCapitalization: TextCapitalization.sentences,
                     keyboardType: TextInputType.number,
@@ -93,12 +102,21 @@ class _ListaComprasState extends State<ListaCompras> {
                         double precoTotal = double.tryParse(preco).toDouble();
                         double resultado = precoTotal * qtdProduto;
                         setState(() {
-                          _controllerPrecoTotal.text = resultado.toString();
+                          _controllerPrecoTotal.text =
+                              resultado.toStringAsFixed(2);
                           _msgErro = "";
                         });
                       }
                     },
                     decoration: InputDecoration(
+                      suffixIcon: IconButton(
+                        icon: Icon(Icons.clear),
+                        onPressed: () {
+                          setState(() {
+                            _controllerQtd.clear();
+                          });
+                        },
+                      ),
                       labelText: "Quantidade do produto",
                     ),
                   ),
@@ -154,7 +172,6 @@ class _ListaComprasState extends State<ListaCompras> {
                     Navigator.pop(context);
                     _controllerPrecoTotal.clear();
                     _controllerQtd.clear();
-                    _recuperaLista();
                   }
                 },
                 child: Text("Salvar"),
@@ -204,12 +221,7 @@ class _ListaComprasState extends State<ListaCompras> {
                       .doc(id)
                       .delete();
 
-                  setState(() {
-                    _totalCompra = "0";
-                  });
-
                   Navigator.pop(context);
-                  _recuperaLista();
                 },
                 child: Text("Confirmar"),
               ),
@@ -388,81 +400,86 @@ class _ListaComprasState extends State<ListaCompras> {
                     child: Text("Cancelar")),
                 TextButton(
                   onPressed: () async {
-                    if (_controllerTroco.text.isNotEmpty) {
-                      double totalCompra =
-                          double.tryParse(_totalCompra).toDouble();
-                      double troco =
-                          double.tryParse(_controllerTroco.text).toDouble();
-                      String trocoSalvar = "0";
-                      double trocoFinal = troco - totalCompra;
-                      trocoSalvar = trocoFinal.toString();
-                      print("troco " + trocoFinal.toString());
-                      print("totalCompra " + totalCompra.toString());
-                      if (trocoFinal >= 0) {
-                        FirebaseFirestore db = FirebaseFirestore.instance;
-                        String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
-                        var dadosUsuario =
-                            await db.collection("usuarios").doc(uid).get();
-                        Map<String, dynamic> mapUsuario = dadosUsuario.data();
+                    if (_controllerTroco.text.contains(",")) {
+                      _mostraErro("O uso de virgula é inválido");
+                    } else {
+                      if (_controllerTroco.text.isNotEmpty) {
+                        double totalCompra =
+                            double.tryParse(_totalCompra).toDouble();
+                        double troco =
+                            double.tryParse(_controllerTroco.text).toDouble();
+                        String trocoSalvar = "0";
+                        double trocoFinal = troco - totalCompra;
+                        trocoSalvar = trocoFinal.toStringAsFixed(2);
+                        print("troco " + trocoFinal.toString());
+                        print("totalCompra " + totalCompra.toString());
+                        if (trocoFinal >= 0) {
+                          FirebaseFirestore db = FirebaseFirestore.instance;
+                          String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
+                          var dadosUsuario =
+                              await db.collection("usuarios").doc(uid).get();
+                          Map<String, dynamic> mapUsuario = dadosUsuario.data();
 
-                        var snap = db
-                            .collection("listaPendente")
-                            .doc(uid)
-                            .collection(uid)
-                            .orderBy("nome", descending: false)
-                            .get();
-                        snap.then((event) {
-                          List<dynamic> listaCompras = [];
-                          for (var item in event.docs) {
-                            Map<String, dynamic> map = item.data();
-                            listaCompras.add(map);
-                          }
-                          db.collection("listaCompra").doc().set({
-                            "dataCompra": DateTime.now().toString(),
-                            "status": "Pendente",
-                            "nome": mapUsuario["nome"],
-                            "telefone": mapUsuario["telefone"],
-                            "whatsapp": mapUsuario["whatsapp"],
-                            "endereco": mapUsuario["endereco"],
-                            "cidade": mapUsuario["cidade"],
-                            "bairro": mapUsuario["bairro"],
-                            "prontoReferencia": mapUsuario["pontoReferencia"],
-                            "idUsuario": uid,
-                            "listaProdutos": listaCompras,
-                            "totalCompra": _totalCompra,
-                            "formaPagamento": formaPagamento,
-                            "troco": trocoSalvar,
-                            "entrega": "pendente"
-                          }).then((value) {
-                            db
-                                .collection("listaPendente")
-                                .doc(uid)
-                                .collection(uid)
-                                .get()
-                                .then((value) {
-                              value.docs.forEach((element) {
-                                db
-                                    .collection("listaPendente")
-                                    .doc(uid)
-                                    .collection(uid)
-                                    .doc(element.reference.id)
-                                    .delete()
-                                    .then((value) {
-                                  setState(() {
-                                    _totalCompra = "0";
+                          var snap = db
+                              .collection("listaPendente")
+                              .doc(uid)
+                              .collection(uid)
+                              .orderBy("nome", descending: false)
+                              .get();
+                          snap.then((event) async {
+                            List<dynamic> listaCompras = [];
+                            for (var item in event.docs) {
+                              Map<String, dynamic> map = item.data();
+                              listaCompras.add(map);
+                            }
+                            await db.collection("listaCompra").doc().set({
+                              "dataCompra": DateTime.now().toString(),
+                              "status": "Pendente",
+                              "nome": mapUsuario["nome"],
+                              "telefone": mapUsuario["telefone"],
+                              "whatsapp": mapUsuario["whatsapp"],
+                              "endereco": mapUsuario["endereco"],
+                              "cidade": mapUsuario["cidade"],
+                              "bairro": mapUsuario["bairro"],
+                              "prontoReferencia": mapUsuario["pontoReferencia"],
+                              "idUsuario": uid,
+                              "listaProdutos": listaCompras,
+                              "totalCompra": _totalCompra,
+                              "formaPagamento": formaPagamento,
+                              "troco": trocoSalvar,
+                              "entrega": "pendente"
+                            }).then((value) async {
+                              await db
+                                  .collection("listaPendente")
+                                  .doc(uid)
+                                  .collection(uid)
+                                  .get()
+                                  .then((value) {
+                                value.docs.forEach((element) async {
+                                  await db
+                                      .collection("listaPendente")
+                                      .doc(uid)
+                                      .collection(uid)
+                                      .doc(element.reference.id)
+                                      .delete()
+                                      .then((value) {
+                                    setState(() {
+                                      _totalCompra = "0";
+                                    });
                                   });
                                 });
+                                Navigator.pop(context);
+                                Navigator.pushNamed(
+                                    context, "/listacategorias");
                               });
-                              Navigator.pop(context);
-                              Navigator.pushNamed(context, "/pedidousuario");
                             });
                           });
-                        });
+                        } else {
+                          _mostraErro("Troco inválido");
+                        }
                       } else {
                         _mostraErro("Troco inválido");
                       }
-                    } else {
-                      _mostraErro("Troco inválido");
                     }
                   },
                   child: Text("Confirmar"),
@@ -550,15 +567,15 @@ class _ListaComprasState extends State<ListaCompras> {
                         "formaPagamento": formaPagamento,
                         "troco": "0",
                         "entrega": "pendente"
-                      }).then((value) {
-                        db
+                      }).then((value) async {
+                        await db
                             .collection("listaPendente")
                             .doc(uid)
                             .collection(uid)
                             .get()
                             .then((value) {
                           value.docs.forEach((element) async {
-                            db
+                            await db
                                 .collection("listaPendente")
                                 .doc(uid)
                                 .collection(uid)
@@ -574,7 +591,7 @@ class _ListaComprasState extends State<ListaCompras> {
                       });
                     });
                     Navigator.pop(context);
-                    Navigator.pushNamed(context, "/pedidousuario");
+                    Navigator.pushNamed(context, "/listacategorias");
                   },
                   child: Text("Confirmar"),
                 ),
@@ -588,6 +605,11 @@ class _ListaComprasState extends State<ListaCompras> {
   void dispose() {
     super.dispose();
     _streamController.close();
+    if (_streamController.isClosed) {
+      print("teste dispose");
+    } else {
+      print("teste deu errado");
+    }
   }
 
   @override
@@ -624,7 +646,7 @@ class _ListaComprasState extends State<ListaCompras> {
                     case ConnectionState.active:
                     case ConnectionState.done:
                       QuerySnapshot querySnapshot = snapshot.data;
-                      if (querySnapshot.docs.length == 0) {
+                      if (querySnapshot.docs.length == 0 || snapshot.hasError) {
                         return Center(
                           child: Text(
                             "Sem produtos",

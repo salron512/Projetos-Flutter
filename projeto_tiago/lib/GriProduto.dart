@@ -33,7 +33,9 @@ class _GridProdutoState extends State<GridProduto> {
         // maxHeight: 500,
         // maxWidth: 500,
       );
-      imagem = File(imagemSelecionada.path);
+      if (imagemSelecionada != null) {
+        imagem = File(imagemSelecionada.path);
+      }
     } else {
       //recupera imagem da galeria
       imagemSelecionada = await picker.getImage(
@@ -42,7 +44,9 @@ class _GridProdutoState extends State<GridProduto> {
         //maxHeight: 500,
         //  maxWidth: 500,
       );
-      imagem = File(imagemSelecionada.path);
+      if (imagemSelecionada != null) {
+        imagem = File(imagemSelecionada.path);
+      }
     }
     setState(() {
       _imagem = imagem;
@@ -129,7 +133,7 @@ class _GridProdutoState extends State<GridProduto> {
                 width: 250,
                 height: 250,
                 child: _urlImagem == null
-                    ? Image.network("images/error.png")
+                    ? Image.asset("images/error.png")
                     : Image.network(_urlImagem),
               ),
               /*

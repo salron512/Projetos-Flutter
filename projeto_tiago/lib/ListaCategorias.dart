@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +17,9 @@ class _ListaCategoriasState extends State<ListaCategorias> {
   _recuperaListaCategorias() {
     FirebaseFirestore db = FirebaseFirestore.instance;
     db.collection("categorias").snapshots().listen((event) {
+
       _streamController.add(event);
+      
     });
   }
 
@@ -182,7 +183,7 @@ class _ListaCategoriasState extends State<ListaCategorias> {
                 leading: Icon(Icons.delivery_dining),
                 title: Text('Entregas em andamento'),
                 onTap: () {
-                  Navigator.pushNamed(context, "/listaentregas");
+                  Navigator.pushNamed(context, "/listaentregas", arguments:_adm);
                 },
               ),
             ),

@@ -53,7 +53,7 @@ class RouteGenerator {
       case "/listaprodutos":
         return MaterialPageRoute(builder: (_) => ListaProdutos(args));
       case "/listaentregas":
-        return MaterialPageRoute(builder: (_) => ListaEntregas());
+        return MaterialPageRoute(builder: (_) => ListaEntregas(args));
       case "/detalhesentrega":
         return MaterialPageRoute(builder: (_) => DetalhesEntrega(args));
       case "/pedidousuario":

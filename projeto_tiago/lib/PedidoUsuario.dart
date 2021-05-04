@@ -23,7 +23,9 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
         .where("idUsuario", isEqualTo: uid)
         .snapshots()
         .listen((event) {
-      _controller.add(event);
+      if (mounted) {
+          _controller.add(event);
+      }
     });
   }
 
@@ -78,7 +80,6 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
           });
     }
   }
-  
 
   @override
   void initState() {

@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:projeto_tiago/util/RecuperaDadosFirebase.dart';
 
 // ignore: must_be_immutable
 class Carrinho extends StatefulWidget {
@@ -16,7 +16,7 @@ class Carrinho extends StatefulWidget {
 class _CarrinhoState extends State<Carrinho> {
   // ignore: unused_field
   String _nomeAppBar = " Produtos";
-  var _mascaraQtd = new MaskTextInputFormatter(
+  var _mascaraQtd = MaskTextInputFormatter(
       mask: '##########', filter: {"#": RegExp(r'[0-9]')});
   StreamController _controller = StreamController.broadcast();
   TextEditingController _controllerQtd = TextEditingController();
@@ -98,17 +98,21 @@ class _CarrinhoState extends State<Carrinho> {
                             },
                           )),
                       onChanged: (valor) {
-                        String valorSemMascara = _mascaraQtd.unmaskText(valor);
-                        print("valor" + valor);
-                        double precoCompra = double.tryParse(preco).toDouble();
-                        double qtdcoCompra =
-                            double.tryParse(valorSemMascara).toDouble();
-                        double resultado = precoCompra * qtdcoCompra;
-                        print("res" + resultado.toString());
-                        precoTotal = resultado.toString();
-                        setState(() {
-                          _controllerResultado.text = precoTotal;
-                        });
+                        if (valor.isNotEmpty) {
+                          String valorSemMascara =
+                              _mascaraQtd.unmaskText(valor);
+                          print("valor" + valor);
+                          double precoCompra =
+                              double.tryParse(preco).toDouble();
+                          double qtdcoCompra =
+                              double.tryParse(valorSemMascara).toDouble();
+                          double resultado = precoCompra * qtdcoCompra;
+                          print("res" + resultado.toString());
+                          precoTotal = resultado.toStringAsFixed(2);
+                          setState(() {
+                            _controllerResultado.text = precoTotal;
+                          });
+                        }
                       },
                     ),
                     TextField(
@@ -131,35 +135,34 @@ class _CarrinhoState extends State<Carrinho> {
                   child: Text("Cancelar")),
               TextButton(
                   child: Text("Confirmar"),
-                  onPressed: () {
+                  onPressed: () async {
                     if (_controllerQtd.text.isNotEmpty) {
-                        int qtd = 0;
-                        qtd = int.tryParse(_controllerQtd.text).toInt();
-                  if (qtd > 0 || _controllerQtd.text.isEmpty) {
-                    FirebaseAuth auth = FirebaseAuth.instance;
-                    FirebaseFirestore db = FirebaseFirestore.instance;
-                    String uid = auth.currentUser.uid;
-                    db
-                        .collection("listaPendente")
-                        .doc(uid)
-                        .collection(uid)
-                        .doc()
-                        .set({
-                      "idUsuario": uid,
-                      "nome": nome,
-                      "marca": marca,
-                      "quantidade": _controllerQtd.text,
-                      "precoUnitario": preco,
-                      "precoTotal": precoTotal,
-                      "urlimagem": urlImagem,
-                    });
+                      int qtd = 0;
+                      qtd = int.tryParse(_controllerQtd.text).toInt();
+                      if (qtd > 0 || _controllerQtd.text.isEmpty) {
+                        FirebaseFirestore db = FirebaseFirestore.instance;
+                        String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
+                        await db
+                            .collection("listaPendente")
+                            .doc(uid)
+                            .collection(uid)
+                            .doc()
+                            .set({
+                          "idUsuario": uid,
+                          "nome": nome,
+                          "marca": marca,
+                          "quantidade": _controllerQtd.text,
+                          "precoUnitario": preco,
+                          "precoTotal": precoTotal,
+                          "urlimagem": urlImagem,
+                        });
 
-                    _controllerQtd.clear();
-                    _controllerResultado.clear();
-                    Navigator.pop(context);
-                  } else {
-                    _alertErro();
-                  }
+                        _controllerQtd.clear();
+                        _controllerResultado.clear();
+                        Navigator.pop(context);
+                      } else {
+                        _alertErro();
+                      }
                     } else {
                       _alertErro();
                     }

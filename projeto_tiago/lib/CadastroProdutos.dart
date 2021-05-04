@@ -339,29 +339,6 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
           Navigator.pushNamed(context, "/produto");
         },
       ),
-      bottomNavigationBar: BottomAppBar(
-        shape: CircularNotchedRectangle(),
-        color: Theme.of(context).primaryColor,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).accentColor,
-                    padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15)),
-                  ),
-                  onPressed: () {
-                    Navigator.pushNamed(context, "/cadastracategorias");
-                  },
-                  child: Text("Cadastrar categoria")),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

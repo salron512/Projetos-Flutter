@@ -26,13 +26,11 @@ class _ListaPedidosState extends State<ListaPedidos> {
   }
 
   _recuperaPedidos() {
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    var stream = db
-        .collection("listaCompra")
-        .where("status", isEqualTo: "Pendente")
-        .snapshots();
-    stream.listen((event) {
-      _controller.add(event);
+    var stream = FirebaseFirestore.instance.collection("listaCompra");
+    stream.where("status", isEqualTo: "Pendente").snapshots().listen((event) {
+      if (mounted) {
+        _controller.add(event);
+      }
     });
   }
 
@@ -111,8 +109,8 @@ class _ListaPedidosState extends State<ListaPedidos> {
   @override
   void initState() {
     super.initState();
-    _recuperaUsuario();
     _recuperaPedidos();
+    _recuperaUsuario();
   }
 
   @override

@@ -7,41 +7,40 @@ import 'package:intl/intl.dart';
 import 'package:projeto_tiago/util/RecuperaDadosFirebase.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+// ignore: must_be_immutable
 class ListaEntregas extends StatefulWidget {
+  bool adm;
+  ListaEntregas(this.adm);
   @override
   _ListaEntregasState createState() => _ListaEntregasState();
 }
 
 class _ListaEntregasState extends State<ListaEntregas> {
   StreamController _controller = StreamController.broadcast();
-  StreamController _streamControllerEntrega = StreamController.broadcast();
-
+  String _uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
   bool _adm = false;
-  String _nomeEntregador;
 
   _recuperaPedidos() async {
-    String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
-    Map<String, dynamic> dadosUsuario;
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    DocumentSnapshot snapshot = await db.collection("usuarios").doc(uid).get();
-    dadosUsuario = snapshot.data();
-    _adm = dadosUsuario["adm"];
+    _adm = widget.adm;
     if (_adm) {
       var stream = FirebaseFirestore.instance.collection("listaCompra");
 
       stream.where("status", isEqualTo: "Recebido").snapshots().listen((event) {
-        _controller.add(event);
+        if (mounted) {
+          _controller.add(event);
+        }
       });
     } else {
-      String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
       var stream = FirebaseFirestore.instance.collection("listaCompra");
 
       stream
-          .where("idEntregador", isEqualTo: uid)
+          .where("idEntregador", isEqualTo: _uid)
           .where("status", isEqualTo: "Recebido")
           .snapshots()
           .listen((event) {
-        _controller.add(event);
+        if (mounted) {
+          _controller.add(event);
+        }
       });
     }
   }
@@ -95,7 +94,6 @@ class _ListaEntregasState extends State<ListaEntregas> {
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  _streamControllerEntrega.close();
                   _cancelarEntrega(dados);
                 },
                 child: Text("Cancelar entrega"),
@@ -167,7 +165,7 @@ class _ListaEntregasState extends State<ListaEntregas> {
                 onPressed: () async {
                   BackgroundLocation.stopLocationService();
                   FirebaseFirestore db = FirebaseFirestore.instance;
-                  db.collection("pedidosRealizados").doc().set({
+                  await db.collection("pedidosRealizados").doc().set({
                     "idUsuario": dados["idUsuario"],
                     "nomeUsuario": dados["nome"],
                     "telefone": dados["telefone"],
@@ -185,7 +183,10 @@ class _ListaEntregasState extends State<ListaEntregas> {
                     "troco": dados["troco"]
                   });
 
-                  db.collection("listaCompra").doc(dados.reference.id).delete();
+                  await db
+                      .collection("listaCompra")
+                      .doc(dados.reference.id)
+                      .delete();
                   db
                       .collection("localizacaoEntregador")
                       .doc(dados.reference.id)
@@ -261,8 +262,8 @@ class _ListaEntregasState extends State<ListaEntregas> {
                   String id = dados.reference.id;
                   FirebaseFirestore db = FirebaseFirestore.instance;
 
-                  db.collection("listaCompra").doc(id).delete();
-                  db.collection("localizacaoEntregador").doc(id).delete();
+                  await db.collection("listaCompra").doc(id).delete();
+                  await db.collection("localizacaoEntregador").doc(id).delete();
                   Navigator.pop(context);
                 },
               ),
@@ -272,6 +273,10 @@ class _ListaEntregasState extends State<ListaEntregas> {
   }
 
   _obtemLocalizacao({DocumentSnapshot dados, bool entrega}) async {
+    BackgroundLocation.checkPermissions().then((status) {
+      print("status Localizacao" + status.toString());
+    });
+
     BackgroundLocation.startLocationService();
     BackgroundLocation.startLocationService(distanceFilter: 1);
 
@@ -291,26 +296,8 @@ class _ListaEntregasState extends State<ListaEntregas> {
           .collection("localizacaoEntregador")
           .doc(idEntrega)
           .set({"latitude": latitude, "longitude": longitude});
-           print("EXECUTANDO!!!!!");
+      print("EXECUTANDO!!!!!");
     });
-
-    /*
-    if (_dtoSubscription != null) {
-       await _dtoSubscription.cancel();
-      await _locationManager.stop();
-    }
-    dtoStream = _locationManager.dtoStream;
-    await _locationManager.start();
-    _dtoSubscription = dtoStream.listen((event) {
-      print("EXECUTANDO");
-      latitude = event.latitude;
-      longitude = event.longitude;
-      db
-          .collection("localizacaoEntregador")
-          .doc(idEntrega)
-          .set({"latitude": latitude, "longitude": longitude});
-    });
-    */
   }
 
   @override

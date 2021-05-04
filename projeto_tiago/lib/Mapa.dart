@@ -24,43 +24,47 @@ class _MapaState extends State<Mapa> {
   }
 
   _adicionarMaracador() {
-    Marker marcador;
-    double latitude = 0;
-    double longitude = 0;
-    String idDocumento = widget.idDocumento;
-    Map<String, dynamic> dados;
+    if (mounted) {
+      Marker marcador;
+      double latitude = 0;
+      double longitude = 0;
+      String idDocumento = widget.idDocumento;
+      Map<String, dynamic> dados;
 
-    _query = FirebaseFirestore.instance
-        .collection("localizacaoEntregador")
-        .doc(idDocumento)
-        .snapshots();
-    _query.listen((event) {
-      dados = event.data();
-      latitude = dados["latitude"];
-      longitude = dados["longitude"];
-      print("latitude" + dados["latitude"].toString());
-      if (event.exists) {
-        setState(() {
+      _query = FirebaseFirestore.instance
+          .collection("localizacaoEntregador")
+          .doc(idDocumento)
+          .snapshots();
+      _query.listen((event) {
+        if (event.exists) {
+          dados = event.data();
+        latitude = dados["latitude"];
+        longitude = dados["longitude"];
+        print("latitude" + dados["latitude"].toString());
+        if (mounted) {
+          setState(() {
             _marcadores.clear();
-          marcador = Marker(
-              markerId: MarkerId("entregador"),
-              position: LatLng(latitude, longitude),
-              infoWindow: InfoWindow(title: "Entregador"));
-          _marcadores.add(marcador);
-          _posicaoCamera =
-              CameraPosition(target: LatLng(latitude, longitude), zoom: 18);
-        });
-      } else {
-        Navigator.pop(context);
-      }
-      _movimentarCamera();
-    });
+            marcador = Marker(
+                markerId: MarkerId("entregador"),
+                position: LatLng(latitude, longitude),
+                infoWindow: InfoWindow(title: "Entregador"));
+            _marcadores.add(marcador);
+            _posicaoCamera =
+                CameraPosition(target: LatLng(latitude, longitude), zoom: 18);
+          });
+        }
+        _movimentarCamera();
+        }
+      });
+    }
   }
 
   _movimentarCamera() async {
-    GoogleMapController googleMapController = await _controller.future;
-    googleMapController
-        .animateCamera(CameraUpdate.newCameraPosition(_posicaoCamera));
+    if (mounted) {
+      GoogleMapController googleMapController = await _controller.future;
+      googleMapController
+          .animateCamera(CameraUpdate.newCameraPosition(_posicaoCamera));
+    }
   }
 
   _fechaMapa() async {
