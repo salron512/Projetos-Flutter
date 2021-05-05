@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:projeto_tiago/util/RecuperaDadosFirebase.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -102,6 +103,7 @@ class _ListaEntregasState extends State<ListaEntregas> {
                 onPressed: () {
                   Navigator.pop(context);
                   _obtemLocalizacao(dados: dados, entrega: true);
+                  _enviaAlerta(dados);
                 },
                 child: Text("Iniciar entrega"),
               ),
@@ -262,8 +264,8 @@ class _ListaEntregasState extends State<ListaEntregas> {
                   String id = dados.reference.id;
                   FirebaseFirestore db = FirebaseFirestore.instance;
 
-                  await db.collection("listaCompra").doc(id).delete();
-                  await db.collection("localizacaoEntregador").doc(id).delete();
+                  db.collection("listaCompra").doc(id).delete();
+                  db.collection("localizacaoEntregador").doc(id).delete();
                   Navigator.pop(context);
                 },
               ),
@@ -298,6 +300,26 @@ class _ListaEntregasState extends State<ListaEntregas> {
           .set({"latitude": latitude, "longitude": longitude});
       print("EXECUTANDO!!!!!");
     });
+  }
+
+  _enviaAlerta(DocumentSnapshot dados) async {
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    List<String> list = [];
+    Map<String, dynamic> dadosUsuario = dados.data();
+    String idUsuario = dadosUsuario["idUsuario"];
+
+    DocumentSnapshot snapshot =
+        await db.collection("usuarios").doc(idUsuario).get();
+
+    Map<String, dynamic> map = snapshot.data();
+    String idUsuarioNotigicacao = map["playerId"];
+    list.add(idUsuarioNotigicacao);
+
+    OneSignal.shared.postNotification(OSCreateNotification(
+      playerIds: list,
+      heading: "Entrega a caminho",
+      content: "Sua entrega já foi enviada!",
+    ));
   }
 
   @override

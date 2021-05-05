@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:projeto_tiago/util/RecuperaDadosFirebase.dart';
 
 // ignore: must_be_immutable
@@ -221,22 +220,12 @@ class _CarrinhoState extends State<Carrinho> {
         });
   }
 
-  _recebeNot() {
-    OneSignal.shared.setNotificationOpenedHandler(
-        (OSNotificationOpenedResult result) async {
-      // será chamado sempre que uma notificação for aberta / botão pressionado.
-      if (result != null) {
-        print("ok");
-        Navigator.pushNamed(context, "/listaorcamento");
-      }
-    });
-  }
+ 
 
   @override
   void initState() {
     super.initState();
     _recebeNomeAppBar();
-    _recebeNot();
     _recuperaProdutos();
   }
 

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:projeto_tiago/util/RecuperaDadosFirebase.dart';
 
 class ListaCompras extends StatefulWidget {
@@ -30,8 +31,7 @@ class _ListaComprasState extends State<ListaCompras> {
     List<QueryDocumentSnapshot> snapshot;
     Map<String, dynamic> dados;
 
-    var dadosFirebase =
-         FirebaseFirestore.instance.collection("listaPendente");
+    var dadosFirebase = FirebaseFirestore.instance.collection("listaPendente");
 
     var stream = dadosFirebase
         .doc(uid)
@@ -41,7 +41,7 @@ class _ListaComprasState extends State<ListaCompras> {
 
     stream.listen((event) {
       if (mounted) {
-         _streamController.add(event);
+        _streamController.add(event);
       }
       snapshot = event.docs;
       if (mounted) {
@@ -57,14 +57,24 @@ class _ListaComprasState extends State<ListaCompras> {
             _totalCesta + double.tryParse(dados["precoTotal"]).toDouble();
         _totalCompra = _totalCesta.toStringAsFixed(2);
         if (mounted) {
-          if (_totalCesta > 0) {
-            setState(() {
-              _mostraBottomBar = true;
-            });
-          }
+          _verificaCompra();
         }
       });
     });
+  }
+
+  _verificaCompra() {
+    if (mounted) {
+      if (_totalCesta > 0) {
+        setState(() {
+          _mostraBottomBar = true;
+        });
+      } else {
+        setState(() {
+          _mostraBottomBar = false;
+        });
+      }
+    }
   }
 
   _editaProduto(String qtd, String preco, String precoTatal, String id) {
@@ -220,7 +230,7 @@ class _ListaComprasState extends State<ListaCompras> {
                       .collection(uid)
                       .doc(id)
                       .delete();
-
+                  _verificaCompra();
                   Navigator.pop(context);
                 },
                 child: Text("Confirmar"),
@@ -338,6 +348,24 @@ class _ListaComprasState extends State<ListaCompras> {
             ],
           );
         });
+  }
+
+  _enviaAlerta() async {
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    List<String> list = [];
+    var snapshot =
+        await db.collection("usuarios").where("adm", isEqualTo: true).get();
+
+    for (var item in snapshot.docs) {
+      Map<String, dynamic> map = item.data();
+      String idUsuarioNotigicacao = map["playerId"];
+      list.add(idUsuarioNotigicacao);
+    }
+    OneSignal.shared.postNotification(OSCreateNotification(
+      playerIds: list,
+      heading: "Nova entrega",
+      content: "Você tem uma nova entrega!",
+    ));
   }
 
   _salvaPedido(String formaPagamento) {
@@ -468,6 +496,7 @@ class _ListaComprasState extends State<ListaCompras> {
                                     });
                                   });
                                 });
+                                _enviaAlerta();
                                 Navigator.pop(context);
                                 Navigator.pushNamed(
                                     context, "/listacategorias");
@@ -590,6 +619,7 @@ class _ListaComprasState extends State<ListaCompras> {
                         });
                       });
                     });
+                     _enviaAlerta();
                     Navigator.pop(context);
                     Navigator.pushNamed(context, "/listacategorias");
                   },

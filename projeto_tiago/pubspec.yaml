@@ -79,6 +79,7 @@ flutter:
     - images/error.png
     - images/cartao.png
     - images/repair.png
+    - images/eclipse_logo.jpg
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

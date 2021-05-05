@@ -38,22 +38,22 @@ class _MapaState extends State<Mapa> {
       _query.listen((event) {
         if (event.exists) {
           dados = event.data();
-        latitude = dados["latitude"];
-        longitude = dados["longitude"];
-        print("latitude" + dados["latitude"].toString());
-        if (mounted) {
-          setState(() {
-            _marcadores.clear();
-            marcador = Marker(
-                markerId: MarkerId("entregador"),
-                position: LatLng(latitude, longitude),
-                infoWindow: InfoWindow(title: "Entregador"));
-            _marcadores.add(marcador);
-            _posicaoCamera =
-                CameraPosition(target: LatLng(latitude, longitude), zoom: 18);
-          });
-        }
-        _movimentarCamera();
+          latitude = dados["latitude"];
+          longitude = dados["longitude"];
+          print("latitude" + dados["latitude"].toString());
+          if (mounted) {
+            setState(() {
+              _marcadores.clear();
+              marcador = Marker(
+                  markerId: MarkerId("entregador"),
+                  position: LatLng(latitude, longitude),
+                  infoWindow: InfoWindow(title: "Entregador"));
+              _marcadores.add(marcador);
+              _posicaoCamera =
+                  CameraPosition(target: LatLng(latitude, longitude), zoom: 18);
+            });
+          }
+          _movimentarCamera();
         }
       });
     }
@@ -96,7 +96,7 @@ class _MapaState extends State<Mapa> {
             initialCameraPosition: _posicaoCamera,
             onMapCreated: _onMapCreated,
             mapType: MapType.hybrid,
-            //  myLocationEnabled: true,
+           // myLocationEnabled: true,
           ),
         ));
   }

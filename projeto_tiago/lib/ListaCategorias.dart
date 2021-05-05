@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 class ListaCategorias extends StatefulWidget {
   @override
@@ -17,9 +18,7 @@ class _ListaCategoriasState extends State<ListaCategorias> {
   _recuperaListaCategorias() {
     FirebaseFirestore db = FirebaseFirestore.instance;
     db.collection("categorias").snapshots().listen((event) {
-
       _streamController.add(event);
-      
     });
   }
 
@@ -47,9 +46,35 @@ class _ListaCategoriasState extends State<ListaCategorias> {
     Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
   }
 
+  _recebeNot() {
+    OneSignal.shared.setNotificationOpenedHandler(
+        (OSNotificationOpenedResult result) async {
+      // será chamado sempre que uma notificação for aberta / botão pressionado.
+      // sempre que o content da notificação for aterado é necessario alterar o
+      // o switch
+      if (result != null) {
+        String dados = result.notification.payload.body;
+
+        print("ok " + dados);
+        switch (dados) {
+          case "Você tem uma nova solicitação de orçamento!":
+            Navigator.pushNamed(context, "/listaorcamento");
+            break;
+          case "Você tem uma nova entrega!":
+            Navigator.pushNamed(context, "/listapedidos");
+            break;
+          case "Sua entrega já foi enviada!":
+            Navigator.pushNamed(context, "/pedidousuario");
+            break;
+        }
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    _recebeNot();
     _recuperaListaCategorias();
     _recuperaUsuario();
   }
@@ -120,6 +145,16 @@ class _ListaCategoriasState extends State<ListaCategorias> {
               },
             ),
             ListTile(
+              leading: Icon(Icons.shopping_bag),
+              title: Text("Carrinho de compras"),
+              onTap: () {
+                //Navigator.push(context, MaterialPageRoute(builder: (context) => SegundaTela()));
+                setState(() {
+                  Navigator.pushNamed(context, "/listaCompras");
+                });
+              },
+            ),
+            ListTile(
               leading: Icon(Icons.access_alarms_outlined),
               title: Text("Pedido em andamento"),
               onTap: () {
@@ -183,7 +218,8 @@ class _ListaCategoriasState extends State<ListaCategorias> {
                 leading: Icon(Icons.delivery_dining),
                 title: Text('Entregas em andamento'),
                 onTap: () {
-                  Navigator.pushNamed(context, "/listaentregas", arguments:_adm);
+                  Navigator.pushNamed(context, "/listaentregas",
+                      arguments: _adm);
                 },
               ),
             ),

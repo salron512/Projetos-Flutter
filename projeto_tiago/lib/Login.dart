@@ -96,23 +96,22 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(color: Theme.of(context).accentColor),
+        decoration: BoxDecoration(color:Color(0xff201b21)),
         child: Center(
           child: SingleChildScrollView(
             padding: EdgeInsets.all(16),
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  /*
                   Padding(
                     padding: EdgeInsets.only(bottom: 10),
                     child: Image.asset(
-                      "images/scart.png",
+                      "images/eclipse_logo.jpg",
                       width: 200,
                       height: 150,
                     ),
                   ),
-                  */
+                  
                   Padding(
                       padding: EdgeInsets.only(bottom: 8),
                       child: Center(
