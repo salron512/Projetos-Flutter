@@ -250,7 +250,7 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
                                             padding: EdgeInsets.only(
                                                 top: 5, bottom: 10),
                                             child: Text(
-                                              "Data de saída: " +
+                                              "Pedido recebido " +
                                                   _formatarData(
                                                       dados["dataRecebimento"]),
                                               style: TextStyle(

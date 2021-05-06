@@ -21,7 +21,7 @@ class _GridState extends State<Grid> {
   // ignore: unused_field
   bool _subindoImagem = false;
   // ignore: unused_field
-  String _urlImagem = "";
+  String _urlImagem;
   File _imagem;
   bool _permissao = false;
   String _tituloImagem = "";
@@ -57,17 +57,15 @@ class _GridState extends State<Grid> {
   }
 
   // ignore: missing_return
-  Future _recuperaGaleria() {
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    var stream = db
-        .collection("galeria")
-        .doc(widget.id)
-        .collection(widget.id)
-        .orderBy("ordenador", descending: false)
-        .snapshots();
+  _recuperaGaleria() {
+    String id = widget.id;
+    var stream =
+        FirebaseFirestore.instance.collection("galeria").doc(id).collection(id);
 
-    stream.listen((event) {
-      _streamController.add(event);
+    stream.orderBy("ordenador", descending: false).snapshots().listen((event) {
+      if (mounted) {
+        _streamController.add(event);
+      }
     });
   }
 
@@ -77,22 +75,18 @@ class _GridState extends State<Grid> {
     File imagem;
     if (daCamera) {
       //recupera imagem da camera
-      imagemSelecionada = await picker.getImage(
-        source: ImageSource.camera,
-        imageQuality: 50,
-       // maxHeight: 500,
-      //  maxWidth: 500,
-      );
-      imagem = File(imagemSelecionada.path);
+      imagemSelecionada =
+          await picker.getImage(source: ImageSource.camera, imageQuality: 50);
+      if (imagemSelecionada != null) {
+        imagem = File(imagemSelecionada.path);
+      }
     } else {
       //recupera imagem da galeria
-      imagemSelecionada = await picker.getImage(
-        source: ImageSource.gallery,
-        imageQuality: 50,
-        //maxHeight: 500,
-       // maxWidth: 500,
-      );
-      imagem = File(imagemSelecionada.path);
+      imagemSelecionada =
+          await picker.getImage(source: ImageSource.gallery, imageQuality: 50);
+      if (imagemSelecionada != null) {
+        imagem = File(imagemSelecionada.path);
+      }
     }
     setState(() {
       _imagem = imagem;
@@ -141,55 +135,55 @@ class _GridState extends State<Grid> {
   }
 
   _apagaImagem(String id, String path) {
-    if(_permissao){
+    if (_permissao) {
       showDialog(
-        context: context,
-        // ignore: missing_return
-        builder: (context) {
-          return AlertDialog(
-            title: Text("Excluir imagem"),
-            content: Container(
-              height: 190,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Container(
-                    height: 100,
-                    width: 100,
-                    child: Padding(
-                      padding: EdgeInsets.only(bottom: 2),
-                      child: Image.asset("images/excluir.png"),
+          context: context,
+          // ignore: missing_return
+          builder: (context) {
+            return AlertDialog(
+              title: Text("Excluir imagem"),
+              content: Container(
+                height: 190,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Container(
+                      height: 100,
+                      width: 100,
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: 2),
+                        child: Image.asset("images/excluir.png"),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text("Cancelar"),
-              ),
-              TextButton(
-                onPressed: () {
-                  FirebaseFirestore db = FirebaseFirestore.instance;
-                  FirebaseStorage storage = FirebaseStorage.instance;
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text("Cancelar"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    FirebaseFirestore db = FirebaseFirestore.instance;
+                    FirebaseStorage storage = FirebaseStorage.instance;
 
-                  db
-                      .collection("galeria")
-                      .doc(widget.id)
-                      .collection(widget.id)
-                      .doc(id)
-                      .delete();
+                    db
+                        .collection("galeria")
+                        .doc(widget.id)
+                        .collection(widget.id)
+                        .doc(id)
+                        .delete();
 
-                  var pastaRaiz = storage.ref();
-                  pastaRaiz.child(path).delete();
-                  Navigator.pop(context);
-                },
-                child: Text("Excluir"),
-              ),
-            ],
-          );
-        });
+                    var pastaRaiz = storage.ref();
+                    pastaRaiz.child(path).delete();
+                    Navigator.pop(context);
+                  },
+                  child: Text("Excluir"),
+                ),
+              ],
+            );
+          });
     }
   }
 

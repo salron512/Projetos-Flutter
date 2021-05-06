@@ -16,7 +16,7 @@ class GridProduto extends StatefulWidget {
 
 class _GridProdutoState extends State<GridProduto> {
   bool _subindoImagem = false;
-  String _urlImagem = "";
+  String _urlImagem;
   File _imagem;
   bool _imagemPerfil = false;
   List<String> listaImagens = [];
@@ -136,13 +136,7 @@ class _GridProdutoState extends State<GridProduto> {
                     ? Image.asset("images/error.png")
                     : Image.network(_urlImagem),
               ),
-              /*
-              CircleAvatar(
-                  backgroundImage:
-                      _urlImagem != null ? NetworkImage(_urlImagem) : null,
-                  maxRadius: 100,
-                  backgroundColor: Colors.grey),
-                  */
+
               Padding(
                 padding: EdgeInsets.all(10),
                 child: Visibility(
@@ -156,7 +150,7 @@ class _GridProdutoState extends State<GridProduto> {
                 padding: EdgeInsets.only(top: 10),
                 child:
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Text("Adicine a foto de perfil",
+                  Text("Adicione a foto de perfil",
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: 15,

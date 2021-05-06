@@ -15,15 +15,14 @@ class _HistoricoState extends State<Historico> {
   StreamController _controller = StreamController.broadcast();
   TextEditingController _controllerQtd = TextEditingController();
   _recuperaPedidos() {
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    var stream = db
-        .collection("pedidosRealizados")
-        .limit(_i)
+    var stream = FirebaseFirestore.instance.collection("pedidosRealizados");
+    stream
         .orderBy("dataCompra", descending: true)
-        .snapshots();
-    stream.listen((event) {
+        .limit(_i)
+        .snapshots()
+        .listen((event) {
       if (mounted) {
-         _controller.add(event);
+        _controller.add(event);
       }
     });
   }
@@ -254,8 +253,24 @@ class _HistoricoState extends State<Historico> {
                                     Padding(
                                       padding: EdgeInsets.only(top: 5),
                                       child: Text(
-                                        "Data da Compra: " +
+                                        "Entregador: " +
+                                            dados["nomeEntregador"],
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 5),
+                                      child: Text(
+                                        "Data da compra: " +
                                             _formatarData(dados["dataCompra"]),
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 5),
+                                      child: Text(
+                                        "Data da entrega: " +
+                                            _formatarData(dados["dataEntrega"]),
                                         style: TextStyle(color: Colors.white),
                                       ),
                                     ),

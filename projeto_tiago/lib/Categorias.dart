@@ -14,19 +14,21 @@ class _CategoriasState extends State<Categorias> {
   TextEditingController _controllerNome = TextEditingController();
 
   // ignore: missing_return
-  Stream _recuperaCategorias() {
+  _recuperaCategorias() {
     FirebaseFirestore db = FirebaseFirestore.instance;
     var stream = db
         .collection("categorias")
         .orderBy("categoria", descending: false)
         .snapshots();
-    stream.listen((event) {
-      _controller.add(event);
-    });
+    if (mounted) {
+      stream.listen((event) {
+        _controller.add(event);
+      });
+    }
   }
 
   _editaCategoria(String nome, String id) {
-      _controllerNome.text = nome;
+    _controllerNome.text = nome;
     showDialog(
         context: context,
         // ignore: missing_return
@@ -150,10 +152,10 @@ class _CategoriasState extends State<Categorias> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Produtos"),
+        title: Text("Categorias"),
       ),
       body: Container(
-        padding: EdgeInsets.only(top: 10),
+          padding: EdgeInsets.only(top: 10),
           decoration: BoxDecoration(color: Theme.of(context).accentColor),
           //padding: EdgeInsets.all(16),
           child: StreamBuilder(
@@ -193,7 +195,7 @@ class _CategoriasState extends State<Categorias> {
                               ? Image.asset("images/gear.png")
                               : Image.network(dados["urlImagem"]),
                           title: Text(
-                            "Produto: " + dados["categoria"],
+                            "Categoria: " + dados["categoria"],
                             style: TextStyle(color: Colors.white),
                           ),
                           trailing: Row(
@@ -219,11 +221,10 @@ class _CategoriasState extends State<Categorias> {
                                   }),
                             ],
                           ),
-                   
                           onTap: () {
-                            Navigator.pushNamed(context, "/perfilcategoria",arguments: dados.reference.id);
+                            Navigator.pushNamed(context, "/perfilcategoria",
+                                arguments: dados.reference.id);
                           },
-                   
                         );
                       },
                     );

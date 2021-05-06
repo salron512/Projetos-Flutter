@@ -14,19 +14,21 @@ class MinhasEntregas extends StatefulWidget {
 class _MinhasEntregasState extends State<MinhasEntregas> {
   StreamController _controller = StreamController.broadcast();
   _recuperaPedidos() {
-    FirebaseFirestore db = FirebaseFirestore.instance;
     FirebaseAuth auth = FirebaseAuth.instance;
     String id = auth.currentUser.uid;
-    var stream = db
-        .collection("pedidosRealizados")
+    var stream = FirebaseFirestore.instance.collection("pedidosRealizados");
+
+    stream
+        .orderBy("dataCompra", descending: true)
         .where("idUsuario", isEqualTo: id)
-         .limit(10)
-        .snapshots();
-    stream.listen((event) {
-      _controller.add(event);
+        .limit(10)
+        .snapshots()
+        .listen((event) {
+      if (mounted) {
+        _controller.add(event);
+      }
     });
   }
-
 
   _formatarData(String data) {
     initializeDateFormatting("pt_BR");
@@ -42,20 +44,20 @@ class _MinhasEntregasState extends State<MinhasEntregas> {
     super.initState();
     _recuperaPedidos();
   }
+
   @override
   void dispose() {
     super.dispose();
     _controller.close();
   }
-  
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Meus pedidos"),
-      ),
-      body: Container(
+        appBar: AppBar(
+          title: Text("Meus pedidos"),
+        ),
+        body: Container(
           padding: EdgeInsets.only(left: 5, right: 5),
           decoration: BoxDecoration(color: Theme.of(context).accentColor),
           child: StreamBuilder(
@@ -201,7 +203,6 @@ class _MinhasEntregasState extends State<MinhasEntregas> {
                     break;
                 }
               }),
-        )
-    );
+        ));
   }
 }

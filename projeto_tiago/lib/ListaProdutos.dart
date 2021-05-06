@@ -34,7 +34,7 @@ class _ListaProdutosState extends State<ListaProdutos> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Lista pedido"),
+        title: Text("Lista pedidos"),
       ),
       body: Container(
         decoration: BoxDecoration(

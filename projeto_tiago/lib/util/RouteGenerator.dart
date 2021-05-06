@@ -37,7 +37,6 @@ class RouteGenerator {
     switch (settings.name) {
       case "/":
         return MaterialPageRoute(builder: (_) => Login());
-
       case "/cadastro":
         return MaterialPageRoute(builder: (_) => Cadastro());
       case "/carrinho":

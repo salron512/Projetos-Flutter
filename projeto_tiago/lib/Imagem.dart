@@ -14,9 +14,7 @@ class _ImagemState extends State<Imagem> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          //title: Text("test" +  widget.dados["nome"].toString())
-          ),
+      appBar: AppBar(),
       body: Container(
         decoration: BoxDecoration(
           color: Theme.of(context).accentColor

@@ -170,6 +170,7 @@ class _ListaEntregasState extends State<ListaEntregas> {
                   await db.collection("pedidosRealizados").doc().set({
                     "idUsuario": dados["idUsuario"],
                     "nomeUsuario": dados["nome"],
+                    "nomeEntregador": dados["nomeEntregador"],
                     "telefone": dados["telefone"],
                     "whatsapp": dados["whatsapp"],
                     "endereco": dados["endereco"],

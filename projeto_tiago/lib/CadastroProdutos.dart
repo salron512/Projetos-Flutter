@@ -13,23 +13,17 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
   TextEditingController _controllerNome = TextEditingController();
   TextEditingController _controllerMarca = TextEditingController();
   TextEditingController _controllerPreco = TextEditingController();
-  
 
   // ignore: missing_return
   Stream _recuperaProdutos() {
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    var stream = db
-        .collection("produtos")
-        .orderBy("nome", descending: false)
-        .snapshots();
-    stream.listen((event) {
-      _controller.add(event);
+    var stream = FirebaseFirestore.instance.collection("produtos");
+
+    stream.orderBy("nome", descending: false).snapshots().listen((event) {
+      if (mounted) {
+        _controller.add(event);
+      }
     });
   }
-
- 
-
- 
 
   _editaProduto(String nome, String marca, String preco, String id) {
     setState(() {
@@ -105,7 +99,7 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
         });
   }
 
-  _selecaoGaleriaPeril(String dados) {
+  _selecaoGaleriaPerfil(String dados) {
     showDialog(
         context: context,
         // ignore: missing_return
@@ -129,6 +123,13 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
               ),
             ),
             actions: [
+              TextButton(
+                child: Text("Mudar categoria"),
+                onPressed: () {
+                  Navigator.pop(context);
+                  _recuperalistaCategorias(dados);
+                },
+              ),
               TextButton(
                 onPressed: () {
                   Navigator.pushNamed(context, "/grid", arguments: dados);
@@ -220,6 +221,60 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
         });
   }
 
+  _alteraCategoria(String idDocumento, String categoria) {
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    db.collection("produtos").doc(idDocumento).update({
+      "categoria": categoria,
+    });
+    Navigator.pop(context);
+  }
+
+  _recuperalistaCategorias(String idDocumento) async {
+    List listaCategorias = [];
+    CollectionReference query =
+        FirebaseFirestore.instance.collection("categorias");
+    QuerySnapshot doc = await query.orderBy("categoria").get();
+    for (var item in doc.docs) {
+      Map<String, dynamic> dados = item.data();
+      listaCategorias.add(dados["categoria"]);
+    }
+    showDialog(
+        context: context,
+        // ignore: missing_return
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Excluir produtos"),
+            content: Container(
+                height: 250,
+                child: ListView.separated(
+                  itemCount: listaCategorias.length,
+                  separatorBuilder: (context, indice) => Divider(
+                    height: 4,
+                    color: Colors.grey,
+                  ),
+                  // ignore: missing_return
+                  itemBuilder: (context, indice) {
+                    var dados = listaCategorias[indice];
+                    return ListTile(
+                      title: Text(dados),
+                      onTap: () {
+                        _alteraCategoria(idDocumento,dados);
+                      },
+                    );
+                  },
+                )),
+            actions: [
+              TextButton(
+                child: Text("Cancelar"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              )
+            ],
+          );
+        });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -291,6 +346,10 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                                 style: TextStyle(color: Colors.white),
                               ),
                               Text(
+                                "Categoria: " + dados["categoria"],
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Text(
                                 "Preço: " + "R\$ " + dados["preco"],
                                 style: TextStyle(color: Colors.white),
                               ),
@@ -320,7 +379,7 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                             ],
                           ),
                           onTap: () {
-                            _selecaoGaleriaPeril(dados.reference.id);
+                            _selecaoGaleriaPerfil(dados.reference.id);
                           },
                         );
                       },
@@ -330,7 +389,6 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
               }
             },
           )),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         backgroundColor: Color(0xffFF0000),

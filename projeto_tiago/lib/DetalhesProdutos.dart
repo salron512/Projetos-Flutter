@@ -30,26 +30,28 @@ class _DetalhesProdutosState extends State<DetalhesProdutos> {
 
   _verificaCampos() async {
     // ignore: unused_local_variable
-
     if (_controllerNome.text.isNotEmpty) {
       if (_controllerMarca.text.isNotEmpty) {
         if (_controllerPreco.text.isNotEmpty) {
           if (_categoriaSelecionada.isNotEmpty) {
-            FirebaseFirestore db = FirebaseFirestore.instance;
-            String id = DateTime.now().microsecondsSinceEpoch.toString();
-            await db.collection("produtos").doc(id).set({
-              "id": id,
-              "categoria": _categoriaSelecionada,
-              "nome": _controllerNome.text,
-              "marca": _controllerMarca.text,
-              "preco": _controllerPreco.text,
-              "urlImagem": null,
-              // ignore: missing_return
-            });
-            Navigator.pushNamed(context, "/grid", arguments: id);
-            _controllerMarca.clear();
-            _controllerNome.clear();
-            _controllerPreco.clear();
+            if (_controllerPreco.text.contains(",")) {
+              setState(() {
+                _msgErro = "O uso de vírgula não é permitido";
+              });
+            } else {
+              FirebaseFirestore db = FirebaseFirestore.instance;
+              String id = DateTime.now().microsecondsSinceEpoch.toString();
+              await db.collection("produtos").doc(id).set({
+                "id": id,
+                "categoria": _categoriaSelecionada,
+                "nome": _controllerNome.text,
+                "marca": _controllerMarca.text,
+                "preco": _controllerPreco.text,
+                "urlImagem": null,
+                // ignore: missing_return
+              });
+              Navigator.pushNamed(context, "/grid", arguments: id);
+            }
           } else {
             setState(() {
               _msgErro = "Por favor selecione uma categoria";
@@ -74,7 +76,7 @@ class _DetalhesProdutosState extends State<DetalhesProdutos> {
 
   _alertCategoria() {
     showDialog(
-      barrierDismissible: false,
+        barrierDismissible: false,
         context: context,
         // ignore: missing_return
         builder: (context) {
@@ -95,7 +97,9 @@ class _DetalhesProdutosState extends State<DetalhesProdutos> {
                       title: Text(dados),
                       onTap: () {
                         Navigator.pop(context);
-                        _categoriaSelecionada = dados;
+                       setState(() {
+                          _categoriaSelecionada = dados;
+                       });
                       },
                     );
                   },
@@ -138,6 +142,16 @@ class _DetalhesProdutosState extends State<DetalhesProdutos> {
                 child: Text(
                   _msgErro,
                   style: TextStyle(color: Colors.red),
+                ),
+              ),
+               Padding(
+                padding: EdgeInsets.only(bottom: 8),
+                child: Text("Categoria selecionada: " +
+                  _categoriaSelecionada,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15
+                  ),
                 ),
               ),
               Padding(

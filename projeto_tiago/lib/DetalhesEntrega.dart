@@ -9,10 +9,7 @@ class DetalhesEntrega extends StatefulWidget {
 }
 
 class _DetalhesEntregaState extends State<DetalhesEntrega> {
-  @override
-  void initState() {
-    super.initState();
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -31,8 +28,7 @@ class _DetalhesEntregaState extends State<DetalhesEntrega> {
           itemBuilder: (context, indice) {
             var requisicoes = widget.dados;
             var dados = requisicoes[indice];
-            return ListTile(
-              leading: Image.network(dados["urlimagem"]),
+            return ListTile( 
               title: Text(
                 "Produto: " + dados["nome"],
                 style: TextStyle(

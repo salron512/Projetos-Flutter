@@ -9,7 +9,6 @@ class CadastraCategoias extends StatefulWidget {
 class _CadastraCategoiasState extends State<CadastraCategoias> {
   TextEditingController _controllerCategoria = TextEditingController();
   String _msgErro = "";
-
   _salvaCadastro() async {
     String categoria = _controllerCategoria.text;
 

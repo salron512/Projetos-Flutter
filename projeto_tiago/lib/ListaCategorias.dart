@@ -16,9 +16,11 @@ class _ListaCategoriasState extends State<ListaCategorias> {
   String _nome = "";
 
   _recuperaListaCategorias() {
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    db.collection("categorias").snapshots().listen((event) {
-      _streamController.add(event);
+    var stream = FirebaseFirestore.instance.collection("categorias");
+    stream.snapshots().listen((event) {
+      if (mounted) {
+        _streamController.add(event);
+      }
     });
   }
 
@@ -77,6 +79,11 @@ class _ListaCategoriasState extends State<ListaCategorias> {
     _recebeNot();
     _recuperaListaCategorias();
     _recuperaUsuario();
+  }
+  @override
+  void dispose() {
+    super.dispose();
+    _streamController.close();
   }
 
   @override
@@ -297,26 +304,27 @@ class _ListaCategoriasState extends State<ListaCategorias> {
                       List<DocumentSnapshot> urls = querySnapshot.docs.toList();
                       DocumentSnapshot dados = urls[indice];
                       // ignore: missing_required_param
-                      return PhysicalModel(
-                        borderRadius: BorderRadius.circular(32),
-                        color: Colors.white,
-                        elevation: 8,
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.pushNamed(context, "/carrinho",
-                                arguments: dados["categoria"]);
-                          },
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, "/carrinho",
+                              arguments: dados["categoria"]);
+                        },
+                        child: PhysicalModel(
+                          borderRadius: BorderRadius.circular(32),
+                          color: Colors.white,
+                          elevation: 8,
                           child: Container(
                             padding: EdgeInsets.all(10),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Expanded(
                                   flex: 60,
                                   child: dados["urlImagem"] == null
                                       ? Center(
-                                          child: Text("produto sem imagem"),
+                                          child:
+                                              Image.asset("images/error.png"),
                                         )
                                       : Image.network(
                                           dados["urlImagem"],
@@ -330,8 +338,7 @@ class _ListaCategoriasState extends State<ListaCategorias> {
                                         CrossAxisAlignment.center,
                                     children: [
                                       Padding(
-                                        padding:
-                                            EdgeInsets.only(top: 3, left: 15),
+                                        padding: EdgeInsets.only(top: 3),
                                         child: Text(
                                           dados["categoria"],
                                           style: TextStyle(

@@ -36,7 +36,9 @@ class _CarrinhoState extends State<Carrinho> {
         .where("categoria", isEqualTo: categoria)
         .snapshots()
         .listen((event) {
-      _controller.add(event);
+      if (mounted) {
+        _controller.add(event);
+      }
     });
   }
 
@@ -219,8 +221,6 @@ class _CarrinhoState extends State<Carrinho> {
           );
         });
   }
-
- 
 
   @override
   void initState() {
