@@ -77,7 +77,7 @@ class _CarrinhoState extends State<Carrinho> {
                     Padding(
                       padding: EdgeInsets.only(bottom: 5),
                       child: Text(
-                        "Valor unitario R\$ " + preco,
+                        "Valor unitário R\$ " + preco,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
@@ -143,7 +143,7 @@ class _CarrinhoState extends State<Carrinho> {
                       if (qtd > 0 || _controllerQtd.text.isEmpty) {
                         FirebaseFirestore db = FirebaseFirestore.instance;
                         String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
-                        await db
+                        db
                             .collection("listaPendente")
                             .doc(uid)
                             .collection(uid)

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:projeto_tiago/util/RecuperaDadosFirebase.dart';
 
 class ListaCategorias extends StatefulWidget {
   @override
@@ -16,8 +17,10 @@ class _ListaCategoriasState extends State<ListaCategorias> {
   String _nome = "";
 
   _recuperaListaCategorias() {
-    var stream = FirebaseFirestore.instance.collection("categorias");
-    stream.snapshots().listen((event) {
+    CollectionReference stream =
+        FirebaseFirestore.instance.collection("categorias");
+
+    stream.orderBy("categoria", descending: false).snapshots().listen((event) {
       if (mounted) {
         _streamController.add(event);
       }
@@ -25,9 +28,8 @@ class _ListaCategoriasState extends State<ListaCategorias> {
   }
 
   _recuperaUsuario() async {
-    FirebaseAuth auth = FirebaseAuth.instance;
     FirebaseFirestore db = FirebaseFirestore.instance;
-    String idUsuario = auth.currentUser.uid;
+    String idUsuario = RecuperaDadosFirebase.RECUPERAUSUARIO();
     var snap = await db.collection("usuarios").doc(idUsuario).get();
     Map<String, dynamic> dados = snap.data();
     setState(() {
@@ -42,10 +44,10 @@ class _ListaCategoriasState extends State<ListaCategorias> {
     }
   }
 
-  _deslogar() {
+  _deslogar() async {
     FirebaseAuth auth = FirebaseAuth.instance;
-    auth.signOut();
-    Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
+    await auth.signOut().then((value) =>
+        Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false));
   }
 
   _recebeNot() {
@@ -62,9 +64,11 @@ class _ListaCategoriasState extends State<ListaCategorias> {
           case "Você tem uma nova solicitação de orçamento!":
             Navigator.pushNamed(context, "/listaorcamento");
             break;
+
           case "Você tem uma nova entrega!":
             Navigator.pushNamed(context, "/listapedidos");
             break;
+
           case "Sua entrega já foi enviada!":
             Navigator.pushNamed(context, "/pedidousuario");
             break;
@@ -80,6 +84,7 @@ class _ListaCategoriasState extends State<ListaCategorias> {
     _recuperaListaCategorias();
     _recuperaUsuario();
   }
+
   @override
   void dispose() {
     super.dispose();
@@ -163,7 +168,7 @@ class _ListaCategoriasState extends State<ListaCategorias> {
             ),
             ListTile(
               leading: Icon(Icons.access_alarms_outlined),
-              title: Text("Pedido em andamento"),
+              title: Text("Pedidos em andamento"),
               onTap: () {
                 setState(() {
                   Navigator.pushNamed(context, "/pedidousuario");
@@ -232,7 +237,7 @@ class _ListaCategoriasState extends State<ListaCategorias> {
             ),
             ListTile(
               leading: Icon(Icons.shopping_cart),
-              title: Text('Meus pedidos'),
+              title: Text('Minhas compras'),
               onTap: () {
                 Navigator.pushNamed(context, "/minhasentregas");
               },

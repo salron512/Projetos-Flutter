@@ -24,39 +24,35 @@ class _MapaState extends State<Mapa> {
   }
 
   _adicionarMaracador() {
-    if (mounted) {
-      Marker marcador;
-      double latitude = 0;
-      double longitude = 0;
-      String idDocumento = widget.idDocumento;
-      Map<String, dynamic> dados;
+    Marker marcador;
+    double latitude = 0;
+    double longitude = 0;
+    String idDocumento = widget.idDocumento;
+    Map<String, dynamic> dados;
 
-      _query = FirebaseFirestore.instance
-          .collection("localizacaoEntregador")
-          .doc(idDocumento)
-          .snapshots();
-      _query.listen((event) {
-        if (event.exists) {
-          dados = event.data();
-          latitude = dados["latitude"];
-          longitude = dados["longitude"];
-          print("latitude" + dados["latitude"].toString());
-          if (mounted) {
-            setState(() {
-              _marcadores.clear();
-              marcador = Marker(
-                  markerId: MarkerId("entregador"),
-                  position: LatLng(latitude, longitude),
-                  infoWindow: InfoWindow(title: "Entregador"));
-              _marcadores.add(marcador);
-              _posicaoCamera =
-                  CameraPosition(target: LatLng(latitude, longitude), zoom: 18);
-            });
-          }
-          _movimentarCamera();
-        }
-      });
-    }
+    _query = FirebaseFirestore.instance
+        .collection("localizacaoEntregador")
+        .doc(idDocumento)
+        .snapshots();
+    _query.listen((event) {
+      if (mounted) {
+        dados = event.data();
+        latitude = dados["latitude"];
+        longitude = dados["longitude"];
+        print("latitude" + dados["latitude"].toString());
+        setState(() {
+          _marcadores.clear();
+          marcador = Marker(
+              markerId: MarkerId("entregador"),
+              position: LatLng(latitude, longitude),
+              infoWindow: InfoWindow(title: "Entregador"));
+          _marcadores.add(marcador);
+          _posicaoCamera =
+              CameraPosition(target: LatLng(latitude, longitude), zoom: 18);
+        });
+        _movimentarCamera();
+      }
+    });
   }
 
   _movimentarCamera() async {
@@ -67,10 +63,7 @@ class _MapaState extends State<Mapa> {
     }
   }
 
-  _fechaMapa() async {
-    GoogleMapController googleMapController = await _controller.future;
-    googleMapController.dispose();
-  }
+  
 
   @override
   void initState() {
@@ -81,7 +74,6 @@ class _MapaState extends State<Mapa> {
   @override
   void dispose() {
     super.dispose();
-    _fechaMapa();
   }
 
   @override
@@ -96,7 +88,7 @@ class _MapaState extends State<Mapa> {
             initialCameraPosition: _posicaoCamera,
             onMapCreated: _onMapCreated,
             mapType: MapType.hybrid,
-           // myLocationEnabled: true,
+            myLocationEnabled: true,
           ),
         ));
   }

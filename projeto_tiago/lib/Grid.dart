@@ -204,7 +204,7 @@ class _GridState extends State<Grid> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Grid produto"),
+          title: Text("Galeria"),
         ),
         body: Container(
           decoration: BoxDecoration(color: Theme.of(context).accentColor),

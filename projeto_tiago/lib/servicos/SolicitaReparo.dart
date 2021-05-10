@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:projeto_tiago/util/RecuperaDadosFirebase.dart';
 
+
+
 class SolicitaReparo extends StatefulWidget {
   SolicitaReparo({Key key}) : super(key: key);
 
@@ -28,9 +30,11 @@ class _SolicitaReparoState extends State<SolicitaReparo> {
       String idUsuarioNotigicacao = map["playerId"];
       list.add(idUsuarioNotigicacao);
     }
+    //sempre que o content for alterado deve-se alterar o metodo _recebeNot
+    // que está no arquivo ListaCategorias.dart
     OneSignal.shared.postNotification(OSCreateNotification(
       playerIds: list,
-      heading: "Solicitaçao de orçamento",
+      heading: "Solicitação de orçamento",
       content: "Você tem uma nova solicitação de orçamento!",
     ));
   }
@@ -90,7 +94,7 @@ class _SolicitaReparoState extends State<SolicitaReparo> {
       }).then((value) {
         setState(() {
           _cor = Colors.white;
-          _msg = "solicitação enviada com sucesso!";
+          _msg = "Solicitação enviada com sucesso!";
           _controllerDescricao.clear();
           _controllerModelo.clear();
           _controllerSenhaAparelho.clear();

@@ -265,7 +265,7 @@ class _LiscaOrcamentosState extends State<ListaOrcamentos> {
                 if (querySnapshot.docs.length == 0) {
                   return Center(
                     child: Text(
-                      "Sem solcitações no momento",
+                      "Sem solicitações no momento",
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: 15,
@@ -293,7 +293,7 @@ class _LiscaOrcamentosState extends State<ListaOrcamentos> {
                               Text("Sennha do aparelho: " + dados["senha"]),
                               Text("Edereço: " + dados["endereco"]),
                               Text("Bairro: " + dados["bairro"]),
-                              Text("Ponto Referência: " +
+                              Text("Ponto referência: " +
                                   dados["pontoReferencia"]),
                               Text("Data do envio: " +
                                   _formatarData(dados["data"])),

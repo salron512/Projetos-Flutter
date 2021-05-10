@@ -51,7 +51,7 @@ class _DetalhesEntregaState extends State<DetalhesEntrega> {
                     ),
                   ),
                   Text(
-                    "Preço unitario: R\$: " + dados["precoUnitario"],
+                    "Preço unitário: R\$: " + dados["precoUnitario"],
                     style: TextStyle(
                       color: Colors.white,
                     ),

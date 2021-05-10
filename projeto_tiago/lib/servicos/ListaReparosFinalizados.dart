@@ -8,7 +8,8 @@ class ListaReparosFinalizados extends StatefulWidget {
   ListaReparosFinalizados({Key key}) : super(key: key);
 
   @override
-  _ListaReparosFinalizadosState createState() => _ListaReparosFinalizadosState();
+  _ListaReparosFinalizadosState createState() =>
+      _ListaReparosFinalizadosState();
 }
 
 class _ListaReparosFinalizadosState extends State<ListaReparosFinalizados> {
@@ -63,7 +64,7 @@ class _ListaReparosFinalizadosState extends State<ListaReparosFinalizados> {
                     autofocus: true,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      labelText: "Digite a quantidade a ser exibida",
+                      labelText: "Digite a quantidade á ser exibida",
                     ),
                   )
                 ],
@@ -98,12 +99,13 @@ class _ListaReparosFinalizadosState extends State<ListaReparosFinalizados> {
     super.initState();
     _recuperaPedidos();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Reparos realizados"),
-         actions: [
+        appBar: AppBar(
+          title: Text("Reparos realizados"),
+          actions: [
             IconButton(
               icon: Icon(Icons.expand),
               color: Colors.white,
@@ -112,8 +114,8 @@ class _ListaReparosFinalizadosState extends State<ListaReparosFinalizados> {
               },
             ),
           ],
-      ),
-      body: Container(
+        ),
+        body: Container(
           padding: EdgeInsets.only(left: 5, right: 5),
           decoration: BoxDecoration(color: Theme.of(context).accentColor),
           child: StreamBuilder(
@@ -156,24 +158,27 @@ class _ListaReparosFinalizadosState extends State<ListaReparosFinalizados> {
                               querySnapshot.docs.toList();
                           DocumentSnapshot dados = requisicoes[indice];
                           return Card(
-                        elevation: 8,
-                        child: ListTile(
-                          title: Text("Cliente: " + dados["nomeUsuario"]),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Descrição do problema: " +
-                                  dados["descricao"]),
-                              Text("Aparelho: " + dados["modeloAparelho"]),
-                              Text("Edereço: " + dados["endereco"]),
-                              Text("Bairro: " + dados["bairro"]),
-                              Text("Ponto Referência: " + dados["pontoReferencia"]),
-                              Text("Data do Entrega: " + _formatarData(dados["data"])),
-                              Text("Data do Envio: " + _formatarData(dados["dataSolicitacao"])),
-                            ],
-                          ),
-                        ),
-                      );
+                            elevation: 8,
+                            child: ListTile(
+                              title: Text("Cliente: " + dados["nomeUsuario"]),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Descrição do problema: " +
+                                      dados["descricao"]),
+                                  Text("Aparelho: " + dados["modeloAparelho"]),
+                                  Text("Edereço: " + dados["endereco"]),
+                                  Text("Bairro: " + dados["bairro"]),
+                                  Text("Ponto de referência: " +
+                                      dados["pontoReferencia"]),
+                                  Text("Data do Entrega: " +
+                                      _formatarData(dados["data"])),
+                                  Text("Data do Envio: " +
+                                      _formatarData(dados["dataSolicitacao"])),
+                                ],
+                              ),
+                            ),
+                          );
                         },
                       );
                     }
@@ -181,7 +186,5 @@ class _ListaReparosFinalizadosState extends State<ListaReparosFinalizados> {
                 }
               }),
         ));
-       
-
   }
 }

@@ -164,11 +164,6 @@ class _CadastroState extends State<Cadastro> {
   }
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -403,7 +398,7 @@ class _CadastroState extends State<Cadastro> {
                               });
                             },
                           ),
-                          hintText: "Digite novamente a senha",
+                          hintText: "Digite a senha novamente",
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(

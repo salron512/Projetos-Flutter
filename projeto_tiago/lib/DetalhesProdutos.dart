@@ -49,8 +49,8 @@ class _DetalhesProdutosState extends State<DetalhesProdutos> {
                 "preco": _controllerPreco.text,
                 "urlImagem": null,
                 // ignore: missing_return
-              });
-              Navigator.pushNamed(context, "/grid", arguments: id);
+              }).then((value) =>
+                  Navigator.pushNamed(context, "/grid", arguments: id));
             }
           } else {
             setState(() {
@@ -97,9 +97,9 @@ class _DetalhesProdutosState extends State<DetalhesProdutos> {
                       title: Text(dados),
                       onTap: () {
                         Navigator.pop(context);
-                       setState(() {
+                        setState(() {
                           _categoriaSelecionada = dados;
-                       });
+                        });
                       },
                     );
                   },
@@ -131,9 +131,10 @@ class _DetalhesProdutosState extends State<DetalhesProdutos> {
         title: Text("Cadastro de produtos"),
       ),
       body: Container(
-        padding: EdgeInsets.all(16),
         decoration: BoxDecoration(color: Theme.of(context).accentColor),
         child: Center(
+            child: SingleChildScrollView(
+          padding: EdgeInsets.all(16),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -144,14 +145,11 @@ class _DetalhesProdutosState extends State<DetalhesProdutos> {
                   style: TextStyle(color: Colors.red),
                 ),
               ),
-               Padding(
+              Padding(
                 padding: EdgeInsets.only(bottom: 8),
-                child: Text("Categoria selecionada: " +
-                  _categoriaSelecionada,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 15
-                  ),
+                child: Text(
+                  "Categoria selecionada: " + _categoriaSelecionada,
+                  style: TextStyle(color: Colors.white, fontSize: 15),
                 ),
               ),
               Padding(
@@ -164,7 +162,6 @@ class _DetalhesProdutosState extends State<DetalhesProdutos> {
                   ),
                   decoration: InputDecoration(
                       contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                      //hintText: "Nome do produto",
                       labelText: "Nome do produto",
                       filled: true,
                       fillColor: Colors.white,
@@ -246,7 +243,7 @@ class _DetalhesProdutosState extends State<DetalhesProdutos> {
               )
             ],
           ),
-        ),
+        )),
       ),
     );
   }

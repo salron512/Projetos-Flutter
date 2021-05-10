@@ -107,7 +107,7 @@ class _ListaComprasState extends State<ListaCompras> {
                     textCapitalization: TextCapitalization.sentences,
                     keyboardType: TextInputType.number,
                     onChanged: (valor) {
-                      if (valor != "0" || valor.isNotEmpty || valor != null) {
+                      if (valor.isNotEmpty) {
                         double qtdProduto = double.tryParse(valor).toDouble();
                         double precoTotal = double.tryParse(preco).toDouble();
                         double resultado = precoTotal * qtdProduto;
@@ -163,14 +163,14 @@ class _ListaComprasState extends State<ListaCompras> {
                 child: Text("Cancelar"),
               ),
               TextButton(
-                onPressed: () async {
+                onPressed: () {
                   if (_controllerQtd.text == "0" ||
                       _controllerQtd.text.isEmpty) {
                     _mostraErro("Insira a quantidade correta");
                   } else {
                     String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
                     FirebaseFirestore db = FirebaseFirestore.instance;
-                    await db
+                    db
                         .collection("listaPendente")
                         .doc(uid)
                         .collection(uid)
@@ -179,9 +179,9 @@ class _ListaComprasState extends State<ListaCompras> {
                       "quantidade": _controllerQtd.text,
                       "precoTotal": _controllerPrecoTotal.text
                     });
-                    Navigator.pop(context);
                     _controllerPrecoTotal.clear();
                     _controllerQtd.clear();
+                    Navigator.pop(context);
                   }
                 },
                 child: Text("Salvar"),
@@ -230,8 +230,8 @@ class _ListaComprasState extends State<ListaCompras> {
                       .collection(uid)
                       .doc(id)
                       .delete();
-                  _verificaCompra();
                   Navigator.pop(context);
+                  _verificaCompra();
                 },
                 child: Text("Confirmar"),
               ),
@@ -329,7 +329,7 @@ class _ListaComprasState extends State<ListaCompras> {
               Padding(
                 padding: EdgeInsets.only(top: 5),
                 child: TextButton(
-                  child: Text("Cartão debito"),
+                  child: Text("Cartão débito"),
                   onPressed: () {
                     Navigator.pop(context);
                     _salvaPedido("Cartão debito");
@@ -361,6 +361,8 @@ class _ListaComprasState extends State<ListaCompras> {
       String idUsuarioNotigicacao = map["playerId"];
       list.add(idUsuarioNotigicacao);
     }
+    //sempre que o content for alterado deve-se alterar o metodo _recebeNot
+    // que está no arquivo ListaCategorias.dart
     OneSignal.shared.postNotification(OSCreateNotification(
       playerIds: list,
       heading: "Nova entrega",
@@ -619,7 +621,7 @@ class _ListaComprasState extends State<ListaCompras> {
                         });
                       });
                     });
-                     _enviaAlerta();
+                    _enviaAlerta();
                     Navigator.pop(context);
                     Navigator.pushNamed(context, "/listacategorias");
                   },
@@ -731,9 +733,9 @@ class _ListaComprasState extends State<ListaCompras> {
                                         Text("Marca: " + dados["marca"]),
                                         Text("Quantidade: " +
                                             dados["quantidade"]),
-                                        Text("Preço unit R\$: " +
+                                        Text("Preço unit: R\$ " +
                                             dados["precoUnitario"]),
-                                        Text("Preço total R\$: " +
+                                        Text("Preço total: R\$ " +
                                             dados["precoTotal"]),
                                       ],
                                     ),

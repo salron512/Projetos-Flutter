@@ -150,7 +150,7 @@ class _GridProdutoState extends State<GridProduto> {
                 padding: EdgeInsets.only(top: 10),
                 child:
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Text("Adicione a foto de perfil",
+                  Text("Adicione a imagem de perfil",
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: 15,

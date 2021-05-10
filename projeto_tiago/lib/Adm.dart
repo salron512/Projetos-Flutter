@@ -32,7 +32,7 @@ class _AdmState extends State<Adm> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("lista usuário"),
+          title: Text("Lista usuários"),
         ),
         body: Container(
           decoration: BoxDecoration(color: Theme.of(context).accentColor),

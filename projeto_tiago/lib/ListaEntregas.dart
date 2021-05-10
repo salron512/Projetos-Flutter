@@ -315,10 +315,12 @@ class _ListaEntregasState extends State<ListaEntregas> {
     Map<String, dynamic> map = snapshot.data();
     String idUsuarioNotigicacao = map["playerId"];
     list.add(idUsuarioNotigicacao);
+    //sempre que o content for alterado deve-se alterar o metodo _recebeNot
+    // que está no arquivo ListaCategorias.dart
 
     OneSignal.shared.postNotification(OSCreateNotification(
       playerIds: list,
-      heading: "Entrega a caminho",
+      heading: "Entrega á caminho",
       content: "Sua entrega já foi enviada!",
     ));
   }

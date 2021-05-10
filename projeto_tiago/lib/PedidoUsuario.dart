@@ -230,7 +230,7 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
                                           Padding(
                                             padding: EdgeInsets.only(top: 5),
                                             child: Text(
-                                              "Data da Compra: " +
+                                              "Data da compra: " +
                                                   _formatarData(
                                                       dados["dataCompra"]),
                                               style: TextStyle(
@@ -377,7 +377,7 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
                                           Padding(
                                             padding: EdgeInsets.only(top: 5),
                                             child: Text(
-                                              "Data da Compra: " +
+                                              "Data da compra: " +
                                                   _formatarData(
                                                       dados["dataCompra"]),
                                               style: TextStyle(

@@ -189,7 +189,7 @@ class _MinhasEntregasState extends State<MinhasEntregas> {
                                     Padding(
                                       padding: EdgeInsets.only(top: 5),
                                       child: Text(
-                                        "Data da Compra: " +
+                                        "Data da compra: " +
                                             _formatarData(dados["dataCompra"]),
                                         style: TextStyle(color: Colors.white),
                                       ),
