@@ -17,14 +17,14 @@ class Localizacao {
 
   static recuperaLocalizacao() async {
     Position position = await Geolocator.getCurrentPosition();
-    //Position testePosition = Position(latitude: -14.44883053081522, longitude: -56.846409733671116);
-    //  -14.448830530815224, -56.846409733671116
+    //Position testePosition = Position(latitude: -15.677293830841084, longitude: -58.09642769239934);
+    //  -15.677293830841084, -58.09642769239934
 
-    var listaendereco =
-        await placemarkFromCoordinates(position.latitude, position.longitude);
+    List<Placemark> listaendereco = await placemarkFromCoordinates(
+        position.latitude, position.longitude);
     var endereco = listaendereco[0];
     String cidade = endereco.subAdministrativeArea;
-    print("cidade recuperada "+ cidade);
+    print("cidade recuperada " + cidade);
     return cidade;
   }
 }

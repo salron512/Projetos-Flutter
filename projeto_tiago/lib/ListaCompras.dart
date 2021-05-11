@@ -354,7 +354,7 @@ class _ListaComprasState extends State<ListaCompras> {
     FirebaseFirestore db = FirebaseFirestore.instance;
     List<String> list = [];
     var snapshot =
-        await db.collection("usuarios").where("adm", isEqualTo: true).get();
+        await db.collection("usuarios").where("entregador", isEqualTo: true).get();
 
     for (var item in snapshot.docs) {
       Map<String, dynamic> map = item.data();
