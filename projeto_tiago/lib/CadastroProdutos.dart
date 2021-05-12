@@ -258,7 +258,7 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                     return ListTile(
                       title: Text(dados),
                       onTap: () {
-                        _alteraCategoria(idDocumento,dados);
+                        _alteraCategoria(idDocumento, dados);
                       },
                     );
                   },
@@ -351,6 +351,12 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                               ),
                               Text(
                                 "Preço: " + "R\$ " + dados["preco"],
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Text(
+                                "Estoque: " +
+                                    dados["quantidade"].toString() +
+                                    " und",
                                 style: TextStyle(color: Colors.white),
                               ),
                             ],

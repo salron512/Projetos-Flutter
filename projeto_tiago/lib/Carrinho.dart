@@ -32,7 +32,8 @@ class _CarrinhoState extends State<Carrinho> {
     var stream = FirebaseFirestore.instance.collection("produtos");
 
     stream
-        .orderBy("nome", descending: false)
+        .where("quantidade", isGreaterThan: 0)
+        //.orderBy("nome", descending: false)
         .where("categoria", isEqualTo: categoria)
         .snapshots()
         .listen((event) {
@@ -42,7 +43,8 @@ class _CarrinhoState extends State<Carrinho> {
     });
   }
 
-  _addItem(String nome, String marca, String preco, String urlImagem) {
+  _addItem(String idProduto, String nome, String marca, String preco,
+      String urlImagem, int estoque) {
     String precoTotal = preco;
     showDialog(
         barrierDismissible: false,
@@ -51,79 +53,84 @@ class _CarrinhoState extends State<Carrinho> {
         builder: (context) {
           return AlertDialog(
             title: Text("Digite a quantidade"),
-            content: SingleChildScrollView(
-              child: Container(
-                height: 300,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Container(
-                      height: 100,
-                      width: 100,
-                      child: Padding(
-                        padding: EdgeInsets.only(bottom: 2),
-                        child: Image.asset("images/cart.png"),
+            content: Container(
+              height: 330,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    height: 80,
+                    width: 80,
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 2),
+                      child: Image.asset("images/cart.png"),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 5),
+                    child: Text(
+                      "Produto: " + nome,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(bottom: 5),
-                      child: Text(
-                        "Produto: " + nome,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 5),
+                    child: Text(
+                      "Valor unitário R\$ " + preco,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(bottom: 5),
-                      child: Text(
-                        "Valor unitário R\$ " + preco,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 5),
+                    child: Text(
+                      "Quantidade disponível: " + estoque.toString() + " und",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    TextField(
-                      autofocus: true,
-                      controller: _controllerQtd,
+                  ),
+                  TextField(
+                    autofocus: true,
+                    controller: _controllerQtd,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [_mascaraQtd],
+                    decoration: InputDecoration(
+                        labelText: "Digite a quantidade",
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.clear),
+                          onPressed: () {
+                            setState(() {
+                              _controllerQtd.clear();
+                            });
+                          },
+                        )),
+                    onChanged: (valor) {
+                      if (valor.isNotEmpty) {
+                        String valorSemMascara = _mascaraQtd.unmaskText(valor);
+                        print("valor" + valor);
+                        double precoCompra = double.tryParse(preco).toDouble();
+                        double qtdcoCompra =
+                            double.tryParse(valorSemMascara).toDouble();
+                        double resultado = precoCompra * qtdcoCompra;
+                        print("res" + resultado.toString());
+                        precoTotal = resultado.toStringAsFixed(2);
+                        setState(() {
+                          _controllerResultado.text = precoTotal;
+                        });
+                      }
+                    },
+                  ),
+                  TextField(
+                      readOnly: true,
+                      controller: _controllerResultado,
                       keyboardType: TextInputType.number,
-                      inputFormatters: [_mascaraQtd],
                       decoration: InputDecoration(
-                          labelText: "Digite a quantidade",
-                          suffixIcon: IconButton(
-                            icon: Icon(Icons.clear),
-                            onPressed: () {
-                              setState(() {
-                                _controllerQtd.clear();
-                              });
-                            },
-                          )),
-                      onChanged: (valor) {
-                        if (valor.isNotEmpty) {
-                          String valorSemMascara =
-                              _mascaraQtd.unmaskText(valor);
-                          print("valor" + valor);
-                          double precoCompra =
-                              double.tryParse(preco).toDouble();
-                          double qtdcoCompra =
-                              double.tryParse(valorSemMascara).toDouble();
-                          double resultado = precoCompra * qtdcoCompra;
-                          print("res" + resultado.toString());
-                          precoTotal = resultado.toStringAsFixed(2);
-                          setState(() {
-                            _controllerResultado.text = precoTotal;
-                          });
-                        }
-                      },
-                    ),
-                    TextField(
-                        readOnly: true,
-                        controller: _controllerResultado,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                            labelText: "Valor total", prefix: Text("R\$ "))),
-                  ],
-                ),
+                          labelText: "Valor total", prefix: Text("R\$ "))),
+                ],
               ),
             ),
             actions: [
@@ -140,27 +147,32 @@ class _CarrinhoState extends State<Carrinho> {
                     if (_controllerQtd.text.isNotEmpty) {
                       int qtd = 0;
                       qtd = int.tryParse(_controllerQtd.text).toInt();
-                      if (qtd > 0 || _controllerQtd.text.isEmpty) {
-                        FirebaseFirestore db = FirebaseFirestore.instance;
-                        String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
-                        db
-                            .collection("listaPendente")
-                            .doc(uid)
-                            .collection(uid)
-                            .doc()
-                            .set({
-                          "idUsuario": uid,
-                          "nome": nome,
-                          "marca": marca,
-                          "quantidade": _controllerQtd.text,
-                          "precoUnitario": preco,
-                          "precoTotal": precoTotal,
-                          "urlimagem": urlImagem,
-                        });
+                      if (estoque >= qtd) {
+                        if (qtd > 0 || _controllerQtd.text.isEmpty) {
+                          FirebaseFirestore db = FirebaseFirestore.instance;
+                          String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
 
-                        _controllerQtd.clear();
-                        _controllerResultado.clear();
-                        Navigator.pop(context);
+                          db
+                              .collection("listaPendente")
+                              .doc(uid)
+                              .collection(uid)
+                              .doc()
+                              .set({
+                            "idProduto": idProduto,
+                            "idUsuario": uid,
+                            "nome": nome,
+                            "marca": marca,
+                            "quantidade": _controllerQtd.text,
+                            "precoUnitario": preco,
+                            "precoTotal": precoTotal,
+                            "urlimagem": urlImagem,
+                          });
+                          _controllerQtd.clear();
+                          _controllerResultado.clear();
+                          Navigator.pop(context);
+                        } else {
+                          _alertErro();
+                        }
                       } else {
                         _alertErro();
                       }
@@ -296,7 +308,7 @@ class _CarrinhoState extends State<Carrinho> {
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 Expanded(
-                                  flex: 60,
+                                  flex: 50,
                                   child: dados["urlImagem"] == null
                                       ? Center(
                                           child: Text("produto sem imagem"),
@@ -306,7 +318,7 @@ class _CarrinhoState extends State<Carrinho> {
                                         ),
                                 ),
                                 Expanded(
-                                  flex: 40,
+                                  flex: 50,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment:
@@ -337,6 +349,18 @@ class _CarrinhoState extends State<Carrinho> {
                                             EdgeInsets.only(top: 3, left: 15),
                                         child: Text(
                                           "R\$ " + dados["preco"],
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding:
+                                            EdgeInsets.only(top: 3, left: 15),
+                                        child: Text(
+                                          "Quantidade disponível: " +
+                                              dados["quantidade"].toString() +
+                                              " und",
                                           style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.bold),
@@ -381,10 +405,12 @@ class _CarrinhoState extends State<Carrinho> {
                                                 child: Text("Comprar"),
                                                 onPressed: () {
                                                   _addItem(
+                                                      dados.reference.id,
                                                       dados["nome"],
                                                       dados["marca"],
                                                       dados["preco"],
-                                                      dados["urlImagem"]);
+                                                      dados["urlImagem"],
+                                                      dados["quantidade"]);
                                                 }),
                                           )
                                         ],

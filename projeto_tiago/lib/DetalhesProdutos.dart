@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class DetalhesProdutos extends StatefulWidget {
   DetalhesProdutos({Key key}) : super(key: key);
@@ -9,9 +10,14 @@ class DetalhesProdutos extends StatefulWidget {
 }
 
 class _DetalhesProdutosState extends State<DetalhesProdutos> {
+  
+  var _mascaraQtd = MaskTextInputFormatter(
+      mask: '##########', filter: {"#": RegExp(r'[0-9]')});
+
   TextEditingController _controllerNome = TextEditingController();
   TextEditingController _controllerMarca = TextEditingController();
   TextEditingController _controllerPreco = TextEditingController();
+  TextEditingController _controllerQtd = TextEditingController(text: "0");
   String _msgErro = "";
   List<String> _listaCategoria = [];
   String _categoriaSelecionada = "";
@@ -30,6 +36,7 @@ class _DetalhesProdutosState extends State<DetalhesProdutos> {
 
   _verificaCampos() async {
     // ignore: unused_local_variable
+    int qtd = int.tryParse(_controllerQtd.text).toInt();
     if (_controllerNome.text.isNotEmpty) {
       if (_controllerMarca.text.isNotEmpty) {
         if (_controllerPreco.text.isNotEmpty) {
@@ -39,18 +46,25 @@ class _DetalhesProdutosState extends State<DetalhesProdutos> {
                 _msgErro = "O uso de vírgula não é permitido";
               });
             } else {
-              FirebaseFirestore db = FirebaseFirestore.instance;
-              String id = DateTime.now().microsecondsSinceEpoch.toString();
-              await db.collection("produtos").doc(id).set({
-                "id": id,
-                "categoria": _categoriaSelecionada,
-                "nome": _controllerNome.text,
-                "marca": _controllerMarca.text,
-                "preco": _controllerPreco.text,
-                "urlImagem": null,
-                // ignore: missing_return
-              }).then((value) =>
-                  Navigator.pushNamed(context, "/grid", arguments: id));
+              if (_controllerQtd.text.isNotEmpty || qtd > 0) {
+                FirebaseFirestore db = FirebaseFirestore.instance;
+                String id = DateTime.now().microsecondsSinceEpoch.toString();
+                await db.collection("produtos").doc(id).set({
+                  "id": id,
+                  "categoria": _categoriaSelecionada,
+                  "nome": _controllerNome.text,
+                  "marca": _controllerMarca.text,
+                  "preco": _controllerPreco.text,
+                  "quantidade": qtd,
+                  "urlImagem": null,
+                  // ignore: missing_return
+                }).then((value) =>
+                    Navigator.pushNamed(context, "/grid", arguments: id));
+              } else {
+                setState(() {
+                  _msgErro = "Quantidade inválida";
+                });
+              }
             }
           } else {
             setState(() {
@@ -206,6 +220,25 @@ class _DetalhesProdutosState extends State<DetalhesProdutos> {
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15))),
                   controller: _controllerPreco,
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(bottom: 8),
+                child: TextField(
+                  inputFormatters: [_mascaraQtd],
+                  keyboardType: TextInputType.number,
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                  decoration: InputDecoration(
+                      contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                      //hintText: "Nome do produto",
+                      labelText: "Quantidade em estoque",
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15))),
+                  controller: _controllerQtd,
                 ),
               ),
               Padding(
