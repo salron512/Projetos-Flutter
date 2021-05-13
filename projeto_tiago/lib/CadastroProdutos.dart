@@ -45,49 +45,58 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
           return AlertDialog(
             title: Text("Editar produtos"),
             content: Container(
-              height: 350,
-              child: SingleChildScrollView(
-                child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  TextField(
-                    controller: _controllerNome,
-                    textCapitalization: TextCapitalization.sentences,
-                    autofocus: true,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(
-                      labelText: "Nome do produto",
-                    ),
+                height: 350,
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TextField(
+                        controller: _controllerNome,
+                        textCapitalization: TextCapitalization.sentences,
+                        autofocus: true,
+                        keyboardType: TextInputType.text,
+                        decoration: InputDecoration(
+                          labelText: "Nome do produto",
+                        ),
+                      ),
+                      TextField(
+                        controller: _controllerMarca,
+                        textCapitalization: TextCapitalization.sentences,
+                        keyboardType: TextInputType.text,
+                        decoration: InputDecoration(
+                          labelText: "Marca do produto",
+                        ),
+                      ),
+                      TextField(
+                        controller: _controllerPreco,
+                        textCapitalization: TextCapitalization.sentences,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          prefix: Text("R\$ "),
+                          labelText: "Preço",
+                        ),
+                      ),
+                      TextField(
+                        controller: _controllerEstoque,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [_mascaraQtd],
+                        decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              Icons.clear,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _controllerEstoque.clear();
+                              });
+                            },
+                          ),
+                          labelText: "Estoque",
+                        ),
+                      )
+                    ],
                   ),
-                  TextField(
-                    controller: _controllerMarca,
-                    textCapitalization: TextCapitalization.sentences,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(
-                      labelText: "Marca do produto",
-                    ),
-                  ),
-                  TextField(
-                    controller: _controllerPreco,
-                    textCapitalization: TextCapitalization.sentences,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      prefix: Text("R\$ "),
-                      labelText: "Preço",
-                    ),
-                  ),
-                  TextField(
-                    controller: _controllerEstoque,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [_mascaraQtd],
-                    decoration: InputDecoration(
-                      labelText: "Estoque",
-                    ),
-                  )
-                ],
-              ),
-              )
-            ),
+                )),
             actions: [
               TextButton(
                 onPressed: () {
@@ -100,12 +109,15 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
               TextButton(
                 onPressed: () {
                   FirebaseFirestore db = FirebaseFirestore.instance;
-                  db.collection("produtos").doc(id).update({
-                    "nome": _controllerNome.text,
-                    "marca": _controllerMarca.text,
-                    "preco": _controllerPreco.text,
-                    "quantidade": int.parse(_controllerEstoque.text).toInt(),
-                  });
+                  if (_controllerPreco.text.contains(",")) {
+                  } else {
+                    db.collection("produtos").doc(id).update({
+                      "nome": _controllerNome.text,
+                      "marca": _controllerMarca.text,
+                      "preco": _controllerPreco.text,
+                      "quantidade": int.parse(_controllerEstoque.text).toInt(),
+                    });
+                  }
                   Navigator.pop(context);
                   _controllerNome.clear();
                   _controllerMarca..clear();
