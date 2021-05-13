@@ -1,10 +1,10 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:projeto_tiago/model/Produtos.dart';
 import 'package:projeto_tiago/util/RecuperaDadosFirebase.dart';
 
 class ListaCompras extends StatefulWidget {
@@ -50,9 +50,13 @@ class _ListaComprasState extends State<ListaCompras> {
           _totalCesta = 0;
         });
       }
-      snapshot.forEach((element) {
+      snapshot.forEach((element) async {
+        Produtos produtos = Produtos();
+
         dados = element.data();
         print("preco total " + dados["precoTotal"]);
+        produtos.id = dados["idProduto"];
+
         _totalCesta =
             _totalCesta + double.tryParse(dados["precoTotal"]).toDouble();
         _totalCompra = _totalCesta.toStringAsFixed(2);
@@ -77,7 +81,8 @@ class _ListaComprasState extends State<ListaCompras> {
     }
   }
 
-  _editaProduto(String qtd, String preco, String precoTatal, String id) {
+  _editaProduto(String qtd, String preco, String precoTatal, String id,
+      String idProduto) {
     setState(() {
       _controllerQtd.text = qtd;
       _controllerPrecoTotal.text = precoTatal;
@@ -163,25 +168,39 @@ class _ListaComprasState extends State<ListaCompras> {
                 child: Text("Cancelar"),
               ),
               TextButton(
-                onPressed: () {
+                onPressed: () async {
+                  FirebaseFirestore db = FirebaseFirestore.instance;
+                  Map<String, dynamic> dados;
+                  int qtd;
+                  int estoque;
+                  DocumentSnapshot snapshot =
+                      await db.collection("produtos").doc(idProduto).get();
+                  dados = snapshot.data();
+                  estoque = dados["quantidade"];
+
                   if (_controllerQtd.text == "0" ||
                       _controllerQtd.text.isEmpty) {
                     _mostraErro("Insira a quantidade correta");
                   } else {
-                    String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
-                    FirebaseFirestore db = FirebaseFirestore.instance;
-                    db
-                        .collection("listaPendente")
-                        .doc(uid)
-                        .collection(uid)
-                        .doc(id)
-                        .update({
-                      "quantidade": _controllerQtd.text,
-                      "precoTotal": _controllerPrecoTotal.text
-                    });
-                    _controllerPrecoTotal.clear();
-                    _controllerQtd.clear();
-                    Navigator.pop(context);
+                    qtd = int.parse(_controllerQtd.text).toInt();
+
+                    if (estoque >= qtd) {
+                      String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
+                      db
+                          .collection("listaPendente")
+                          .doc(uid)
+                          .collection(uid)
+                          .doc(id)
+                          .update({
+                        "quantidade": _controllerQtd.text,
+                        "precoTotal": _controllerPrecoTotal.text
+                      });
+                      _controllerPrecoTotal.clear();
+                      _controllerQtd.clear();
+                      Navigator.pop(context);
+                    } else {
+                      _mostraErro("Produto sem estoque");
+                    }
                   }
                 },
                 child: Text("Salvar"),
@@ -189,6 +208,59 @@ class _ListaComprasState extends State<ListaCompras> {
             ],
           );
         });
+  }
+
+  _verificaEstoque() async {
+    // _selecionaFormaPagamento();
+    String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
+    bool confirmarCompra = true;
+
+    QuerySnapshot listaCompras = await FirebaseFirestore.instance
+        .collection("listaPendente")
+        .doc(uid)
+        .collection(uid)
+        .get();
+
+    for (var item in listaCompras.docs) {
+      int estoque = 0;
+      int qtdCompra = 0;
+      int resultado = 0;
+      Map<String, dynamic> dados = item.data();
+      Map<String, dynamic> mapProduto;
+      String idProduto = dados["idProduto"];
+      qtdCompra = int.parse(dados["quantidade"]).toInt();
+      DocumentSnapshot produto = await FirebaseFirestore.instance
+          .collection("produtos")
+          .doc(idProduto)
+          .get();
+      mapProduto = produto.data();
+      estoque = mapProduto["quantidade"];
+      resultado = estoque - qtdCompra;
+      print("resultado " + resultado.toString());
+      if (resultado < 0) {
+        confirmarCompra = false;
+      }
+      print("contando estoque");
+    }
+    return confirmarCompra;
+  }
+
+  _alterarEstoque(String idProtudo, int qtdCompra) async {
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    Map<String, dynamic> mapProduto;
+    int estoque = 0;
+
+    DocumentSnapshot produto = await FirebaseFirestore.instance
+        .collection("produtos")
+        .doc(idProtudo)
+        .get();
+    mapProduto = produto.data();
+    estoque = mapProduto["quantidade"];
+    estoque = estoque - qtdCompra;
+
+    db.collection("produtos").doc(idProtudo).update({
+      "quantidade": estoque,
+    });
   }
 
   _apagaProduto(String id) {
@@ -249,7 +321,7 @@ class _ListaComprasState extends State<ListaCompras> {
           return AlertDialog(
             title: Text("Erro"),
             content: Container(
-              height: 200,
+              height: 350,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -353,8 +425,10 @@ class _ListaComprasState extends State<ListaCompras> {
   _enviaAlerta() async {
     FirebaseFirestore db = FirebaseFirestore.instance;
     List<String> list = [];
-    var snapshot =
-        await db.collection("usuarios").where("entregador", isEqualTo: true).get();
+    var snapshot = await db
+        .collection("usuarios")
+        .where("entregador", isEqualTo: true)
+        .get();
 
     for (var item in snapshot.docs) {
       Map<String, dynamic> map = item.data();
@@ -433,83 +507,98 @@ class _ListaComprasState extends State<ListaCompras> {
                     if (_controllerTroco.text.contains(",")) {
                       _mostraErro("O uso de virgula é inválido");
                     } else {
-                      if (_controllerTroco.text.isNotEmpty) {
-                        double totalCompra =
-                            double.tryParse(_totalCompra).toDouble();
-                        double troco =
-                            double.tryParse(_controllerTroco.text).toDouble();
-                        String trocoSalvar = "0";
-                        double trocoFinal = troco - totalCompra;
-                        trocoSalvar = trocoFinal.toStringAsFixed(2);
-                        print("troco " + trocoFinal.toString());
-                        print("totalCompra " + totalCompra.toString());
-                        if (trocoFinal >= 0) {
-                          FirebaseFirestore db = FirebaseFirestore.instance;
-                          String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
-                          var dadosUsuario =
-                              await db.collection("usuarios").doc(uid).get();
-                          Map<String, dynamic> mapUsuario = dadosUsuario.data();
+                      bool confirmarCompra = await _verificaEstoque();
+                      if (confirmarCompra) {
+                        if (_controllerTroco.text.isNotEmpty) {
+                          double totalCompra =
+                              double.tryParse(_totalCompra).toDouble();
+                          double troco =
+                              double.tryParse(_controllerTroco.text).toDouble();
+                          String trocoSalvar = "0";
+                          double trocoFinal = troco - totalCompra;
+                          trocoSalvar = trocoFinal.toStringAsFixed(2);
+                          print("troco " + trocoFinal.toString());
+                          print("totalCompra " + totalCompra.toString());
+                          if (trocoFinal >= 0) {
+                            FirebaseFirestore db = FirebaseFirestore.instance;
+                            String uid =
+                                RecuperaDadosFirebase.RECUPERAUSUARIO();
+                            var dadosUsuario =
+                                await db.collection("usuarios").doc(uid).get();
+                            Map<String, dynamic> mapUsuario =
+                                dadosUsuario.data();
 
-                          var snap = db
-                              .collection("listaPendente")
-                              .doc(uid)
-                              .collection(uid)
-                              .orderBy("nome", descending: false)
-                              .get();
-                          snap.then((event) async {
-                            List<dynamic> listaCompras = [];
-                            for (var item in event.docs) {
-                              Map<String, dynamic> map = item.data();
-                              listaCompras.add(map);
-                            }
-                            await db.collection("listaCompra").doc().set({
-                              "dataCompra": DateTime.now().toString(),
-                              "status": "Pendente",
-                              "nome": mapUsuario["nome"],
-                              "telefone": mapUsuario["telefone"],
-                              "whatsapp": mapUsuario["whatsapp"],
-                              "endereco": mapUsuario["endereco"],
-                              "cidade": mapUsuario["cidade"],
-                              "bairro": mapUsuario["bairro"],
-                              "prontoReferencia": mapUsuario["pontoReferencia"],
-                              "idUsuario": uid,
-                              "listaProdutos": listaCompras,
-                              "totalCompra": _totalCompra,
-                              "formaPagamento": formaPagamento,
-                              "troco": trocoSalvar,
-                              "entrega": "pendente"
-                            }).then((value) async {
-                              await db
-                                  .collection("listaPendente")
-                                  .doc(uid)
-                                  .collection(uid)
-                                  .get()
-                                  .then((value) {
-                                value.docs.forEach((element) async {
-                                  await db
-                                      .collection("listaPendente")
-                                      .doc(uid)
-                                      .collection(uid)
-                                      .doc(element.reference.id)
-                                      .delete()
-                                      .then((value) {
-                                    setState(() {
-                                      _totalCompra = "0";
+                            var snap = db
+                                .collection("listaPendente")
+                                .doc(uid)
+                                .collection(uid)
+                                .orderBy("nome", descending: false)
+                                .get();
+                            snap.then((event) async {
+                              List<dynamic> listaCompras = [];
+                              for (var item in event.docs) {
+                                Map<String, dynamic> map = item.data();
+                                listaCompras.add(map);
+                                String idProduto = map["idProduto"];
+                                int qtdCompra =
+                                    int.parse(map["quantidade"]).toInt();
+
+                                _alterarEstoque(idProduto, qtdCompra);
+                              }
+
+                              await db.collection("listaCompra").doc().set({
+                                "dataCompra": DateTime.now().toString(),
+                                "status": "Pendente",
+                                "nome": mapUsuario["nome"],
+                                "telefone": mapUsuario["telefone"],
+                                "whatsapp": mapUsuario["whatsapp"],
+                                "endereco": mapUsuario["endereco"],
+                                "cidade": mapUsuario["cidade"],
+                                "bairro": mapUsuario["bairro"],
+                                "prontoReferencia":
+                                    mapUsuario["pontoReferencia"],
+                                "idUsuario": uid,
+                                "listaProdutos": listaCompras,
+                                "totalCompra": _totalCompra,
+                                "formaPagamento": formaPagamento,
+                                "troco": trocoSalvar,
+                                "entrega": "pendente"
+                              }).then((value) async {
+                                await db
+                                    .collection("listaPendente")
+                                    .doc(uid)
+                                    .collection(uid)
+                                    .get()
+                                    .then((value) {
+                                  value.docs.forEach((element) async {
+                                    await db
+                                        .collection("listaPendente")
+                                        .doc(uid)
+                                        .collection(uid)
+                                        .doc(element.reference.id)
+                                        .delete()
+                                        .then((value) {
+                                      setState(() {
+                                        _totalCompra = "0";
+                                      });
                                     });
                                   });
+                                  _enviaAlerta();
+                                  Navigator.pop(context);
+                                  Navigator.pushNamed(
+                                      context, "/listacategorias");
                                 });
-                                _enviaAlerta();
-                                Navigator.pop(context);
-                                Navigator.pushNamed(
-                                    context, "/listacategorias");
                               });
                             });
-                          });
+                          } else {
+                            _mostraErro("Troco inválido");
+                          }
                         } else {
                           _mostraErro("Troco inválido");
                         }
                       } else {
-                        _mostraErro("Troco inválido");
+                        _mostraErro(
+                            "Existe algum produto sem estoque na sua compra, por favor refaça a compra");
                       }
                     }
                   },
@@ -569,61 +658,70 @@ class _ListaComprasState extends State<ListaCompras> {
                     var dadosUsuario =
                         await db.collection("usuarios").doc(uid).get();
                     Map<String, dynamic> mapUsuario = dadosUsuario.data();
+                    bool confirmaCompra = await _verificaEstoque();
+                    if (confirmaCompra) {
+                      var snap = db
+                          .collection("listaPendente")
+                          .doc(uid)
+                          .collection(uid)
+                          .orderBy("nome", descending: false)
+                          .get();
+                      snap.then((event) async {
+                        List<dynamic> listaCompras = [];
+                        for (var item in event.docs) {
+                          Map<String, dynamic> map = item.data();
+                          listaCompras.add(map);
+                          String idProduto = map["idProduto"];
+                          int qtdCompra = int.parse(map["quantidade"]).toInt();
 
-                    var snap = db
-                        .collection("listaPendente")
-                        .doc(uid)
-                        .collection(uid)
-                        .orderBy("nome", descending: false)
-                        .get();
-                    snap.then((event) async {
-                      List<dynamic> listaCompras = [];
-                      for (var item in event.docs) {
-                        Map<String, dynamic> map = item.data();
-                        listaCompras.add(map);
-                      }
-                      await db.collection("listaCompra").doc().set({
-                        "dataCompra": DateTime.now().toString(),
-                        "status": "Pendente",
-                        "nome": mapUsuario["nome"],
-                        "telefone": mapUsuario["telefone"],
-                        "whatsapp": mapUsuario["whatsapp"],
-                        "endereco": mapUsuario["endereco"],
-                        "cidade": mapUsuario["cidade"],
-                        "bairro": mapUsuario["bairro"],
-                        "prontoReferencia": mapUsuario["pontoReferencia"],
-                        "idUsuario": uid,
-                        "listaProdutos": listaCompras,
-                        "totalCompra": _totalCompra,
-                        "formaPagamento": formaPagamento,
-                        "troco": "0",
-                        "entrega": "pendente"
-                      }).then((value) async {
-                        await db
-                            .collection("listaPendente")
-                            .doc(uid)
-                            .collection(uid)
-                            .get()
-                            .then((value) {
-                          value.docs.forEach((element) async {
-                            await db
-                                .collection("listaPendente")
-                                .doc(uid)
-                                .collection(uid)
-                                .doc(element.reference.id)
-                                .delete()
-                                .then((value) {
-                              setState(() {
-                                _totalCompra = "0";
+                          _alterarEstoque(idProduto, qtdCompra);
+                        }
+                        await db.collection("listaCompra").doc().set({
+                          "dataCompra": DateTime.now().toString(),
+                          "status": "Pendente",
+                          "nome": mapUsuario["nome"],
+                          "telefone": mapUsuario["telefone"],
+                          "whatsapp": mapUsuario["whatsapp"],
+                          "endereco": mapUsuario["endereco"],
+                          "cidade": mapUsuario["cidade"],
+                          "bairro": mapUsuario["bairro"],
+                          "prontoReferencia": mapUsuario["pontoReferencia"],
+                          "idUsuario": uid,
+                          "listaProdutos": listaCompras,
+                          "totalCompra": _totalCompra,
+                          "formaPagamento": formaPagamento,
+                          "troco": "0",
+                          "entrega": "pendente"
+                        }).then((value) async {
+                          await db
+                              .collection("listaPendente")
+                              .doc(uid)
+                              .collection(uid)
+                              .get()
+                              .then((value) {
+                            value.docs.forEach((element) async {
+                              await db
+                                  .collection("listaPendente")
+                                  .doc(uid)
+                                  .collection(uid)
+                                  .doc(element.reference.id)
+                                  .delete()
+                                  .then((value) {
+                                setState(() {
+                                  _totalCompra = "0";
+                                });
                               });
                             });
                           });
                         });
                       });
-                    });
-                    _enviaAlerta();
-                    Navigator.pop(context);
-                    Navigator.pushNamed(context, "/listacategorias");
+                      _enviaAlerta();
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, "/listacategorias");
+                    } else {
+                      _mostraErro(
+                          "Existe algum produto sem estoque na sua compra, por favor refaça a compra");
+                    }
                   },
                   child: Text("Confirmar"),
                 ),
@@ -708,7 +806,8 @@ class _ListaComprasState extends State<ListaCompras> {
                                       dados["quantidade"],
                                       dados["precoUnitario"],
                                       dados["precoTotal"],
-                                      dados.reference.id),
+                                      dados.reference.id,
+                                      dados["idProduto"]),
                                 ),
                                 IconSlideAction(
                                     caption: "Excluir",
@@ -721,7 +820,7 @@ class _ListaComprasState extends State<ListaCompras> {
                                   elevation: 8,
                                   child: ListTile(
                                     leading: Image.network(
-                                      dados["urlimagem"],
+                                      dados["urlImagem"],
                                       width: 50,
                                       height: 80,
                                     ),

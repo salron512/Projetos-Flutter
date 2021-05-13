@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class CadastroProdutos extends StatefulWidget {
   @override
@@ -9,10 +10,14 @@ class CadastroProdutos extends StatefulWidget {
 }
 
 class _CadastroProdutosState extends State<CadastroProdutos> {
+  var _mascaraQtd = MaskTextInputFormatter(
+      mask: '##########', filter: {"#": RegExp(r'[0-9]')});
+
   StreamController _controller = StreamController.broadcast();
   TextEditingController _controllerNome = TextEditingController();
   TextEditingController _controllerMarca = TextEditingController();
   TextEditingController _controllerPreco = TextEditingController();
+  TextEditingController _controllerEstoque = TextEditingController();
 
   // ignore: missing_return
   Stream _recuperaProdutos() {
@@ -25,11 +30,13 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
     });
   }
 
-  _editaProduto(String nome, String marca, String preco, String id) {
+  _editaProduto(
+      String nome, String marca, String preco, String id, int estoque) {
     setState(() {
       _controllerNome.text = nome;
       _controllerMarca.text = marca;
       _controllerPreco.text = preco;
+      _controllerEstoque.text = estoque.toString();
     });
     showDialog(
         context: context,
@@ -38,8 +45,9 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
           return AlertDialog(
             title: Text("Editar produtos"),
             content: Container(
-              height: 250,
-              child: Column(
+              height: 350,
+              child: SingleChildScrollView(
+                child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   TextField(
@@ -67,9 +75,18 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                       prefix: Text("R\$ "),
                       labelText: "Preço",
                     ),
+                  ),
+                  TextField(
+                    controller: _controllerEstoque,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [_mascaraQtd],
+                    decoration: InputDecoration(
+                      labelText: "Estoque",
+                    ),
                   )
                 ],
               ),
+              )
             ),
             actions: [
               TextButton(
@@ -87,6 +104,7 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                     "nome": _controllerNome.text,
                     "marca": _controllerMarca.text,
                     "preco": _controllerPreco.text,
+                    "quantidade": int.parse(_controllerEstoque.text).toInt(),
                   });
                   Navigator.pop(context);
                   _controllerNome.clear();
@@ -107,7 +125,7 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
           return AlertDialog(
             title: Text("Dados do produtos"),
             content: Container(
-              height: 250,
+              height: 350,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -370,8 +388,12 @@ class _CadastroProdutosState extends State<CadastroProdutos> {
                                     color: Colors.green,
                                   ),
                                   onPressed: () {
-                                    _editaProduto(dados["nome"], dados["marca"],
-                                        dados["preco"], dados.reference.id);
+                                    _editaProduto(
+                                        dados["nome"],
+                                        dados["marca"],
+                                        dados["preco"],
+                                        dados.reference.id,
+                                        dados["quantidade"]);
                                   }),
                               IconButton(
                                   icon: Icon(

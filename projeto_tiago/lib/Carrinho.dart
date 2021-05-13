@@ -151,12 +151,11 @@ class _CarrinhoState extends State<Carrinho> {
                         if (qtd > 0 || _controllerQtd.text.isEmpty) {
                           FirebaseFirestore db = FirebaseFirestore.instance;
                           String uid = RecuperaDadosFirebase.RECUPERAUSUARIO();
-
                           db
                               .collection("listaPendente")
                               .doc(uid)
                               .collection(uid)
-                              .doc()
+                              .doc(idProduto)
                               .set({
                             "idProduto": idProduto,
                             "idUsuario": uid,
@@ -165,7 +164,7 @@ class _CarrinhoState extends State<Carrinho> {
                             "quantidade": _controllerQtd.text,
                             "precoUnitario": preco,
                             "precoTotal": precoTotal,
-                            "urlimagem": urlImagem,
+                            "urlImagem": urlImagem,
                           });
                           _controllerQtd.clear();
                           _controllerResultado.clear();

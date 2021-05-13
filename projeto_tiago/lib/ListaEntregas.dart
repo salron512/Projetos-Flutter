@@ -264,9 +264,30 @@ class _ListaEntregasState extends State<ListaEntregas> {
                   BackgroundLocation.stopLocationService();
                   String id = dados.reference.id;
                   FirebaseFirestore db = FirebaseFirestore.instance;
-
+                  List<dynamic> listaProduto = dados["listaProdutos"];
                   db.collection("listaCompra").doc(id).delete();
                   db.collection("localizacaoEntregador").doc(id).delete();
+                  for (var item in listaProduto) {
+                    Map<String, dynamic> dados;
+                    int estoque = 0;
+                    int qtdCompra = 0;
+                    qtdCompra = int.parse(item["quantidade"]).toInt();
+                    DocumentSnapshot query = await FirebaseFirestore.instance
+                        .collection("produtos")
+                        .doc(item["idProduto"])
+                        .get();
+                    dados = query.data();
+                    estoque = dados["quantidade"];
+                    estoque = estoque + qtdCompra;
+                    print("estoque atualizado" + estoque.toString());
+                    FirebaseFirestore.instance
+                        .collection("produtos")
+                        .doc(item["idProduto"])
+                        .update({
+                          "quantidade": estoque,
+                        });
+                  }
+
                   Navigator.pop(context);
                 },
               ),
