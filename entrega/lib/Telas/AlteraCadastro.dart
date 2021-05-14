@@ -1,99 +1,63 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:entrega/util/RecupepraFirebase.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
-class Cadastro extends StatefulWidget {
+class AlteraCadastro extends StatefulWidget {
   @override
-  _CadastroState createState() => _CadastroState();
+  _AlteraCadastroState createState() => _AlteraCadastroState();
 }
 
-class _CadastroState extends State<Cadastro> {
+class _AlteraCadastroState extends State<AlteraCadastro> {
   var _mascaraTelefone = new MaskTextInputFormatter(
       mask: '(##) #####-####', filter: {"#": RegExp(r'[0-9]')});
   bool _mostrarSenha = false;
   bool _motrarSenhaConfirma = false;
   String _msgErro = "";
+
   TextEditingController _controllerNome = TextEditingController();
-  TextEditingController _controllerEmail = TextEditingController();
   TextEditingController _controllerTelefone = TextEditingController();
   TextEditingController _controllerWhatsapp = TextEditingController();
   TextEditingController _controllerEndereco = TextEditingController();
   TextEditingController _controllerBairro = TextEditingController();
-  TextEditingController _controllerSenha = TextEditingController();
-  TextEditingController _controllerConfirmaSenha = TextEditingController();
 
-  _verificaCampos() async {
+  _recuperaDadosUsuaurio() async {
+    String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+    Map<String, dynamic> dadosUsuario;
+    DocumentSnapshot snapshot =
+        await FirebaseFirestore.instance.collection("usuarios").doc(uid).get();
+    dadosUsuario = snapshot.data();
+    _controllerNome.text = dadosUsuario["nome"];
+    _controllerTelefone.text = dadosUsuario["telefone"];
+    _controllerWhatsapp.text = dadosUsuario["whatsapp"];
+    _controllerEndereco.text = dadosUsuario["endereco"];
+    _controllerBairro.text = dadosUsuario["bairro"];
+  }
+
+  _verificaCampos() {
     String nome = _controllerNome.text;
     String telefone = _controllerTelefone.text;
     String whatsapp = _controllerWhatsapp.text;
     String endereco = _controllerEndereco.text;
     String bairro = _controllerBairro.text;
-    String senha = _controllerSenha.text;
-    String confirmaSenha = _controllerConfirmaSenha.text;
-    String email = _controllerEmail.text;
 
     if (nome.isNotEmpty) {
       if (telefone.isNotEmpty) {
         if (whatsapp.isNotEmpty) {
           if (endereco.isNotEmpty) {
             if (bairro.isNotEmpty) {
-              if (senha.isNotEmpty) {
-                if (senha.length > 6) {
-                  if (senha == confirmaSenha) {
-                    if (email.isNotEmpty) {
-                      if (email.contains("@")) {
-                        await FirebaseAuth.instance
-                            .createUserWithEmailAndPassword(
-                                email: email, password: senha)
-                            .then((value) {
-                          String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
-                          FirebaseFirestore.instance
-                              .collection("usuarios")
-                              .doc(uid)
-                              .set({
-                            "nome": nome,
-                            "email": email,
-                            "telefone": telefone,
-                            "whatsapp": whatsapp,
-                            "endereco": endereco,
-                            "bairro": bairro,
-                          }).then((value) {
-                            Navigator.pushNamedAndRemoveUntil(
-                                context, "/home", (route) => false);
-                          });
-                        }).catchError((erro) {
-                          setState(() {
-                            _msgErro = "Falha ao cadastrar, por favor" +
-                                "verifique suas informações";
-                          });
-                        });
-                      } else {
-                        setState(() {
-                          _msgErro = "E-mail inválido";
-                        });
-                      }
-                    } else {
-                      setState(() {
-                        _msgErro = "Por favor preencha o campo senha";
-                      });
-                    }
-                  } else {
-                    setState(() {
-                      _msgErro = "Senha não confere digite novamente";
-                    });
-                  }
-                } else {
-                  setState(() {
-                    _msgErro = "A senha teve ter mais de seis caracteres";
-                  });
-                }
-              } else {
-                setState(() {
-                  _msgErro = "Por favor preencha o campo senha";
-                });
-              }
+              String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+              FirebaseFirestore.instance
+                  .collection("usuarios")
+                  .doc(uid)
+                  .update({
+                "nome": nome,
+                "telefone": telefone,
+                "whatsapp": whatsapp,
+                "endereco": endereco,
+                "bairro": bairro,
+              }).then((value) => Navigator.pushNamedAndRemoveUntil(
+                      context, "/home", (route) => false));
             } else {
               setState(() {
                 _msgErro = "Por favor preencha o campo bairro";
@@ -101,7 +65,7 @@ class _CadastroState extends State<Cadastro> {
             }
           } else {
             setState(() {
-              _msgErro = "Por favor preencha o campo endereço";
+              _msgErro = "Por favor preencha o campo endereco";
             });
           }
         } else {
@@ -122,10 +86,16 @@ class _CadastroState extends State<Cadastro> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _recuperaDadosUsuaurio();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Cadastro"),
+        title: Text("Atualizar cadastro"),
       ),
       body: Container(
         child: Center(
@@ -159,23 +129,6 @@ class _CadastroState extends State<Cadastro> {
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15))),
                     controller: _controllerNome,
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(bottom: 8),
-                  child: TextField(
-                    keyboardType: TextInputType.emailAddress,
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                    decoration: InputDecoration(
-                        contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                        labelText: "E-mail",
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15))),
-                    controller: _controllerEmail,
                   ),
                 ),
                 Padding(
@@ -270,66 +223,6 @@ class _CadastroState extends State<Cadastro> {
                               borderRadius: BorderRadius.circular(15))),
                       controller: _controllerBairro),
                 ),
-                Padding(
-                  padding: EdgeInsets.only(top: 8),
-                  child: TextField(
-                    obscureText: !_mostrarSenha,
-                    keyboardType: TextInputType.text,
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                    decoration: InputDecoration(
-                        contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            Icons.remove_red_eye,
-                            color: _mostrarSenha ? Colors.blue : Colors.grey,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _mostrarSenha = !_mostrarSenha;
-                            });
-                          },
-                        ),
-                        hintText: "Digite a senha",
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15))),
-                    controller: _controllerSenha,
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 8),
-                  child: TextField(
-                    obscureText: !_motrarSenhaConfirma,
-                    keyboardType: TextInputType.text,
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                    decoration: InputDecoration(
-                        contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            Icons.remove_red_eye,
-                            color: _motrarSenhaConfirma
-                                ? Colors.blue
-                                : Colors.grey,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _motrarSenhaConfirma = !_motrarSenhaConfirma;
-                            });
-                          },
-                        ),
-                        hintText: "Digite a senha novamente",
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15))),
-                    controller: _controllerConfirmaSenha,
-                  ),
-                ),
                 Text(
                   _msgErro,
                   style: TextStyle(
@@ -341,7 +234,7 @@ class _CadastroState extends State<Cadastro> {
                   padding: EdgeInsets.only(top: 10, bottom: 10),
                   child: ElevatedButton(
                     child: Text(
-                      "Cadastrar",
+                      "Atualizar",
                       style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
                     style: ElevatedButton.styleFrom(

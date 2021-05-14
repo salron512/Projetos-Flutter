@@ -1,4 +1,6 @@
+import 'package:entrega/Telas/AlteraCadastro.dart';
 import 'package:entrega/Telas/Cadastro.dart';
+import 'package:entrega/Telas/Home.dart';
 import 'package:entrega/Telas/Login.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,17 +11,23 @@ class Rotas {
     // ignore: unused_local_variable
     final args = settings.arguments;
 
-  switch(settings.name){
-     case "/":
+    switch (settings.name) {
+      case "/":
         return MaterialPageRoute(builder: (_) => Login());
-        case "/cadastro":
+
+      case "/cadastro":
         return MaterialPageRoute(builder: (_) => Cadastro());
-    
+
+      case "/home":
+        return MaterialPageRoute(builder: (_) => Home());
+           case "/alteracadastro":
+        return MaterialPageRoute(builder: (_) => AlteraCadastro());
+
       default:
         _erroRota();
+    }
   }
 
-  }
   static Route<dynamic> _erroRota() {
     return MaterialPageRoute(builder: (_) {
       return Scaffold(
@@ -32,5 +40,4 @@ class Rotas {
       );
     });
   }
-  
 }

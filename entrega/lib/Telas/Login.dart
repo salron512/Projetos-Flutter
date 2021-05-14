@@ -24,7 +24,7 @@ class _LoginState extends State<Login> {
             _msg = "Entrando...";
           });
           _controllerSenha.clear();
-          Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
+          Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);
         }).catchError((erro) {
           setState(() {
             _msg = "Erro ao autenticar o usuário, verifique e-mail e"
@@ -43,17 +43,17 @@ class _LoginState extends State<Login> {
     }
   }
 
-  _veriifcaUsuario() {
+  _veririficaUsuario() {
     User usuario = FirebaseAuth.instance.currentUser;
     if (usuario != null) {
-      Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
+      Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);
     }
   }
 
   @override
   void initState() {
     super.initState();
-    _veriifcaUsuario();
+   // _veririficaUsuario();
   }
 
   @override
