@@ -63,7 +63,7 @@ class _CadastraImagemPerfilEmpresaState
     FirebaseStorage storage = FirebaseStorage.instance;
     var pastaRaiz = storage.ref();
     var arquivo =
-        pastaRaiz.child("produtos").child(widget.id).child("perfil" + ".jpg");
+        pastaRaiz.child("empresas").child(widget.id).child("perfil" + ".jpg");
     UploadTask task = arquivo.putFile(_imagem);
     task.snapshotEvents.listen((TaskSnapshot storageTaskEvent) {
       if (storageTaskEvent.state == TaskState.running) {
@@ -97,13 +97,13 @@ class _CadastraImagemPerfilEmpresaState
   _atualizarUrlIamgemFirestore(String url) {
     Map<String, dynamic> dadosAtualizar = {"urlImagem": url};
     FirebaseFirestore db = FirebaseFirestore.instance;
-    db.collection("empresas").doc(widget.id).update(dadosAtualizar);
+    db.collection("usuarios").doc(widget.id).update(dadosAtualizar);
   }
 
   _recuperaImagemPeril() async {
     FirebaseFirestore db = FirebaseFirestore.instance;
 
-    var snap = await db.collection("empresas").doc(widget.id).get();
+    var snap = await db.collection("usuarios").doc(widget.id).get();
 
     Map<String, dynamic> dadosRecuperados = snap.data();
 

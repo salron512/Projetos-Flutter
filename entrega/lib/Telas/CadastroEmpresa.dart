@@ -21,13 +21,8 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
   List<String> itensMenu = [];
   bool _mostrarSenha = false;
   bool _motrarSenhaConfirma = false;
-
-  _escolhaMenuItem(String itemEscolhido) {
-    setState(() {
-      _escolhaCategoria = itemEscolhido;
-    });
-  }
-
+  List<String> listaCidades = ["Mirassol D'Oeste"];
+  String _cidade = "";
   TextEditingController _controllerRazaoSocial = TextEditingController();
   TextEditingController _controllerNomeFantasia = TextEditingController();
   TextEditingController _controllerEmail = TextEditingController();
@@ -35,13 +30,26 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
   TextEditingController _controllerCnpj = TextEditingController();
   TextEditingController _controllerEndereco = TextEditingController();
   TextEditingController _controllerBairro = TextEditingController();
-  TextEditingController _controllerCidade = TextEditingController();
   TextEditingController _controllerHoraAbertura = TextEditingController();
   TextEditingController _controllerHoraFechamento = TextEditingController();
   TextEditingController _controllerSenha = TextEditingController();
   TextEditingController _controllerConfirmaSenha = TextEditingController();
+  TextEditingController _controllerDiasFuncionamento = TextEditingController();
+
+  _escolhaMenuItem(String itemEscolhido) {
+    setState(() {
+      _escolhaCategoria = itemEscolhido;
+    });
+  }
+
+  _escolhaMenuCidade(String cidadeEscolhida) {
+    setState(() {
+      _cidade = cidadeEscolhida;
+    });
+  }
 
   _verificaCampos() async {
+    String idUsurio;
     String razaoSocial = _controllerRazaoSocial.text;
     String nomeFantasia = _controllerNomeFantasia.text;
     String email = _controllerEmail.text;
@@ -49,11 +57,11 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
     String cnpj = _controllerCnpj.text;
     String endereco = _controllerEndereco.text;
     String bairro = _controllerBairro.text;
-    String cidade = _controllerCidade.text;
     String hAbertura = _controllerHoraAbertura.text;
     String hFechamento = _controllerHoraFechamento.text;
     String senha = _controllerSenha.text;
     String confirmarSenha = _controllerConfirmaSenha.text;
+    String diasFuncionamento = _controllerDiasFuncionamento.text;
 
     if (razaoSocial.isNotEmpty) {
       if (nomeFantasia.isNotEmpty) {
@@ -61,80 +69,92 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
           if (cnpj.isNotEmpty) {
             if (endereco.isNotEmpty) {
               if (bairro.isNotEmpty) {
-                if (cidade.isNotEmpty) {
-                  if (hAbertura.isNotEmpty) {
-                    if (hFechamento.isNotEmpty) {
-                      if (_escolhaCategoria.isNotEmpty) {
-                        if (senha.isNotEmpty) {
-                          if (confirmarSenha.isNotEmpty) {
-                            if (senha == confirmarSenha) {
-                            await  FirebaseAuth.instance
-                                  .createUserWithEmailAndPassword(
+                if (hAbertura.isNotEmpty) {
+                  if (hFechamento.isNotEmpty) {
+                    if (_escolhaCategoria.isNotEmpty) {
+                      if (senha.isNotEmpty) {
+                        if (confirmarSenha.isNotEmpty) {
+                          if (senha == confirmarSenha) {
+                            if (_escolhaCategoria.isNotEmpty) {
+                              if (_cidade.isNotEmpty) {
+                                if(diasFuncionamento.isNotEmpty){
+                                  await FirebaseAuth.instance
+                                      .createUserWithEmailAndPassword(
                                       email: email, password: senha)
-                                  .then((value) {
-                                String uid = value.user.uid;
-                                FirebaseFirestore.instance
-                                    .collection("empresas")
-                                    .doc(uid)
-                                    .set({
-                                  "razaoSocial": razaoSocial,
-                                  "nomeFantasia": nomeFantasia,
-                                  "empresa": true,
-                                  "ativa": true,
-                                  "telefone": telefone,
-                                  "cnpj": cnpj,
-                                  "endereco": endereco,
-                                  "bairro": bairro,
-                                  "cidade": cidade,
-                                  "hAbertura": hAbertura,
-                                  "hFechamento": hFechamento,
-                                  "categoria": _escolhaCategoria,
-                                  "urlImagem": null
-                                }).then((value) {
-                                  Navigator.pushNamed(
-                                      context, "/cadastroperfil", arguments: uid);
-                                });
-                              }).catchError((erro) {
+                                      .then((value) {
+                                    idUsurio = value.user.uid;
+                                    FirebaseFirestore.instance
+                                        .collection("usuarios")
+                                        .doc(idUsurio)
+                                        .set({
+                                      "adm": false,
+                                      "razaoSocial": razaoSocial,
+                                      "nomeFantasia": nomeFantasia,
+                                      "empresa": true,
+                                      "ativa": false,
+                                      "telefone": telefone,
+                                      "cnpj": cnpj,
+                                      "endereco": endereco,
+                                      "bairro": bairro,
+                                      "cidade": _cidade,
+                                      "hAbertura": hAbertura,
+                                      "hFechamento": hFechamento,
+                                      "diasFunc": diasFuncionamento,
+                                      "categoria": _escolhaCategoria,
+                                      "urlImagem": null,
+                                    });
+                                  }).catchError((erro) {
+                                    setState(() {
+                                      _msgErro = "Falha ao salvar o cadastro por"
+                                          "favor verifique sua conexão";
+                                    });
+                                  });
+                                  Navigator.pushNamed(context, "/cadastroperfil",
+                                      arguments: idUsurio);
+                                }else{
+                                  setState(() {
+                                    _msgErro = "Por favor informe os dias de funcionamento ";
+                                  });
+                                }
+                              } else {
                                 setState(() {
-                                  _msgErro =
-                                      "Falha ao salvar o cadastro por favor verifique sua conexão";
+                                  _msgErro = "Escolha uma cidade";
                                 });
-                              });
+                              }
                             } else {
                               setState(() {
-                                _msgErro = "Sua senha não confere";
+                                _msgErro = "Escolha uma categoria";
                               });
                             }
                           } else {
                             setState(() {
-                              _msgErro = "Por favor confirme sua senha";
+                              _msgErro = "Sua senha não confere";
                             });
                           }
                         } else {
                           setState(() {
-                            _msgErro = "Por favor preencha o campo senha";
+                            _msgErro = "Por favor confirme sua senha";
                           });
                         }
                       } else {
                         setState(() {
-                          _msgErro = "Por favor escolha uma categoria";
+                          _msgErro = "Por favor preencha o campo senha";
                         });
                       }
                     } else {
                       setState(() {
-                        _msgErro =
-                            "Por favor preencha o campo horário de fechamento";
+                        _msgErro = "Por favor escolha uma categoria";
                       });
                     }
                   } else {
                     setState(() {
                       _msgErro =
-                          "Por favor preencha o campo horário de abertura";
+                          "Por favor preencha o campo horário de fechamento";
                     });
                   }
                 } else {
                   setState(() {
-                    _msgErro = "Por favor preencha o campo ciade";
+                    _msgErro = "Por favor preencha o campo horário de abertura";
                   });
                 }
               } else {
@@ -205,7 +225,6 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
                 Padding(
                   padding: EdgeInsets.only(bottom: 8),
                   child: TextField(
-                    autofocus: true,
                     keyboardType: TextInputType.name,
                     textCapitalization: TextCapitalization.sentences,
                     style: TextStyle(
@@ -359,12 +378,12 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
                     ),
                     decoration: InputDecoration(
                         contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                        labelText: "Cidade",
+                        labelText: "Dias de funciomento Ex: Seg á Sex",
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15))),
-                    controller: _controllerCidade,
+                    controller: _controllerDiasFuncionamento,
                   ),
                 ),
                 Padding(
@@ -483,12 +502,6 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
                     controller: _controllerConfirmaSenha,
                   ),
                 ),
-                Text(
-                  "Categoria selecionada: " + _escolhaCategoria,
-                  style: TextStyle(
-                    fontSize: 15,
-                  ),
-                ),
                 Padding(
                     padding: EdgeInsets.only(bottom: 5),
                     child: PopupMenuButton<String>(
@@ -506,6 +519,35 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
                         }).toList();
                       },
                     )),
+                Padding(
+                    padding: EdgeInsets.only(bottom: 5),
+                    child: PopupMenuButton<String>(
+                      color: Color(0xff37474f),
+                      icon: Text("Escolha sua cidade"),
+                      onSelected: _escolhaMenuCidade,
+                      // ignore: missing_return
+                      itemBuilder: (context) {
+                        return listaCidades.map((String item) {
+                          return PopupMenuItem<String>(
+                            value: item,
+                            child: Text(item,
+                                style: TextStyle(color: Colors.white)),
+                          );
+                        }).toList();
+                      },
+                    )),
+                Text(
+                  "Categoria selecionada: " + _escolhaCategoria,
+                  style: TextStyle(
+                    fontSize: 15,
+                  ),
+                ),
+                Text(
+                  "Cidade selecionada: " + _cidade,
+                  style: TextStyle(
+                    fontSize: 15,
+                  ),
+                ),
                 Text(
                   _msgErro,
                   style: TextStyle(

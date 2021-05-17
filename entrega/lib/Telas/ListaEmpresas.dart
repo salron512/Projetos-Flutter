@@ -15,7 +15,8 @@ class _ListaEmpressasState extends State<ListaEmpressas> {
     List listaRecuperada = [];
     String categoria = widget.categoria;
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection("empresas")
+        .collection("usuarios")
+        .where("empresa", isEqualTo: true)
         .where("ativa", isEqualTo: true)
         .where("categoria", isEqualTo: categoria)
         .get();
@@ -23,6 +24,10 @@ class _ListaEmpressasState extends State<ListaEmpressas> {
       Map<String, dynamic> dados = item.data();
       Empresa empresa = Empresa();
       empresa.nomeFantasia = dados["nomeFantasia"];
+      empresa.urlImagem = dados["urlImagem"];
+      empresa.hAbertura = dados["hAbertura"];
+      empresa.hFechamento = dados["hFechamento"];
+      empresa.diasFunc = dados["diasFunc"];
       listaRecuperada.add(empresa);
     }
     return listaRecuperada;
@@ -34,17 +39,16 @@ class _ListaEmpressasState extends State<ListaEmpressas> {
       body: Container(
         child: FutureBuilder(
           future: _recuperaListaEmpresas(),
+          // ignore: missing_return
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.none:
-
               case ConnectionState.waiting:
                 return Center(
                   child: CircularProgressIndicator(),
                 );
                 break;
               case ConnectionState.active:
-
               case ConnectionState.done:
                 List listaSnap = snapshot.data;
                 if (listaSnap.isEmpty) {
@@ -62,10 +66,25 @@ class _ListaEmpressasState extends State<ListaEmpressas> {
                         ),
                         child: ListTile(
                           contentPadding: EdgeInsets.fromLTRB(20, 16, 20, 16),
-                          title: Text(dadosEmpresa.nomeFantasia,
-                          style: TextStyle(
-                            color: Colors.white
+                          leading: dadosEmpresa.urlImagem == null
+                              ? Image.asset("images/error.png")
+                              : Image.network(dadosEmpresa.urlImagem),
+                          title: Text(
+                            dadosEmpresa.nomeFantasia,
+                            style: TextStyle(color: Colors.white),
                           ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Aberto de: " + dadosEmpresa.diasFunc,
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Text(
+                                "Horário de funcionamento ${dadosEmpresa.hAbertura} á ${dadosEmpresa.hFechamento} ",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ],
                           ),
                         ),
                       );
