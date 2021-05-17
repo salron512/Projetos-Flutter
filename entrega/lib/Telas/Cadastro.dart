@@ -10,7 +10,7 @@ class Cadastro extends StatefulWidget {
 }
 
 class _CadastroState extends State<Cadastro> {
-  var _mascaraTelefone = new MaskTextInputFormatter(
+  var _mascaraTelefone =  MaskTextInputFormatter(
       mask: '(##) #####-####', filter: {"#": RegExp(r'[0-9]')});
   bool _mostrarSenha = false;
   bool _motrarSenhaConfirma = false;

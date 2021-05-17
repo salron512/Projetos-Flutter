@@ -1,28 +1,28 @@
 class Empresa {
-  String _nome;
+  String _nomeFantasia;
   String _descricao;
   String _categoria;
   String _urlImagem;
   String _idImagem;
+  get nomeFantasia => this._nomeFantasia;
 
-  
- String get idImagem => this._idImagem;
+ set nomeFantasia( value) => this._nomeFantasia = value;
 
- set idImagem(String value) => this._idImagem = value;
+  get descricao => this._descricao;
 
-  String get urlImagem => this._urlImagem;
-
-  set urlImagem(String value) => this._urlImagem = value;
+ set descricao( value) => this._descricao = value;
 
   get categoria => this._categoria;
 
-  set categoria(value) => this._categoria = value;
+ set categoria( value) => this._categoria = value;
 
-  String get nome => this._nome;
+  get urlImagem => this._urlImagem;
 
-  set nome(String value) => this._nome = value;
+ set urlImagem( value) => this._urlImagem = value;
 
-  String get descricao => this._descricao;
+  get idImagem => this._idImagem;
 
-  set descricao(String value) => this._descricao = value;
+ set idImagem( value) => this._idImagem = value;
+
+  
 }
