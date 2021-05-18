@@ -1,4 +1,5 @@
 import 'package:entrega/Telas/AlteraCadastro.dart';
+import 'package:entrega/Telas/AlteraCadastroEmpresa.dart';
 import 'package:entrega/Telas/CadastraImagemPerfilEmpresa.dart';
 import 'package:entrega/Telas/Cadastro.dart';
 import 'package:entrega/Telas/CadastroEmpresa.dart';
@@ -23,16 +24,19 @@ class Rotas {
 
       case "/home":
         return MaterialPageRoute(builder: (_) => Home());
-           case "/alteracadastro":
+      case "/alteracadastro":
         return MaterialPageRoute(builder: (_) => AlteraCadastro());
-         case "/home":
+      case "/home":
         return MaterialPageRoute(builder: (_) => Home());
-           case "/cadastroEmpresa":
+      case "/cadastroEmpresa":
         return MaterialPageRoute(builder: (_) => CadastroEmpresa());
-           case "/cadastroperfil":
-        return MaterialPageRoute(builder: (_) => CadastraImagemPerfilEmpresa(args));
-          case "/listaempresas":
+      case "/cadastroperfil":
+        return MaterialPageRoute(
+            builder: (_) => CadastraImagemPerfilEmpresa(args));
+      case "/listaempresas":
         return MaterialPageRoute(builder: (_) => ListaEmpressas(args));
+      case "/alteracadastroempresa":
+        return MaterialPageRoute(builder: (_) => AlteraCadastroEmpresa());
 
       default:
         _erroRota();

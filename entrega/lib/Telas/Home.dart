@@ -11,7 +11,8 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  bool _adm = true;
+  bool _adm = false;
+  bool _empresa = false;
   List<String> itensMenu = ["Cadastrar empresa"];
   _deslogar() {
     FirebaseAuth.instance.signOut().then((value) =>
@@ -56,6 +57,7 @@ class _HomeState extends State<Home> {
     map = dadosUsuario.data();
     setState(() {
       _adm = map["adm"];
+      _empresa = map["ativa"];
     });
   }
 
@@ -154,7 +156,19 @@ class _HomeState extends State<Home> {
                           color: Colors.white,
                         ),
                         onPressed: () {
+                        if(_empresa){
+                          Navigator.pushNamed(context, "/alteracadastroempresa");
+                        }else{
                           Navigator.pushNamed(context, "/alteracadastro");
+                        }
+                        }),
+                    IconButton(
+                        icon: Icon(
+                          Icons.add,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+
                         }),
                     IconButton(
                         icon: Icon(

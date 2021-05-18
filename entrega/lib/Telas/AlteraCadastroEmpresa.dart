@@ -1,14 +1,19 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:entrega/util/RecupepraFirebase.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
-class CadastroEmpresa extends StatefulWidget {
+class AlteraCadastroEmpresa extends StatefulWidget {
   @override
-  _CadastroEmpresaState createState() => _CadastroEmpresaState();
+  _AlteraCadastroEmpresaState createState() => _AlteraCadastroEmpresaState();
 }
 
-class _CadastroEmpresaState extends State<CadastroEmpresa> {
+class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
   var _mascaraTelefone = MaskTextInputFormatter(
       mask: '(##) #####-####', filter: {"#": RegExp(r'[0-9]')});
   var _mascaraCnpj = MaskTextInputFormatter(
@@ -21,155 +26,62 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
   List<String> itensMenu = [];
   bool _mostrarSenha = false;
   bool _motrarSenhaConfirma = false;
+  bool _subindoImagem = false;
+  String _urlImagem;
+  File _imagem;
   List<String> listaCidades = ["Mirassol D'Oeste"];
   String _cidade = "";
   TextEditingController _controllerRazaoSocial = TextEditingController();
   TextEditingController _controllerNomeFantasia = TextEditingController();
-  TextEditingController _controllerEmail = TextEditingController();
   TextEditingController _controllerTelefone = TextEditingController();
   TextEditingController _controllerCnpj = TextEditingController();
   TextEditingController _controllerEndereco = TextEditingController();
   TextEditingController _controllerBairro = TextEditingController();
   TextEditingController _controllerHoraAbertura = TextEditingController();
   TextEditingController _controllerHoraFechamento = TextEditingController();
-  TextEditingController _controllerSenha = TextEditingController();
-  TextEditingController _controllerConfirmaSenha = TextEditingController();
   TextEditingController _controllerDiasFuncionamento = TextEditingController();
 
-  _escolhaMenuItem(String itemEscolhido) {
-    setState(() {
-      _escolhaCategoria = itemEscolhido;
-    });
-  }
-
-  _escolhaMenuCidade(String cidadeEscolhida) {
-    setState(() {
-      _cidade = cidadeEscolhida;
-    });
-  }
-
   _verificaCampos() async {
-    String idUsurio;
+    String idUsurio = RecuperaFirebase.RECUPERAIDUSUARIO();
     String razaoSocial = _controllerRazaoSocial.text;
     String nomeFantasia = _controllerNomeFantasia.text;
-    String email = _controllerEmail.text;
     String telefone = _controllerTelefone.text;
     String cnpj = _controllerCnpj.text;
     String endereco = _controllerEndereco.text;
     String bairro = _controllerBairro.text;
     String hAbertura = _controllerHoraAbertura.text;
     String hFechamento = _controllerHoraFechamento.text;
-    String senha = _controllerSenha.text;
-    String confirmarSenha = _controllerConfirmaSenha.text;
     String diasFuncionamento = _controllerDiasFuncionamento.text;
 
     if (razaoSocial.isNotEmpty) {
       if (nomeFantasia.isNotEmpty) {
         if (telefone.isNotEmpty) {
-          if (cnpj.isNotEmpty) {
-            if (endereco.isNotEmpty) {
-              if (bairro.isNotEmpty) {
-                if (hAbertura.isNotEmpty) {
-                  if (hFechamento.isNotEmpty) {
-                    if (_escolhaCategoria.isNotEmpty) {
-                      if (senha.isNotEmpty) {
-                        if (confirmarSenha.isNotEmpty) {
-                          if (senha == confirmarSenha) {
-                            if (_escolhaCategoria.isNotEmpty) {
-                              if (_cidade.isNotEmpty) {
-                                if(diasFuncionamento.isNotEmpty){
-                                  await FirebaseAuth.instance
-                                      .createUserWithEmailAndPassword(
-                                      email: email, password: senha)
-                                      .then((value) {
-                                    idUsurio = value.user.uid;
-                                    FirebaseFirestore.instance
-                                        .collection("usuarios")
-                                        .doc(idUsurio)
-                                        .set({
-                                      "adm": false,
-                                      "razaoSocial": razaoSocial,
-                                      "nomeFantasia": nomeFantasia,
-                                      "empresa": true,
-                                      "ativa": true,
-                                      "telefone": telefone,
-                                      "cnpj": cnpj,
-                                      "endereco": endereco,
-                                      "bairro": bairro,
-                                      "cidade": _cidade,
-                                      "hAbertura": hAbertura,
-                                      "hFechamento": hFechamento,
-                                      "diasFunc": diasFuncionamento,
-                                      "categoria": _escolhaCategoria,
-                                      "urlImagem": null,
-                                    });
-                                  }).catchError((erro) {
-                                    setState(() {
-                                      _msgErro = "Falha ao salvar o cadastro por"
-                                          "favor verifique sua conexão";
-                                    });
-                                  });
-                                  Navigator.pushNamed(context, "/cadastroperfil",
-                                      arguments: idUsurio);
-                                }else{
-                                  setState(() {
-                                    _msgErro = "Por favor informe os dias de funcionamento ";
-                                  });
-                                }
-                              } else {
-                                setState(() {
-                                  _msgErro = "Escolha uma cidade";
-                                });
-                              }
-                            } else {
-                              setState(() {
-                                _msgErro = "Escolha uma categoria";
-                              });
-                            }
-                          } else {
-                            setState(() {
-                              _msgErro = "Sua senha não confere";
-                            });
-                          }
-                        } else {
-                          setState(() {
-                            _msgErro = "Por favor confirme sua senha";
-                          });
-                        }
-                      } else {
-                        setState(() {
-                          _msgErro = "Por favor preencha o campo senha";
-                        });
-                      }
-                    } else {
-                      setState(() {
-                        _msgErro = "Por favor escolha uma categoria";
-                      });
-                    }
-                  } else {
-                    setState(() {
-                      _msgErro =
-                          "Por favor preencha o campo horário de fechamento";
-                    });
-                  }
-                } else {
+          if(cnpj.isNotEmpty){
+            if(endereco.isNotEmpty){
+              if(bairro.isNotEmpty){
+                if(hFechamento.isNotEmpty){
+
+                }else{
                   setState(() {
-                    _msgErro = "Por favor preencha o campo horário de abertura";
+                    _msgErro = "Por favor informe a hora de abertura";
                   });
                 }
-              } else {
+
+              }else{
                 setState(() {
-                  _msgErro = "Por favor preencha o campo bairro";
+                  _msgErro = "Por favor preencha o campo bairo";
                 });
               }
-            } else {
+
+            }else{
               setState(() {
                 _msgErro = "Por favor preencha o campo endereço";
               });
             }
-          } else {
+
+          }else{
             setState(() {
-              _msgErro = "Por favor preencha o campo telefone";
+              _msgErro = "Por favor preencha o campo cnpj";
             });
           }
         } else {
@@ -189,31 +101,110 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
     }
   }
 
-  _recuperaCategorias() async {
-    List<String> listaRecuperada = [];
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection("categorias").get();
-    for (var item in querySnapshot.docs) {
-      Map<String, dynamic> categorias = item.data();
-      String categoria = categorias["categoria"];
-      listaRecuperada.add(categoria);
+  Future _uploadImagem() async {
+    FirebaseStorage storage = FirebaseStorage.instance;
+    String idUsuarioLogado = RecuperaFirebase.RECUPERAIDUSUARIO();
+    var pastaRaiz = storage.ref();
+    var arquivo = pastaRaiz.child("perfil").child(idUsuarioLogado + ".jpg");
+    UploadTask task = arquivo.putFile(_imagem);
+    task.snapshotEvents.listen((TaskSnapshot storageTaskEvent) {
+      if (storageTaskEvent.state == TaskState.running) {
+        setState(() {
+          _subindoImagem = true;
+        });
+      } else if (storageTaskEvent.state == TaskState.success) {
+        setState(() {
+          _subindoImagem = false;
+        });
+      }
+    });
+    //recupera a url da imagem
+    task.whenComplete(() {}).then((snapshot) {
+      _recuperarUrlImagem(snapshot);
+    });
+  }
+
+  //faz download da imagem
+  Future _recuperarUrlImagem(TaskSnapshot snapshot) async {
+    String url = await snapshot.ref.getDownloadURL();
+    _atualizarUrlIamgemFirestore(url);
+
+    setState(() {
+      _urlImagem = url;
+    });
+  }
+
+  _atualizarUrlIamgemFirestore(String url) {
+    String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+    FirebaseFirestore.instance.collection("usuarios").doc(uid).update({
+      "urlImagem": url,
+    });
+  }
+
+  Future _recuperaImagem(bool daCamera) async {
+    var picker = ImagePicker();
+    PickedFile imagemSelecionada;
+    File imagem;
+    if (daCamera) {
+      //recupera imagem da camera
+      imagemSelecionada =
+          await picker.getImage(source: ImageSource.camera, imageQuality: 50);
+      if (imagemSelecionada != null) {
+        imagem = File(imagemSelecionada.path);
+      }
+    } else {
+      //recupera imagem da galeria
+      imagemSelecionada =
+          await picker.getImage(source: ImageSource.gallery, imageQuality: 50);
+      if (imagemSelecionada != null) {
+        imagem = File(imagemSelecionada.path);
+      }
     }
     setState(() {
-      itensMenu = listaRecuperada;
+      _imagem = imagem;
+      if (_imagem != null) {
+        _subindoImagem = true;
+        _uploadImagem();
+      }
+    });
+  }
+
+  _escolhaMenuItem(String itemEscolhido) {
+    setState(() {
+      _escolhaCategoria = itemEscolhido;
+    });
+  }
+
+  _escolhaMenuCidade(String cidadeEscolhida) {
+    setState(() {
+      _cidade = cidadeEscolhida;
+    });
+  }
+
+  _recuperadados() async {
+    String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+    Map<String, dynamic> map;
+    var snapshot =
+        await FirebaseFirestore.instance.collection("usuarios").doc(uid).get();
+    map = snapshot.data();
+    setState(() {
+      _urlImagem = map["urlImagem"];
+      _controllerRazaoSocial.text = map["razaoSocial"];
+      _controllerNomeFantasia.text = map["nomeFantasia"];
     });
   }
 
   @override
   void initState() {
     super.initState();
-    _recuperaCategorias();
+    _recuperadados();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Cadastro empresas"),
+        title: Text("Atualiza cadastro"),
       ),
       body: Container(
         child: Center(
@@ -222,6 +213,43 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                CircleAvatar(
+                    backgroundImage:
+                        _urlImagem != null ? NetworkImage(_urlImagem) : null,
+                    maxRadius: 100,
+                    backgroundColor: Colors.grey),
+                Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        child: Text(
+                          "Câmera",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                        ),
+                        onPressed: () {
+                          _recuperaImagem(true);
+                        },
+                      ),
+                      TextButton(
+                        child: Text(
+                          "Galeria",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                        ),
+                        onPressed: () {
+                          _recuperaImagem(false);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
                 Padding(
                   padding: EdgeInsets.only(bottom: 8),
                   child: TextField(
@@ -256,23 +284,6 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15))),
                     controller: _controllerNomeFantasia,
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(bottom: 8),
-                  child: TextField(
-                    keyboardType: TextInputType.emailAddress,
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                    decoration: InputDecoration(
-                        contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                        labelText: "Email",
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15))),
-                    controller: _controllerEmail,
                   ),
                 ),
                 Padding(
@@ -440,66 +451,6 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15))),
                     controller: _controllerHoraFechamento,
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(bottom: 0),
-                  child: TextField(
-                    obscureText: !_mostrarSenha,
-                    keyboardType: TextInputType.text,
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                    decoration: InputDecoration(
-                        contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            Icons.remove_red_eye,
-                            color: _mostrarSenha ? Colors.blue : Colors.grey,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _mostrarSenha = !_mostrarSenha;
-                            });
-                          },
-                        ),
-                        labelText: "Digite a senha",
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15))),
-                    controller: _controllerSenha,
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 8),
-                  child: TextField(
-                    obscureText: !_motrarSenhaConfirma,
-                    keyboardType: TextInputType.text,
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                    decoration: InputDecoration(
-                        contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            Icons.remove_red_eye,
-                            color: _motrarSenhaConfirma
-                                ? Colors.blue
-                                : Colors.grey,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _motrarSenhaConfirma = !_motrarSenhaConfirma;
-                            });
-                          },
-                        ),
-                        labelText: "Digite a senha novamente",
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15))),
-                    controller: _controllerConfirmaSenha,
                   ),
                 ),
                 Padding(

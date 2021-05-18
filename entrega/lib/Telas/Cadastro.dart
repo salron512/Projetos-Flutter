@@ -53,10 +53,10 @@ class _CadastroState extends State<Cadastro> {
                               .collection("usuarios")
                               .doc(uid)
                               .set({
-                            "adm": true,
+                            "adm": false,
+                            "empresa": false,
+                            "ativa": false,
                             "nome": nome,
-                            "empresa": true,
-                            "ativa": true,
                             "email": email,
                             "telefone": telefone,
                             "whatsapp": whatsapp,

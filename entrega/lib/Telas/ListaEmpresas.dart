@@ -60,6 +60,7 @@ class _ListaEmpressasState extends State<ListaEmpressas> {
                     itemBuilder: (context, indice) {
                       Empresa dadosEmpresa = listaSnap[indice];
                       return Card(
+                        elevation: 8,
                         color: Theme.of(context).primaryColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16.0),
