@@ -156,11 +156,12 @@ class _HomeState extends State<Home> {
                           color: Colors.white,
                         ),
                         onPressed: () {
-                        if(_empresa){
-                          Navigator.pushNamed(context, "/alteracadastroempresa");
-                        }else{
-                          Navigator.pushNamed(context, "/alteracadastro");
-                        }
+                          if (_empresa) {
+                            Navigator.pushNamed(
+                                context, "/alteracadastroempresa");
+                          } else {
+                            Navigator.pushNamed(context, "/alteracadastro");
+                          }
                         }),
                     IconButton(
                         icon: Icon(
@@ -168,7 +169,7 @@ class _HomeState extends State<Home> {
                           color: Colors.white,
                         ),
                         onPressed: () {
-
+                          Navigator.pushNamed(context, "/listaprodutos");
                         }),
                     IconButton(
                         icon: Icon(

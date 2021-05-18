@@ -43,8 +43,10 @@ class _LoginState extends State<Login> {
     }
   }
 
-  _veririficaUsuario() {
-    User usuario = FirebaseAuth.instance.currentUser;
+  _veririficaUsuario() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    // ignore: await_only_futures
+    User usuario = await auth.currentUser;
     if (usuario != null) {
       Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);
     }
@@ -53,7 +55,7 @@ class _LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
-   // _veririficaUsuario();
+    _veririficaUsuario();
   }
 
   @override

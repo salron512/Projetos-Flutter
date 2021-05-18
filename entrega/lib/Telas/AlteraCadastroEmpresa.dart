@@ -56,30 +56,75 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
     if (razaoSocial.isNotEmpty) {
       if (nomeFantasia.isNotEmpty) {
         if (telefone.isNotEmpty) {
-          if(cnpj.isNotEmpty){
-            if(endereco.isNotEmpty){
-              if(bairro.isNotEmpty){
-                if(hFechamento.isNotEmpty){
-
-                }else{
+          if (cnpj.isNotEmpty) {
+            if (endereco.isNotEmpty) {
+              if (bairro.isNotEmpty) {
+                if (hAbertura.isNotEmpty) {
+                  if (hFechamento.isNotEmpty) {
+                    if (diasFuncionamento.isNotEmpty) {
+                      if (_cidade.isNotEmpty) {
+                        if (_escolhaCategoria.isNotEmpty) {
+                          FirebaseFirestore.instance
+                              .collection("usuarios")
+                              .doc(idUsurio)
+                              .update({
+                            "razaoSocial": razaoSocial,
+                            "nomeFantasia": nomeFantasia,
+                            "telefone": telefone,
+                            "cnpj": cnpj,
+                            "endereco": endereco,
+                            "bairro": bairro,
+                            "cidade": _cidade,
+                            "hAbertura": hAbertura,
+                            "hFechamento": hFechamento,
+                            "diasFunc": diasFuncionamento,
+                            "categoria": _escolhaCategoria,
+                          }).catchError((erro) {
+                            setState(() {
+                              setState(() {
+                                _msgErro =
+                                    "Falha ao salvar verifique sua conexão";
+                              });
+                            });
+                          });
+                          Navigator.pushNamedAndRemoveUntil(
+                              context, "/home", (route) => false);
+                        } else {
+                          setState(() {
+                            _msgErro = "Por favor escolha uma categoria";
+                          });
+                        }
+                      } else {
+                        setState(() {
+                          _msgErro = "Por favor escolha uma cidade";
+                        });
+                      }
+                    } else {
+                      setState(() {
+                        _msgErro = "Por favor informe os dias de funcionamento";
+                      });
+                    }
+                  } else {
+                    setState(() {
+                      _msgErro = "Por favor informe a hora de fechamento";
+                    });
+                  }
+                } else {
                   setState(() {
                     _msgErro = "Por favor informe a hora de abertura";
                   });
                 }
-
-              }else{
+              } else {
                 setState(() {
-                  _msgErro = "Por favor preencha o campo bairo";
+                  _msgErro = "Por favor preencha o campo bairro";
                 });
               }
-
-            }else{
+            } else {
               setState(() {
                 _msgErro = "Por favor preencha o campo endereço";
               });
             }
-
-          }else{
+          } else {
             setState(() {
               _msgErro = "Por favor preencha o campo cnpj";
             });
@@ -191,6 +236,15 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
       _urlImagem = map["urlImagem"];
       _controllerRazaoSocial.text = map["razaoSocial"];
       _controllerNomeFantasia.text = map["nomeFantasia"];
+      _controllerTelefone.text = map["telefone"];
+      _controllerCnpj.text = map["cnpj"];
+      _controllerEndereco.text = map["endereco"];
+      _controllerBairro.text = map["bairro"];
+      _controllerDiasFuncionamento.text = map["diasFunc"];
+      _controllerHoraAbertura.text = map["hAbertura"];
+      _controllerHoraFechamento.text = map["hFechamento"];
+      _cidade = map["cidade"];
+      _escolhaCategoria = map["categoria"];
     });
   }
 
@@ -510,7 +564,7 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
                   padding: EdgeInsets.only(top: 10, bottom: 10),
                   child: ElevatedButton(
                     child: Text(
-                      "Cadastrar",
+                      "Atualizar",
                       style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
                     style: ElevatedButton.styleFrom(
