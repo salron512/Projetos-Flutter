@@ -7,6 +7,11 @@ class Empresa {
   String _hAbertura;
   String _hFechamento;
   String _diasFunc;
+  String _idEmpresa;
+  
+ String get idEmpresa => this._idEmpresa;
+
+ set idEmpresa(String value) => this._idEmpresa = value;
 
   String get diasFunc => _diasFunc;
 
@@ -16,11 +21,11 @@ class Empresa {
 
   String get hAbertura => this._hAbertura;
 
- set hAbertura(String value) => this._hAbertura = value;
+  set hAbertura(String value) => this._hAbertura = value;
 
   get hFechamento => this._hFechamento;
 
- set hFechamento( value) => this._hFechamento = value;
+  set hFechamento(value) => this._hFechamento = value;
   get nomeFantasia => this._nomeFantasia;
 
   set nomeFantasia(value) => this._nomeFantasia = value;

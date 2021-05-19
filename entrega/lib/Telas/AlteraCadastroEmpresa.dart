@@ -267,11 +267,13 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                CircleAvatar(
-                    backgroundImage:
-                        _urlImagem != null ? NetworkImage(_urlImagem) : null,
-                    maxRadius: 100,
-                    backgroundColor: Colors.grey),
+                 Container(
+                width: 200,
+                height: 200,
+                child: _urlImagem == null
+                    ? Image.asset("images/error.png")
+                    : Image.network(_urlImagem),
+              ),
                 Padding(
                   padding: EdgeInsets.all(16),
                   child: Row(

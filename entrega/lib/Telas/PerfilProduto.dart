@@ -139,7 +139,6 @@ class _PerfilProdutoState extends State<PerfilProduto> {
                 child: Visibility(
                   visible: _subindoImagem,
                   child: CircularProgressIndicator(
-                    backgroundColor: Theme.of(context).primaryColor,
                   ),
                 ),
               ),

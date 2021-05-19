@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:entrega/util/Empresa.dart';
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class ListaEmpressas extends StatefulWidget {
   String categoria;
   ListaEmpressas(this.categoria);
@@ -28,6 +29,7 @@ class _ListaEmpressasState extends State<ListaEmpressas> {
       empresa.hAbertura = dados["hAbertura"];
       empresa.hFechamento = dados["hFechamento"];
       empresa.diasFunc = dados["diasFunc"];
+      empresa.idEmpresa = dados["idEmpresa"];
       listaRecuperada.add(empresa);
     }
     return listaRecuperada;
@@ -87,6 +89,10 @@ class _ListaEmpressasState extends State<ListaEmpressas> {
                               ),
                             ],
                           ),
+                          onTap: () {
+                            Navigator.pushNamed(
+                                context, "/listaprodutosusuario", arguments: dadosEmpresa.idEmpresa);
+                          },
                         ),
                       );
                     },

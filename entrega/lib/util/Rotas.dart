@@ -7,6 +7,7 @@ import 'package:entrega/Telas/CadastroProdutos.dart';
 import 'package:entrega/Telas/Home.dart';
 import 'package:entrega/Telas/ListaEmpresas.dart';
 import 'package:entrega/Telas/ListaProdutos.dart';
+import 'package:entrega/Telas/ListaProdutosUsuario.dart';
 import 'package:entrega/Telas/Login.dart';
 import 'package:entrega/Telas/PerfilProduto.dart';
 import 'package:flutter/cupertino.dart';
@@ -46,6 +47,8 @@ class Rotas {
         return MaterialPageRoute(builder: (_) => CadastraProdutos());
       case "/perfilproduto":
         return MaterialPageRoute(builder: (_) => PerfilProduto(args));
+        case "/listaprodutosusuario":
+        return MaterialPageRoute(builder: (_) => ListaProdutosUsuario(args));
 
       default:
         _erroRota();

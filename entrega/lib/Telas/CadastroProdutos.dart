@@ -13,7 +13,7 @@ class _CadastraProdutosState extends State<CadastraProdutos> {
   TextEditingController _controllerDescicao = TextEditingController();
   String _msgErro = "";
 
-  _verificaCampos() {
+  _verificaCampos() async {
     String nome = _controllerNome.text;
     String preco = _controllerPreco.text;
     String descricao = _controllerDescicao.text;
@@ -28,7 +28,8 @@ class _CadastraProdutosState extends State<CadastraProdutos> {
             String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
             double precoFirebase = double.tryParse(preco).toDouble();
             String idDoc = DateTime.now().microsecondsSinceEpoch.toString();
-            FirebaseFirestore.instance.collection("produtos").doc(idDoc).set({
+            await FirebaseFirestore.instance.collection("produtos").doc().set({
+              "id": idDoc,
               "idEmpresa": uid,
               "nome": nome,
               "descricao": descricao,
@@ -40,7 +41,19 @@ class _CadastraProdutosState extends State<CadastraProdutos> {
                     "Falha ao salvar os dados por favor verifique sua conexão";
               });
             });
-            Navigator.pushNamed(context, "/perfilproduto", arguments: idDoc);
+            String idDocumento;
+            CollectionReference query =
+                FirebaseFirestore.instance.collection("produtos");
+            QuerySnapshot snap = await query
+                .where("idEmpresa", isEqualTo: uid)
+                .where("id", isEqualTo: idDoc)
+                .get();
+            for (var item in snap.docs) {
+              idDocumento = item.reference.id;
+            }
+            print("idDoc " + idDocumento);
+            Navigator.pushNamed(context, "/perfilproduto",
+                arguments: idDocumento);
           } else {
             setState(() {
               _msgErro = "Por favor preencha a descrição do produto";

@@ -1,7 +1,7 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:entrega/util/RecupepraFirebase.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 class ListaProdutos extends StatefulWidget {
@@ -27,10 +27,172 @@ class _ListaProdutosState extends State<ListaProdutos> {
     });
   }
 
+  _editaProduto(String id, String nome, String descricao, String preco) {
+    TextEditingController controllerNome = TextEditingController(text: nome);
+    TextEditingController controllerDescricao =
+        TextEditingController(text: descricao);
+    TextEditingController controllerPreco = TextEditingController(text: preco);
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Editar informações"),
+            content: Container(
+              width: 200,
+              height: 200,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 5),
+                    child: TextField(
+                      keyboardType: TextInputType.name,
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                        hintText: "Nome produto",
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                      controller: controllerNome,
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 5),
+                    child: TextField(
+                      keyboardType: TextInputType.number,
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                        prefix: Text("R\$ "),
+                        hintText: "Preço",
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                      controller: controllerPreco,
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 5),
+                    child: TextField(
+                      keyboardType: TextInputType.name,
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                        hintText: "Descrição",
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                      controller: controllerDescricao,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                child: Text("Cancelar"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              TextButton(
+                child: Text("Confirmar"),
+                onPressed: () {
+                  _salvaAlteracaoProduto(
+                    id,
+                    controllerNome.text,
+                    controllerDescricao.text,
+                    controllerPreco.text,
+                  );
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  _salvaAlteracaoProduto(
+      String id, String nome, String descricao, String preco) {
+    FirebaseFirestore.instance
+        .collection("produtos")
+        .doc(id)
+        .update({"nome": nome, "descricao": descricao, "preco": preco});
+  }
+
+  _excluirProduto(String idDoc) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Excluir produto"),
+            content: Container(
+              width: 150,
+              height: 150,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text("Confirmar exclusão?",
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ))
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                child: Text("Cancelar"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              TextButton(
+                child: Text("Confirmar"),
+                onPressed: () {
+                  FirebaseFirestore.instance
+                      .collection("produtos")
+                      .doc(idDoc)
+                      .delete();
+                  _excluiImagem(idDoc);
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  _excluiImagem(String idProduto) {
+    FirebaseStorage storage = FirebaseStorage.instance;
+    var pastaRaiz = storage.ref();
+    pastaRaiz.child("produtos").child(idProduto).listAll().then((value) {
+      for (var item in value.items) {
+        print("teste for: " + item.fullPath);
+        pastaRaiz.child(item.fullPath).delete();
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     _recuperaListaProdutos();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _streamController.close();
   }
 
   @override
@@ -75,7 +237,7 @@ class _ListaProdutosState extends State<ListaProdutos> {
                           querySnapshot.docs.toList();
                       DocumentSnapshot dados = listadados[indice];
                       return ListTile(
-                        contentPadding: EdgeInsets.fromLTRB(5, 15, 15, 15),
+                        contentPadding: EdgeInsets.fromLTRB(0, 15, 15, 15),
                         leading: CircleAvatar(
                             backgroundImage: dados["urlImagem"] != null
                                 ? NetworkImage(dados["urlImagem"])
@@ -88,8 +250,34 @@ class _ListaProdutosState extends State<ListaProdutos> {
                           children: [
                             Text("Preço: R\$ " + dados["preco"]),
                             Text(dados["descricao"]),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                IconButton(
+                                    icon: Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                    ),
+                                    onPressed: () {
+                                      _excluirProduto(dados.reference.id);
+                                    })
+                              ],
+                            ),
                           ],
                         ),
+                        onTap: () {
+                          _editaProduto(
+                            dados.reference.id,
+                            dados["nome"],
+                            dados["descricao"],
+                            dados["preco"],
+                          );
+                        },
+                        onLongPress: () {
+                          String idDocumento = dados.reference.id;
+                          Navigator.pushNamed(context, "/perfilproduto",
+                              arguments: idDocumento);
+                        },
                       );
                     });
               }

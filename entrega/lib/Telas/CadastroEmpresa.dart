@@ -77,16 +77,17 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
                           if (senha == confirmarSenha) {
                             if (_escolhaCategoria.isNotEmpty) {
                               if (_cidade.isNotEmpty) {
-                                if(diasFuncionamento.isNotEmpty){
+                                if (diasFuncionamento.isNotEmpty) {
                                   await FirebaseAuth.instance
                                       .createUserWithEmailAndPassword(
-                                      email: email, password: senha)
+                                          email: email, password: senha)
                                       .then((value) {
                                     idUsurio = value.user.uid;
                                     FirebaseFirestore.instance
                                         .collection("usuarios")
                                         .doc(idUsurio)
                                         .set({
+                                      "idEmpresa": idUsurio,
                                       "adm": false,
                                       "razaoSocial": razaoSocial,
                                       "nomeFantasia": nomeFantasia,
@@ -105,15 +106,18 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
                                     });
                                   }).catchError((erro) {
                                     setState(() {
-                                      _msgErro = "Falha ao salvar o cadastro por"
+                                      _msgErro =
+                                          "Falha ao salvar o cadastro por"
                                           "favor verifique sua conexão";
                                     });
                                   });
-                                  Navigator.pushNamed(context, "/cadastroperfil",
+                                  Navigator.pushNamed(
+                                      context, "/cadastroperfil",
                                       arguments: idUsurio);
-                                }else{
+                                } else {
                                   setState(() {
-                                    _msgErro = "Por favor informe os dias de funcionamento ";
+                                    _msgErro =
+                                        "Por favor informe os dias de funcionamento ";
                                   });
                                 }
                               } else {
