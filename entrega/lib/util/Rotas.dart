@@ -4,6 +4,7 @@ import 'package:entrega/Telas/CadastraImagemPerfilEmpresa.dart';
 import 'package:entrega/Telas/Cadastro.dart';
 import 'package:entrega/Telas/CadastroEmpresa.dart';
 import 'package:entrega/Telas/CadastroProdutos.dart';
+import 'package:entrega/Telas/Carrinho.dart';
 import 'package:entrega/Telas/Home.dart';
 import 'package:entrega/Telas/ListaEmpresas.dart';
 import 'package:entrega/Telas/ListaProdutos.dart';
@@ -47,8 +48,10 @@ class Rotas {
         return MaterialPageRoute(builder: (_) => CadastraProdutos());
       case "/perfilproduto":
         return MaterialPageRoute(builder: (_) => PerfilProduto(args));
-        case "/listaprodutosusuario":
+      case "/listaprodutosusuario":
         return MaterialPageRoute(builder: (_) => ListaProdutosUsuario(args));
+         case "/carinho":
+        return MaterialPageRoute(builder: (_) => Carrinho());
 
       default:
         _erroRota();

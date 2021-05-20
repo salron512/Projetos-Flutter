@@ -3,10 +3,15 @@ class Produtos {
   String _descricao;
   String _preco;
   String _urlImagem;
+  String _idEmpresa;
   
- String get urlImagem => this._urlImagem;
+ String get idEmpresa => this._idEmpresa;
 
- set urlImagem(String value) => this._urlImagem = value;
+ set idEmpresa(String value) => this._idEmpresa = value;
+
+  String get urlImagem => this._urlImagem;
+
+  set urlImagem(String value) => this._urlImagem = value;
 
   get nome => this._nome;
 

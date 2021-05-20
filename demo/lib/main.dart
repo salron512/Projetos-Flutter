@@ -102,17 +102,17 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    _realizaPagamento();
+    //_realizaPagamento();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("teste"),
+        title: Text("teste ok"),
       ),
       body: Center(
-        child: Text("teste"),
+        child: Text("teste Winddows"),
       ),
     );
   }
