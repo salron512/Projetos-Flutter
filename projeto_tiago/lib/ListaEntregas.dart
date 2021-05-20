@@ -284,8 +284,8 @@ class _ListaEntregasState extends State<ListaEntregas> {
                         .collection("produtos")
                         .doc(item["idProduto"])
                         .update({
-                          "quantidade": estoque,
-                        });
+                      "quantidade": estoque,
+                    });
                   }
 
                   Navigator.pop(context);

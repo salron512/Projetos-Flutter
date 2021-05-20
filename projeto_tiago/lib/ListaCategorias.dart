@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:background_location/background_location.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -77,12 +78,15 @@ class _ListaCategoriasState extends State<ListaCategorias> {
     });
   }
 
+
+
   @override
   void initState() {
     super.initState();
     _recebeNot();
     _recuperaListaCategorias();
     _recuperaUsuario();
+
   }
 
   @override
