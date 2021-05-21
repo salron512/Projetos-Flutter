@@ -505,9 +505,9 @@ class _ListaComprasState extends State<ListaCompras> {
                 TextButton(
                   onPressed: () async {
                     if (_controllerTroco.text.contains(",")) {
-                      _mostraErro("O uso de virgula é inválido");
+                      _mostraErro("O uso de virgula não é inválido");
                     } else {
-                      bool confirmarCompra = await _verificaEstoque();
+                      bool confirmarCompra =  _verificaEstoque();
                       if (confirmarCompra) {
                         if (_controllerTroco.text.isNotEmpty) {
                           double totalCompra =
@@ -534,7 +534,7 @@ class _ListaComprasState extends State<ListaCompras> {
                                 .collection(uid)
                                 .orderBy("nome", descending: false)
                                 .get();
-                            snap.then((event) async {
+                            snap.then((event) {
                               List<dynamic> listaCompras = [];
                               for (var item in event.docs) {
                                 Map<String, dynamic> map = item.data();
@@ -546,7 +546,7 @@ class _ListaComprasState extends State<ListaCompras> {
                                 _alterarEstoque(idProduto, qtdCompra);
                               }
 
-                              await db.collection("listaCompra").doc().set({
+                              db.collection("listaCompra").doc().set({
                                 "dataCompra": DateTime.now().toString(),
                                 "status": "Pendente",
                                 "nome": mapUsuario["nome"],
@@ -563,15 +563,15 @@ class _ListaComprasState extends State<ListaCompras> {
                                 "formaPagamento": formaPagamento,
                                 "troco": trocoSalvar,
                                 "entrega": "pendente"
-                              }).then((value) async {
-                                await db
+                              }).then((value) {
+                                db
                                     .collection("listaPendente")
                                     .doc(uid)
                                     .collection(uid)
                                     .get()
                                     .then((value) {
-                                  value.docs.forEach((element) async {
-                                    await db
+                                  value.docs.forEach((element) {
+                                    db
                                         .collection("listaPendente")
                                         .doc(uid)
                                         .collection(uid)
@@ -666,7 +666,7 @@ class _ListaComprasState extends State<ListaCompras> {
                           .collection(uid)
                           .orderBy("nome", descending: false)
                           .get();
-                      snap.then((event) async {
+                      snap.then((event) {
                         List<dynamic> listaCompras = [];
                         for (var item in event.docs) {
                           Map<String, dynamic> map = item.data();
@@ -676,7 +676,7 @@ class _ListaComprasState extends State<ListaCompras> {
 
                           _alterarEstoque(idProduto, qtdCompra);
                         }
-                        await db.collection("listaCompra").doc().set({
+                        db.collection("listaCompra").doc().set({
                           "dataCompra": DateTime.now().toString(),
                           "status": "Pendente",
                           "nome": mapUsuario["nome"],
@@ -692,15 +692,15 @@ class _ListaComprasState extends State<ListaCompras> {
                           "formaPagamento": formaPagamento,
                           "troco": "0",
                           "entrega": "pendente"
-                        }).then((value) async {
-                          await db
+                        }).then((value) {
+                          db
                               .collection("listaPendente")
                               .doc(uid)
                               .collection(uid)
                               .get()
                               .then((value) {
-                            value.docs.forEach((element) async {
-                              await db
+                            value.docs.forEach((element) {
+                              db
                                   .collection("listaPendente")
                                   .doc(uid)
                                   .collection(uid)

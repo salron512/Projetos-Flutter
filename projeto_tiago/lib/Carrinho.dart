@@ -94,7 +94,7 @@ class _CarrinhoState extends State<Carrinho> {
                     ),
                   ),
                   TextField(
-                    autofocus: true,
+                   // autofocus: true,
                     controller: _controllerQtd,
                     keyboardType: TextInputType.number,
                     inputFormatters: [_mascaraQtd],

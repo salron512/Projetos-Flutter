@@ -37,7 +37,7 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
     String dataFormatada = formatador.format(dataConvertida);
     return dataFormatada;
   }
-
+  /*
   _apagaSolcilitacao(String id, String status) {
     if (status == "Pendente") {
       showDialog(
@@ -80,6 +80,7 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
           });
     }
   }
+  */
 
   @override
   void initState() {
@@ -286,10 +287,6 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
                                   elevation: 8,
                                   color: Theme.of(context).primaryColor,
                                   child: ListTile(
-                                      onLongPress: () {
-                                        _apagaSolcilitacao(dados.reference.id,
-                                            dados["status"]);
-                                      },
                                       onTap: () {
                                         Navigator.pushNamed(
                                             context, "/detalhesentrega",
