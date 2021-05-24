@@ -23,13 +23,16 @@ Future<void> main() async {
   //Remove this method to stop OneSignal Debugging
   OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
 
-  OneSignal.shared.init("ab58bbf0-b659-4ebf-8a66-ca62a3c4c68b", iOSSettings: {
+  OneSignal.shared.init("df35c33a-fa77-43f7-9558-4369f700b162", iOSSettings: {
     OSiOSSettings.autoPrompt: false,
     OSiOSSettings.inAppLaunchUrl: false
   });
   OneSignal.shared
       .setInFocusDisplayType(OSNotificationDisplayType.notification);
-// The promptForPushNotificationsWithUserResponse function will show the iOS push notification prompt. We recommend removing the following code and instead using an In-App Message to prompt for notification permission
+// The promptForPushNotificationsWithUserResponse function
+// will show the iOS push notification prompt. We recommend
+// removing the following code and instead using an
+// In-App Message to prompt for notification permission
   await OneSignal.shared
       .promptUserForPushNotificationPermission(fallbackToSettings: true);
   runApp(MaterialApp(

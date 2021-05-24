@@ -88,10 +88,9 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
                                         .doc(idUsurio)
                                         .set({
                                       "idEmpresa": idUsurio,
-                                      "adm": false,
+                                     "tipoUsuario": "empresa",
                                       "razaoSocial": razaoSocial,
                                       "nomeFantasia": nomeFantasia,
-                                      "empresa": true,
                                       "ativa": true,
                                       "telefone": telefone,
                                       "cnpj": cnpj,

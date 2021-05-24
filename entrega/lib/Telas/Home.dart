@@ -55,10 +55,17 @@ class _HomeState extends State<Home> {
     DocumentSnapshot dadosUsuario =
         await FirebaseFirestore.instance.collection("usuarios").doc(uid).get();
     map = dadosUsuario.data();
-    setState(() {
-      _adm = map["adm"];
-      _empresa = map["ativa"];
-    });
+    String tipoUsuario = map["tipoUsuario"];
+    if (tipoUsuario == "Empresa") {
+      setState(() {
+        _empresa = true;
+      });
+    }
+    if (tipoUsuario == "adm") {
+      setState(() {
+        _adm = true;
+      });
+    }
   }
 
   @override
@@ -150,6 +157,14 @@ class _HomeState extends State<Home> {
                             }).toList();
                           },
                         )),
+                    IconButton(
+                        icon: Icon(
+                          Icons.shopping_cart,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          Navigator.pushNamed(context, "/carinho");
+                        }),
                     IconButton(
                         icon: Icon(
                           Icons.account_circle,

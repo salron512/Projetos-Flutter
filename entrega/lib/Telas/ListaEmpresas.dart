@@ -12,12 +12,15 @@ class ListaEmpressas extends StatefulWidget {
 }
 
 class _ListaEmpressasState extends State<ListaEmpressas> {
+  String _estado = "";
+  Color _cor = Colors.white;
+
   Future _recuperaListaEmpresas() async {
     List listaRecuperada = [];
     String categoria = widget.categoria;
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection("usuarios")
-        .where("empresa", isEqualTo: true)
+        .where("tipoUsuario", isEqualTo: "empresa")
         .where("ativa", isEqualTo: true)
         .where("categoria", isEqualTo: categoria)
         .get();
@@ -33,6 +36,16 @@ class _ListaEmpressasState extends State<ListaEmpressas> {
       listaRecuperada.add(empresa);
     }
     return listaRecuperada;
+  }
+
+  _recuperaHora(String abertura, String fechamento) {
+    int hora = DateTime.now().hour.toInt();
+    int minutos = DateTime.now().minute.toInt();
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -68,10 +81,24 @@ class _ListaEmpressasState extends State<ListaEmpressas> {
                           borderRadius: BorderRadius.circular(16.0),
                         ),
                         child: ListTile(
-                          contentPadding: EdgeInsets.fromLTRB(20, 16, 20, 16),
+                          contentPadding: EdgeInsets.fromLTRB(20, 16, 5, 16),
                           leading: dadosEmpresa.urlImagem == null
-                              ? Image.asset("images/error.png")
-                              : Image.network(dadosEmpresa.urlImagem),
+                              ? Container(
+                                  height: 50,
+                                  width: 50,
+                                  child: Image.asset(
+                                    "images/error.png",
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : Container(
+                                  height: 50,
+                                  width: 50,
+                                  child: Image.network(
+                                    dadosEmpresa.urlImagem,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
                           title: Text(
                             dadosEmpresa.nomeFantasia,
                             style: TextStyle(color: Colors.white),
@@ -87,11 +114,17 @@ class _ListaEmpressasState extends State<ListaEmpressas> {
                                 "Horário de funcionamento ${dadosEmpresa.hAbertura} á ${dadosEmpresa.hFechamento} ",
                                 style: TextStyle(color: Colors.white),
                               ),
+                              Text(
+                                _recuperaHora(dadosEmpresa.hAbertura,
+                                    dadosEmpresa.hFechamento),
+                                style: TextStyle(color: _cor),
+                              ),
                             ],
                           ),
                           onTap: () {
                             Navigator.pushNamed(
-                                context, "/listaprodutosusuario", arguments: dadosEmpresa.idEmpresa);
+                                context, "/listaprodutosusuario",
+                                arguments: dadosEmpresa.idEmpresa);
                           },
                         ),
                       );

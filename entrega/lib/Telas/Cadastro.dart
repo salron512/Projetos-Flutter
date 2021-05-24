@@ -47,15 +47,13 @@ class _CadastroState extends State<Cadastro> {
                         await FirebaseAuth.instance
                             .createUserWithEmailAndPassword(
                                 email: email, password: senha)
-                            .then((value) {
+                            .then((value) async {
                           String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
-                          FirebaseFirestore.instance
+                          await FirebaseFirestore.instance
                               .collection("usuarios")
                               .doc(uid)
                               .set({
-                            "adm": false,
-                            "empresa": false,
-                            "ativa": false,
+                            "tipoUsuario": "cliente",
                             "nome": nome,
                             "email": email,
                             "telefone": telefone,
