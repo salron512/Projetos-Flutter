@@ -27,6 +27,7 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
   bool _mostrarSenha = false;
   bool _motrarSenhaConfirma = false;
   bool _subindoImagem = false;
+  bool _aberto = false;
   String _urlImagem;
   File _imagem;
   List<String> listaCidades = ["Mirassol D'Oeste"];
@@ -79,6 +80,7 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
                             "hFechamento": hFechamento,
                             "diasFunc": diasFuncionamento,
                             "categoria": _escolhaCategoria,
+                            "aberto": _aberto,
                           }).catchError((erro) {
                             setState(() {
                               setState(() {
@@ -245,6 +247,7 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
       _controllerHoraFechamento.text = map["hFechamento"];
       _cidade = map["cidade"];
       _escolhaCategoria = map["categoria"];
+      _aberto = map["aberto"];
     });
   }
 
@@ -267,13 +270,13 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                 Container(
-                width: 200,
-                height: 200,
-                child: _urlImagem == null
-                    ? Image.asset("images/error.png")
-                    : Image.network(_urlImagem),
-              ),
+                Container(
+                  width: 200,
+                  height: 200,
+                  child: _urlImagem == null
+                      ? Image.asset("images/error.png")
+                      : Image.network(_urlImagem),
+                ),
                 Padding(
                   padding: EdgeInsets.all(16),
                   child: Row(
@@ -305,6 +308,19 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
                       ),
                     ],
                   ),
+                ),
+                Row(
+                  children: [
+                    Text("Fechado"),
+                    Switch(
+                        value: _aberto,
+                        onChanged: (bool valor) {
+                          setState(() {
+                            _aberto = valor;
+                          });
+                        }),
+                    Text("Aberto"),
+                  ],
                 ),
                 Padding(
                   padding: EdgeInsets.only(bottom: 8),

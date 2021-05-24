@@ -7,6 +7,8 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class Carrinho extends StatefulWidget {
+  String idEmpresa;
+  Carrinho(this.idEmpresa);
   @override
   _CarrinhoState createState() => _CarrinhoState();
 }
@@ -23,11 +25,16 @@ class _CarrinhoState extends State<Carrinho> {
   List<dynamic> _listaCompras = [];
 
   _recuperaCesta() {
+    String idEmpresa = widget.idEmpresa;
     double soma = 0;
     String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
     CollectionReference ref = FirebaseFirestore.instance.collection("cesta");
 
-    ref.where("idUsuario", isEqualTo: uid).snapshots().listen((event) {
+    ref
+        .where("idEmpresa", isEqualTo: idEmpresa)
+        .where("idUsuario", isEqualTo: uid)
+        .snapshots()
+        .listen((event) {
       if (mounted) {
         if (_listaCompras.isNotEmpty) {
           _listaCompras.clear();
@@ -362,6 +369,7 @@ class _CarrinhoState extends State<Carrinho> {
         "bairroUsuario": mapUsuario["bairro"],
         "listaPedido": _listaCompras,
         "totalPedido": _totalCompra,
+        "horaPedido": DateTime.now().toString(),
         "formaPagamento": formaPagamento,
         "troco": "sem troco",
       }).then((value) async {
@@ -413,6 +421,7 @@ class _CarrinhoState extends State<Carrinho> {
         "bairroUsuario": mapUsuario["bairro"],
         "listaPedido": _listaCompras,
         "totalPedido": _totalCompra,
+        "horaPedido": DateTime.now().toString(),
         "formaPagamento": formaPagamento,
         "troco": verificaTroco,
       }).then((value) async {

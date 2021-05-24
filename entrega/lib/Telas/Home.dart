@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:entrega/util/Categorias.dart';
+import 'package:entrega/util/Localizacao.dart';
 import 'package:entrega/util/RecupepraFirebase.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -13,7 +15,9 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   bool _adm = false;
   bool _empresa = false;
-  List<String> itensMenu = ["Cadastrar empresa"];
+  List<String> itensMenu = ["Cadastrar empresa","Cadastrar entregador", 
+  "Lista entregador"];
+  
   _deslogar() {
     FirebaseAuth.instance.signOut().then((value) =>
         Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false));
@@ -23,6 +27,12 @@ class _HomeState extends State<Home> {
     switch (itemEscolhido) {
       case "Cadastrar empresa":
         Navigator.pushNamed(context, "/cadastroEmpresa");
+        break;
+         case "Cadastrar entregador":
+        Navigator.pushNamed(context, "/cadastroentregador");
+        break;
+           case "Lista entregador":
+        Navigator.pushNamed(context, "/cadastroentregador");
         break;
     }
   }
@@ -56,7 +66,7 @@ class _HomeState extends State<Home> {
         await FirebaseFirestore.instance.collection("usuarios").doc(uid).get();
     map = dadosUsuario.data();
     String tipoUsuario = map["tipoUsuario"];
-    if (tipoUsuario == "Empresa") {
+    if (tipoUsuario == "empresa") {
       setState(() {
         _empresa = true;
       });
@@ -71,6 +81,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    Localizacao.verificaLocalizacao();
     _recuperaUsuario();
   }
 
@@ -107,9 +118,16 @@ class _HomeState extends State<Home> {
                             contentPadding: EdgeInsets.fromLTRB(20, 16, 20, 16),
                             leading: Image.network(dados.urlImagem),
                             title: Text(dados.categoria),
-                            onTap: () {
-                              Navigator.pushNamed(context, "/listaempresas",
-                                  arguments: dados.categoria);
+                            onTap: () async {
+                              LocationPermission permission =
+                                  await Geolocator.checkPermission();
+                              if (permission == LocationPermission.denied ||
+                                  permission ==
+                                      LocationPermission.deniedForever) {
+                              } else {
+                                Navigator.pushNamed(context, "/listaempresas",
+                                    arguments: dados.categoria);
+                              }
                             },
                           ),
                         );
@@ -159,7 +177,7 @@ class _HomeState extends State<Home> {
                         )),
                     IconButton(
                         icon: Icon(
-                          Icons.shopping_cart,
+                          Icons.delivery_dining_sharp,
                           color: Colors.white,
                         ),
                         onPressed: () {
@@ -178,14 +196,17 @@ class _HomeState extends State<Home> {
                             Navigator.pushNamed(context, "/alteracadastro");
                           }
                         }),
-                    IconButton(
-                        icon: Icon(
-                          Icons.add,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {
-                          Navigator.pushNamed(context, "/listaprodutos");
-                        }),
+                    Visibility(
+                      visible: _empresa,
+                      child: IconButton(
+                          icon: Icon(
+                            Icons.add,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            Navigator.pushNamed(context, "/listaprodutos");
+                          }),
+                    ),
                     IconButton(
                         icon: Icon(
                           Icons.exit_to_app,

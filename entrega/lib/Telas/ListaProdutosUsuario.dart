@@ -13,6 +13,7 @@ class ListaProdutosUsuario extends StatefulWidget {
 }
 
 class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
+  String _idEmpresa;
   var _mascaraQtd = MaskTextInputFormatter(
       mask: '#########', filter: {"#": RegExp(r'[0-9]')});
   Future _recuperaProdutos() async {
@@ -34,6 +35,7 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
       produtos.descricao = dados["descricao"];
       produtos.urlImagem = dados["urlImagem"];
       produtos.idEmpresa = dados["idEmpresa"];
+      _idEmpresa = dados["idEmpresa"];
       listaProdutos.add(produtos);
     }
     return listaProdutos;
@@ -150,6 +152,7 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
                         Produtos produtos = listaProdutos[indice];
 
                         return Card(
+                          elevation: 8,
                           child: ListTile(
                             contentPadding: EdgeInsets.fromLTRB(5, 5, 5, 5),
                             leading: produtos.urlImagem == null
@@ -181,7 +184,7 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
         backgroundColor: Theme.of(context).primaryColor,
         child: Icon(Icons.shopping_cart),
         onPressed: () {
-          Navigator.pushNamed(context, "/carinho");
+          Navigator.pushNamed(context, "/carinho", arguments: _idEmpresa);
         },
       ),
     );

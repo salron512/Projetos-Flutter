@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:entrega/util/Empresa.dart';
+import 'package:entrega/util/Localizacao.dart';
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
@@ -12,18 +13,22 @@ class ListaEmpressas extends StatefulWidget {
 }
 
 class _ListaEmpressasState extends State<ListaEmpressas> {
-  String _estado = "";
-  Color _cor = Colors.white;
-
   Future _recuperaListaEmpresas() async {
+    String cidade = await Localizacao.recuperaLocalizacao();
     List listaRecuperada = [];
+
     String categoria = widget.categoria;
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection("usuarios")
+    CollectionReference reference =
+         FirebaseFirestore.instance.collection("usuarios");
+
+    QuerySnapshot querySnapshot = await reference
+        .orderBy("aberto", descending: true)
+        .where("cidade", isEqualTo: cidade)
         .where("tipoUsuario", isEqualTo: "empresa")
         .where("ativa", isEqualTo: true)
         .where("categoria", isEqualTo: categoria)
         .get();
+
     for (var item in querySnapshot.docs) {
       Map<String, dynamic> dados = item.data();
       Empresa empresa = Empresa();
@@ -33,16 +38,18 @@ class _ListaEmpressasState extends State<ListaEmpressas> {
       empresa.hFechamento = dados["hFechamento"];
       empresa.diasFunc = dados["diasFunc"];
       empresa.idEmpresa = dados["idEmpresa"];
+      empresa.estado = dados["aberto"];
       listaRecuperada.add(empresa);
     }
     return listaRecuperada;
   }
 
+/*
   _recuperaHora(String abertura, String fechamento) {
     int hora = DateTime.now().hour.toInt();
     int minutos = DateTime.now().minute.toInt();
   }
-
+*/
   @override
   void initState() {
     super.initState();
@@ -114,17 +121,25 @@ class _ListaEmpressasState extends State<ListaEmpressas> {
                                 "Horário de funcionamento ${dadosEmpresa.hAbertura} á ${dadosEmpresa.hFechamento} ",
                                 style: TextStyle(color: Colors.white),
                               ),
-                              Text(
-                                _recuperaHora(dadosEmpresa.hAbertura,
-                                    dadosEmpresa.hFechamento),
-                                style: TextStyle(color: _cor),
-                              ),
+                              dadosEmpresa.estado == true
+                                  ? Text("Aberto",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green))
+                                  : Text("Fechado",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.grey)),
                             ],
                           ),
                           onTap: () {
-                            Navigator.pushNamed(
-                                context, "/listaprodutosusuario",
-                                arguments: dadosEmpresa.idEmpresa);
+                            if (dadosEmpresa.estado) {
+                              Navigator.pushNamed(
+                                  context, "/listaprodutosusuario",
+                                  arguments: dadosEmpresa.idEmpresa);
+                            }
                           },
                         ),
                       );

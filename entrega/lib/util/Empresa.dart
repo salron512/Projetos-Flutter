@@ -8,10 +8,15 @@ class Empresa {
   String _hFechamento;
   String _diasFunc;
   String _idEmpresa;
+  bool _estado;
   
- String get idEmpresa => this._idEmpresa;
+ bool get estado => this._estado;
 
- set idEmpresa(String value) => this._idEmpresa = value;
+ set estado(bool value) => this._estado = value;
+
+  String get idEmpresa => this._idEmpresa;
+
+  set idEmpresa(String value) => this._idEmpresa = value;
 
   String get diasFunc => _diasFunc;
 

@@ -21,7 +21,7 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
   List<String> itensMenu = [];
   bool _mostrarSenha = false;
   bool _motrarSenhaConfirma = false;
-  List<String> listaCidades = ["Mirassol D'Oeste"];
+  List<String> listaCidades = ["Mirassol d'Oeste"];
   String _cidade = "";
   TextEditingController _controllerRazaoSocial = TextEditingController();
   TextEditingController _controllerNomeFantasia = TextEditingController();
@@ -81,14 +81,15 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
                                   await FirebaseAuth.instance
                                       .createUserWithEmailAndPassword(
                                           email: email, password: senha)
-                                      .then((value) {
+                                      .then((value) async {
                                     idUsurio = value.user.uid;
-                                    FirebaseFirestore.instance
+                                   await FirebaseFirestore.instance
                                         .collection("usuarios")
                                         .doc(idUsurio)
                                         .set({
                                       "idEmpresa": idUsurio,
-                                     "tipoUsuario": "empresa",
+                                      "aberto": false,
+                                      "tipoUsuario": "empresa",
                                       "razaoSocial": razaoSocial,
                                       "nomeFantasia": nomeFantasia,
                                       "ativa": true,
@@ -505,6 +506,7 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
                     controller: _controllerConfirmaSenha,
                   ),
                 ),
+              
                 Padding(
                     padding: EdgeInsets.only(bottom: 5),
                     child: PopupMenuButton<String>(
