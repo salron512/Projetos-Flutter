@@ -15,9 +15,13 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   bool _adm = false;
   bool _empresa = false;
-  List<String> itensMenu = ["Cadastrar empresa","Cadastrar entregador", 
-  "Lista entregador"];
-  
+  bool _entregador = false;
+  List<String> itensMenu = [
+    "Cadastrar empresa",
+    "Cadastrar entregador",
+    "Lista entregador"
+  ];
+
   _deslogar() {
     FirebaseAuth.instance.signOut().then((value) =>
         Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false));
@@ -28,10 +32,10 @@ class _HomeState extends State<Home> {
       case "Cadastrar empresa":
         Navigator.pushNamed(context, "/cadastroEmpresa");
         break;
-         case "Cadastrar entregador":
+      case "Cadastrar entregador":
         Navigator.pushNamed(context, "/cadastroentregador");
         break;
-           case "Lista entregador":
+      case "Lista entregador":
         Navigator.pushNamed(context, "/listaEntregadores");
         break;
     }
@@ -74,6 +78,11 @@ class _HomeState extends State<Home> {
     if (tipoUsuario == "adm") {
       setState(() {
         _adm = true;
+      });
+    }
+     if (tipoUsuario == "entregador") {
+      setState(() {
+        _entregador = true;
       });
     }
   }
@@ -177,7 +186,7 @@ class _HomeState extends State<Home> {
                         )),
                     IconButton(
                         icon: Icon(
-                          Icons.delivery_dining_sharp,
+                          Icons.update,
                           color: Colors.white,
                         ),
                         onPressed: () {
@@ -205,6 +214,28 @@ class _HomeState extends State<Home> {
                           ),
                           onPressed: () {
                             Navigator.pushNamed(context, "/listaprodutos");
+                          }),
+                    ),
+                    Visibility(
+                      visible: _entregador,
+                      child: IconButton(
+                          icon: Icon(
+                            Icons.delivery_dining_rounded,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            Navigator.pushNamed(context, "/listaEntregaPedentes");
+                          }),
+                    ),
+                     Visibility(
+                      visible: _entregador,
+                      child: IconButton(
+                          icon: Icon(
+                            Icons.sports_motorsports,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            Navigator.pushNamed(context, "/listaEntregaPedentes");
                           }),
                     ),
                     IconButton(

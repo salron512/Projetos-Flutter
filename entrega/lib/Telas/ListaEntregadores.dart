@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:entrega/util/Entregadores.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ListaEntregadores extends StatefulWidget {
   @override
@@ -32,6 +33,55 @@ class _ListaEntregadoresState extends State<ListaEntregadores> {
       listaEntregadores.add(entegadores);
     }
     return listaEntregadores;
+  }
+
+  _abrirWhatsApp(String telefone) async {
+    var whatsappUrl = "whatsapp://send?phone=+55$telefone=Olá,tudo bem ?";
+
+    if (await canLaunch(whatsappUrl)) {
+      await launch(whatsappUrl);
+    } else {
+      throw 'Could not launch $whatsappUrl';
+    }
+  }
+
+  _abrirTelefone(String telefone) async {
+    var telefoneUrl = "tel:$telefone";
+
+    if (await canLaunch(telefoneUrl)) {
+      await launch(telefoneUrl);
+    } else {
+      throw 'Could not launch $telefoneUrl';
+    }
+  }
+
+  _selecionaOpcao({String telefone, String whatsapp}) {
+    // ignore: missing_return
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Selecione uma opção"),
+            content: Container(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [Text("")],
+              ),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    _abrirTelefone(telefone);
+                  },
+                  child: Text("Telefone")),
+              TextButton(
+                  onPressed: () {
+                    _abrirWhatsApp(whatsapp);
+                  },
+                  child: Text("Telefone")),
+            ],
+          );
+        });
   }
 
   @override
@@ -77,6 +127,23 @@ class _ListaEntregadoresState extends State<ListaEntregadores> {
                               Text("Whatsapp " + entregador.whatsapp),
                               Text("Endereço " + entregador.endereco),
                               Text("Bairro " + entregador.bairro),
+                              Padding(
+                                padding: EdgeInsets.only(top: 15),
+                                child: Row(
+                                  children: [
+                                    TextButton(
+                                        onPressed: () {
+                                          _abrirTelefone(entregador.telefone);
+                                        },
+                                        child: Text("Telefone")),
+                                    TextButton(
+                                        onPressed: () {
+                                          _abrirWhatsApp(entregador.whatsapp);
+                                        },
+                                        child: Text("Whatsapp"))
+                                  ],
+                                ),
+                              )
                             ],
                           ),
                           value: entregador.ativo,

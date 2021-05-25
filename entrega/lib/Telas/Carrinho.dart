@@ -4,8 +4,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:entrega/util/RecupepraFirebase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
+// ignore: must_be_immutable
 class Carrinho extends StatefulWidget {
   String idEmpresa;
   Carrinho(this.idEmpresa);
@@ -22,7 +25,12 @@ class _CarrinhoState extends State<Carrinho> {
   String _totalCompra = "0";
   bool _mostraTotal = false;
   String _idEmpresa;
+  String _numero = "";
+  String _endereco = "";
+  String _bairro = "";
+  String _enderecoFinal = "vazio";
   List<dynamic> _listaCompras = [];
+  TextEditingController _controllerEndereco = TextEditingController();
 
   _recuperaCesta() {
     String idEmpresa = widget.idEmpresa;
@@ -339,8 +347,224 @@ class _CarrinhoState extends State<Carrinho> {
     }
   }
 
+  _selecionaEndereco() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Selecione um opção"),
+            content: Container(
+              height: 150,
+              child: Column(
+                children: [
+                  Container(
+                    width: 80,
+                    height: 80,
+                    child: Image.asset("images/localizacao.png"),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 8),
+                    child: Text("Dejesa utilizar sua localização atual ou " +
+                        "o endereço do seu cadastro?"),
+                  )
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _recuperaLocalizacao();
+                  },
+                  child: Text('Localização atual')),
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _selecionaPagamentoAlert();
+                  },
+                  child: Text('Localização cadastro'))
+            ],
+          );
+        });
+  }
+
+  _recuperaLocalizacao() async {
+    LocationPermission permission;
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    } else {
+      Position position = await Geolocator.getCurrentPosition();
+      Position testePosition =
+          // ignore: missing_required_param
+          Position(latitude: -15.67934342388134, longitude: -58.09606548073397);
+      //-15.67934342388134, -58.09606548073397
+      List<Placemark> listaendereco = await placemarkFromCoordinates(
+          testePosition.latitude, testePosition.longitude);
+      Placemark endereco = listaendereco[0];
+      _endereco = endereco.thoroughfare;
+      _numero = endereco.subThoroughfare;
+      _bairro = endereco.subLocality;
+
+      print("Teste Endereco " + _endereco);
+      print("Teste numero " + _numero);
+      print("Teste bairro " + _bairro);
+      _enderecoFinal = "$_endereco " + "$_numero";
+      _controllerEndereco.text = _enderecoFinal;
+      _confirmaEndereco();
+    }
+  }
+
+  _confirmaEndereco() {
+    // ignore: missing_return
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Confirmar endereço"),
+            content: Container(
+              height: 150,
+              child: Column(
+                children: [
+                  TextField(
+                      keyboardType: TextInputType.url,
+                      style: TextStyle(
+                        fontSize: 15,
+                      ),
+                      decoration: InputDecoration(
+                        //contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                        hintText: "Endereco",
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                      controller: _controllerEndereco),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("Cancelar")),
+              TextButton(
+                  onPressed: () {
+                     Navigator.pop(context);
+                    _selecionaPagamentoAlert();
+                  },
+                  child: Text("Confirmar"))
+            ],
+          );
+        });
+  }
+
   _salvaPedido(String formaPagamento, {double troco}) async {
-    if (troco < 0) {
+    if (_enderecoFinal == "vazio") {
+      if (troco < 0) {
+        _aguardandoFirebase();
+        String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+        Map<String, dynamic> mapUsuario;
+        Map<String, dynamic> mapEmpresa;
+        DocumentSnapshot dadosUsuario = await FirebaseFirestore.instance
+            .collection("usuarios")
+            .doc(uid)
+            .get();
+        mapUsuario = dadosUsuario.data();
+
+        DocumentSnapshot dadosEmpresa = await FirebaseFirestore.instance
+            .collection("usuarios")
+            .doc(_idEmpresa)
+            .get();
+        mapEmpresa = dadosEmpresa.data();
+
+        await FirebaseFirestore.instance.collection("pedidos").doc().set({
+          "status": "Aguardando",
+          "idEmpresa": _idEmpresa,
+          "nomeEmpresa": mapEmpresa["nomeFantasia"],
+          "idUsuario": uid,
+          "cliente": mapUsuario["nome"],
+          "telefoneUsuario": mapUsuario["telefone"],
+          "whatasappUsuario": mapUsuario["whatsapp"],
+          "enderecoUsuario": mapUsuario["endereco"],
+          "bairroUsuario": mapUsuario["bairro"],
+          "listaPedido": _listaCompras,
+          "totalPedido": _totalCompra,
+          "horaPedido": DateTime.now().toString(),
+          "formaPagamento": formaPagamento,
+          "troco": "sem troco",
+        }).then((value) async {
+          QuerySnapshot cestaCompras = await FirebaseFirestore.instance
+              .collection("cesta")
+              .where("idUsuario", isEqualTo: uid)
+              .get();
+          cestaCompras.docs.forEach((element) {
+            FirebaseFirestore.instance
+                .collection("cesta")
+                .doc(element.reference.id)
+                .delete();
+          });
+
+          Navigator.pop(context);
+          _confirmaPedido();
+        }).catchError((erro) {
+          Navigator.pop(context);
+          _alertErro("Erro ao enviar seu pedido");
+        });
+      } else {
+        String verificaTroco = troco.toStringAsFixed(2);
+        _aguardandoFirebase();
+        String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+        Map<String, dynamic> mapUsuario;
+        Map<String, dynamic> mapEmpresa;
+
+        DocumentSnapshot dadosUsuario = await FirebaseFirestore.instance
+            .collection("usuarios")
+            .doc(uid)
+            .get();
+        mapUsuario = dadosUsuario.data();
+
+        DocumentSnapshot dadosEmpresa = await FirebaseFirestore.instance
+            .collection("usuarios")
+            .doc(_idEmpresa)
+            .get();
+        mapEmpresa = dadosEmpresa.data();
+
+        await FirebaseFirestore.instance.collection("pedidos").doc().set({
+          "status": "Aguardando",
+          "idEmpresa": _idEmpresa,
+          "nomeEmpresa": mapEmpresa["nomeFantasia"],
+          "idUsuario": uid,
+          "cliente": mapUsuario["nome"],
+          "telefoneUsuario": mapUsuario["telefone"],
+          "whatasappUsuario": mapUsuario["whatsapp"],
+          "enderecoUsuario": mapUsuario["endereco"],
+          "bairroUsuario": mapUsuario["bairro"],
+          "listaPedido": _listaCompras,
+          "totalPedido": _totalCompra,
+          "horaPedido": DateTime.now().toString(),
+          "formaPagamento": formaPagamento,
+          "troco": verificaTroco,
+        }).then((value) async {
+          QuerySnapshot cestaCompras = await FirebaseFirestore.instance
+              .collection("cesta")
+              .where("idUsuario", isEqualTo: uid)
+              .get();
+          cestaCompras.docs.forEach((element) {
+            FirebaseFirestore.instance
+                .collection("cesta")
+                .doc(element.reference.id)
+                .delete();
+          });
+
+          Navigator.pop(context);
+          _confirmaPedido();
+        }).catchError((erro) {
+          Navigator.pop(context);
+          _alertErro("Erro ao enviar seu pedido");
+        });
+      }
+    } else {
+      if (troco < 0) {
       _aguardandoFirebase();
       String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
       Map<String, dynamic> mapUsuario;
@@ -365,8 +589,8 @@ class _CarrinhoState extends State<Carrinho> {
         "cliente": mapUsuario["nome"],
         "telefoneUsuario": mapUsuario["telefone"],
         "whatasappUsuario": mapUsuario["whatsapp"],
-        "enderecoUsuario": mapUsuario["endereco"],
-        "bairroUsuario": mapUsuario["bairro"],
+        "enderecoUsuario": _enderecoFinal,
+        "bairroUsuario": _bairro,
         "listaPedido": _listaCompras,
         "totalPedido": _totalCompra,
         "horaPedido": DateTime.now().toString(),
@@ -390,6 +614,8 @@ class _CarrinhoState extends State<Carrinho> {
         Navigator.pop(context);
         _alertErro("Erro ao enviar seu pedido");
       });
+
+
     } else {
       String verificaTroco = troco.toStringAsFixed(2);
       _aguardandoFirebase();
@@ -417,8 +643,8 @@ class _CarrinhoState extends State<Carrinho> {
         "cliente": mapUsuario["nome"],
         "telefoneUsuario": mapUsuario["telefone"],
         "whatasappUsuario": mapUsuario["whatsapp"],
-        "enderecoUsuario": mapUsuario["endereco"],
-        "bairroUsuario": mapUsuario["bairro"],
+        "enderecoUsuario": _enderecoFinal,
+        "bairroUsuario": _bairro,
         "listaPedido": _listaCompras,
         "totalPedido": _totalCompra,
         "horaPedido": DateTime.now().toString(),
@@ -442,6 +668,7 @@ class _CarrinhoState extends State<Carrinho> {
         Navigator.pop(context);
         _alertErro("Erro ao enviar seu pedido");
       });
+    }
     }
   }
 
@@ -687,7 +914,7 @@ class _CarrinhoState extends State<Carrinho> {
                               borderRadius: BorderRadius.circular(15)),
                         ),
                         onPressed: () {
-                          _selecionaPagamentoAlert();
+                          _selecionaEndereco();
                         },
                       ),
                     )
