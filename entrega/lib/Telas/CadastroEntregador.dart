@@ -52,6 +52,7 @@ class _CadastroEntregadorState extends State<CadastroEntregador> {
                               .collection("usuarios")
                               .doc(uid)
                               .set({
+                            "idUsuario": uid,
                             "tipoUsuario": "entregador",
                             "ativo": true,
                             "nome": nome,

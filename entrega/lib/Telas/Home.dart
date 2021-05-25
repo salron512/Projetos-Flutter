@@ -32,7 +32,7 @@ class _HomeState extends State<Home> {
         Navigator.pushNamed(context, "/cadastroentregador");
         break;
            case "Lista entregador":
-        Navigator.pushNamed(context, "/cadastroentregador");
+        Navigator.pushNamed(context, "/listaEntregadores");
         break;
     }
   }
@@ -181,7 +181,7 @@ class _HomeState extends State<Home> {
                           color: Colors.white,
                         ),
                         onPressed: () {
-                          Navigator.pushNamed(context, "/carinho");
+                          Navigator.pushNamed(context, "/listapedidousuario");
                         }),
                     IconButton(
                         icon: Icon(
