@@ -80,7 +80,7 @@ class _HomeState extends State<Home> {
         _adm = true;
       });
     }
-     if (tipoUsuario == "entregador") {
+    if (tipoUsuario == "entregador") {
       setState(() {
         _entregador = true;
       });
@@ -224,10 +224,11 @@ class _HomeState extends State<Home> {
                             color: Colors.white,
                           ),
                           onPressed: () {
-                            Navigator.pushNamed(context, "/listaEntregaPedentes");
+                            Navigator.pushNamed(
+                                context, "/listaEntregaPedentes");
                           }),
                     ),
-                     Visibility(
+                    Visibility(
                       visible: _entregador,
                       child: IconButton(
                           icon: Icon(
@@ -235,7 +236,18 @@ class _HomeState extends State<Home> {
                             color: Colors.white,
                           ),
                           onPressed: () {
-                            Navigator.pushNamed(context, "/listaEntregaPedentes");
+                            Navigator.pushNamed(context, "/minhasentregas");
+                          }),
+                    ),
+                     Visibility(
+                      visible: _entregador,
+                      child: IconButton(
+                          icon: Icon(
+                            Icons.reorder,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            Navigator.pushNamed(context, "/entregasrealizadas");
                           }),
                     ),
                     IconButton(

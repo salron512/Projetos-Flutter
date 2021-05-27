@@ -22,6 +22,7 @@ class _ListaPedidosUsuarioState extends State<ListaPedidosUsuario> {
     reference
         .orderBy("horaPedido", descending: true)
         .where("idUsuario", isEqualTo: uid)
+        .where("andamento", isEqualTo: true)
         .snapshots()
         .listen((event) {
       if (mounted) {
@@ -83,7 +84,9 @@ class _ListaPedidosUsuarioState extends State<ListaPedidosUsuario> {
                           query.docs.toList();
                       QueryDocumentSnapshot pedido = listQuery[indice];
                       return Card(
-                        color: Theme.of(context).primaryColor,
+                        color: pedido["status"] == "Iniciada"
+                            ? Colors.green
+                            : Theme.of(context).primaryColor,
                         child: ListTile(
                           title: Text(
                             "Cliente " + pedido["cliente"],
@@ -93,7 +96,7 @@ class _ListaPedidosUsuarioState extends State<ListaPedidosUsuario> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Local do pedido " + pedido["nomeEmpresa"],
+                                "Estabelecimento " + pedido["nomeEmpresa"],
                                 style: TextStyle(color: Colors.white),
                               ),
                               Text(
@@ -108,7 +111,22 @@ class _ListaPedidosUsuarioState extends State<ListaPedidosUsuario> {
                                 "Data do pedido  " +
                                     _formatarData(pedido["horaPedido"]),
                                 style: TextStyle(color: Colors.white),
-                              )
+                              ),
+                              pedido["status"] == "Iniciada"
+                                  ? TextButton(
+                                    
+                                      onPressed: () {
+                                        Navigator.pushNamed(context, "/mapa",
+                                            arguments: pedido.reference.id);
+                                      },
+                                      child: Text("Acompanhe seu pedido",
+                                      style: TextStyle(
+                                        color: Colors.white
+                                      ),
+                                      ),
+                                      
+                                      )
+                                  : Text("")
                             ],
                           ),
                           onTap: () {

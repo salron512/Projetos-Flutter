@@ -11,10 +11,13 @@ import 'package:entrega/Telas/Home.dart';
 import 'package:entrega/Telas/ListaEmpresas.dart';
 import 'package:entrega/Telas/ListaEntregadores.dart';
 import 'package:entrega/Telas/ListaEntregasPendentes.dart';
+import 'package:entrega/Telas/ListaEntregasRealizadas.dart';
 import 'package:entrega/Telas/ListaPedidosUsuario.dart';
 import 'package:entrega/Telas/ListaProdutos.dart';
 import 'package:entrega/Telas/ListaProdutosUsuario.dart';
 import 'package:entrega/Telas/Login.dart';
+import 'package:entrega/Telas/Mapa.dart';
+import 'package:entrega/Telas/MinhasEntregasEntregador.dart';
 import 'package:entrega/Telas/PerfilProduto.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -67,6 +70,12 @@ class Rotas {
         return MaterialPageRoute(builder: (_) => ListaEntregadores());
          case "/listaEntregaPedentes":
         return MaterialPageRoute(builder: (_) => ListEntregasPendentes());
+           case "/minhasentregas":
+        return MaterialPageRoute(builder: (_) => MinhasEntregasEntregador());
+           case "/mapa":
+        return MaterialPageRoute(builder: (_) => Mapa(args));
+           case "/entregasrealizadas":
+        return MaterialPageRoute(builder: (_) => ListaEntregasRealizadas());
 
       default:
         _erroRota();

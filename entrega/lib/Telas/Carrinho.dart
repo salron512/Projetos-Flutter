@@ -394,6 +394,7 @@ class _CarrinhoState extends State<Carrinho> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
     } else {
+      _aguardandoLocalizacao();
       Position position = await Geolocator.getCurrentPosition();
       Position testePosition =
           // ignore: missing_required_param
@@ -411,6 +412,7 @@ class _CarrinhoState extends State<Carrinho> {
       print("Teste bairro " + _bairro);
       _enderecoFinal = "$_endereco " + "$_numero";
       _controllerEndereco.text = _enderecoFinal;
+      Navigator.pop(context);
       _confirmaEndereco();
     }
   }
@@ -449,7 +451,7 @@ class _CarrinhoState extends State<Carrinho> {
                   child: Text("Cancelar")),
               TextButton(
                   onPressed: () {
-                     Navigator.pop(context);
+                    Navigator.pop(context);
                     _selecionaPagamentoAlert();
                   },
                   child: Text("Confirmar"))
@@ -479,6 +481,7 @@ class _CarrinhoState extends State<Carrinho> {
 
         await FirebaseFirestore.instance.collection("pedidos").doc().set({
           "status": "Aguardando",
+          "andamento": true,
           "idEmpresa": _idEmpresa,
           "nomeEmpresa": mapEmpresa["nomeFantasia"],
           "idUsuario": uid,
@@ -532,6 +535,7 @@ class _CarrinhoState extends State<Carrinho> {
         await FirebaseFirestore.instance.collection("pedidos").doc().set({
           "status": "Aguardando",
           "idEmpresa": _idEmpresa,
+          "andamento": true,
           "nomeEmpresa": mapEmpresa["nomeFantasia"],
           "idUsuario": uid,
           "cliente": mapUsuario["nome"],
@@ -565,110 +569,108 @@ class _CarrinhoState extends State<Carrinho> {
       }
     } else {
       if (troco < 0) {
-      _aguardandoFirebase();
-      String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
-      Map<String, dynamic> mapUsuario;
-      Map<String, dynamic> mapEmpresa;
-      DocumentSnapshot dadosUsuario = await FirebaseFirestore.instance
-          .collection("usuarios")
-          .doc(uid)
-          .get();
-      mapUsuario = dadosUsuario.data();
-
-      DocumentSnapshot dadosEmpresa = await FirebaseFirestore.instance
-          .collection("usuarios")
-          .doc(_idEmpresa)
-          .get();
-      mapEmpresa = dadosEmpresa.data();
-
-      await FirebaseFirestore.instance.collection("pedidos").doc().set({
-        "status": "Aguardando",
-        "idEmpresa": _idEmpresa,
-        "nomeEmpresa": mapEmpresa["nomeFantasia"],
-        "idUsuario": uid,
-        "cliente": mapUsuario["nome"],
-        "telefoneUsuario": mapUsuario["telefone"],
-        "whatasappUsuario": mapUsuario["whatsapp"],
-        "enderecoUsuario": _enderecoFinal,
-        "bairroUsuario": _bairro,
-        "listaPedido": _listaCompras,
-        "totalPedido": _totalCompra,
-        "horaPedido": DateTime.now().toString(),
-        "formaPagamento": formaPagamento,
-        "troco": "sem troco",
-      }).then((value) async {
-        QuerySnapshot cestaCompras = await FirebaseFirestore.instance
-            .collection("cesta")
-            .where("idUsuario", isEqualTo: uid)
+        _aguardandoFirebase();
+        String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+        Map<String, dynamic> mapUsuario;
+        Map<String, dynamic> mapEmpresa;
+        DocumentSnapshot dadosUsuario = await FirebaseFirestore.instance
+            .collection("usuarios")
+            .doc(uid)
             .get();
-        cestaCompras.docs.forEach((element) {
-          FirebaseFirestore.instance
-              .collection("cesta")
-              .doc(element.reference.id)
-              .delete();
-        });
+        mapUsuario = dadosUsuario.data();
 
-        Navigator.pop(context);
-        _confirmaPedido();
-      }).catchError((erro) {
-        Navigator.pop(context);
-        _alertErro("Erro ao enviar seu pedido");
-      });
-
-
-    } else {
-      String verificaTroco = troco.toStringAsFixed(2);
-      _aguardandoFirebase();
-      String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
-      Map<String, dynamic> mapUsuario;
-      Map<String, dynamic> mapEmpresa;
-
-      DocumentSnapshot dadosUsuario = await FirebaseFirestore.instance
-          .collection("usuarios")
-          .doc(uid)
-          .get();
-      mapUsuario = dadosUsuario.data();
-
-      DocumentSnapshot dadosEmpresa = await FirebaseFirestore.instance
-          .collection("usuarios")
-          .doc(_idEmpresa)
-          .get();
-      mapEmpresa = dadosEmpresa.data();
-
-      await FirebaseFirestore.instance.collection("pedidos").doc().set({
-        "status": "Aguardando",
-        "idEmpresa": _idEmpresa,
-        "nomeEmpresa": mapEmpresa["nomeFantasia"],
-        "idUsuario": uid,
-        "cliente": mapUsuario["nome"],
-        "telefoneUsuario": mapUsuario["telefone"],
-        "whatasappUsuario": mapUsuario["whatsapp"],
-        "enderecoUsuario": _enderecoFinal,
-        "bairroUsuario": _bairro,
-        "listaPedido": _listaCompras,
-        "totalPedido": _totalCompra,
-        "horaPedido": DateTime.now().toString(),
-        "formaPagamento": formaPagamento,
-        "troco": verificaTroco,
-      }).then((value) async {
-        QuerySnapshot cestaCompras = await FirebaseFirestore.instance
-            .collection("cesta")
-            .where("idUsuario", isEqualTo: uid)
+        DocumentSnapshot dadosEmpresa = await FirebaseFirestore.instance
+            .collection("usuarios")
+            .doc(_idEmpresa)
             .get();
-        cestaCompras.docs.forEach((element) {
-          FirebaseFirestore.instance
-              .collection("cesta")
-              .doc(element.reference.id)
-              .delete();
-        });
+        mapEmpresa = dadosEmpresa.data();
 
-        Navigator.pop(context);
-        _confirmaPedido();
-      }).catchError((erro) {
-        Navigator.pop(context);
-        _alertErro("Erro ao enviar seu pedido");
-      });
-    }
+        await FirebaseFirestore.instance.collection("pedidos").doc().set({
+          "status": "Aguardando",
+          "idEmpresa": _idEmpresa,
+          "nomeEmpresa": mapEmpresa["nomeFantasia"],
+          "idUsuario": uid,
+          "cliente": mapUsuario["nome"],
+          "telefoneUsuario": mapUsuario["telefone"],
+          "whatasappUsuario": mapUsuario["whatsapp"],
+          "enderecoUsuario": _enderecoFinal,
+          "bairroUsuario": _bairro,
+          "listaPedido": _listaCompras,
+          "totalPedido": _totalCompra,
+          "horaPedido": DateTime.now().toString(),
+          "formaPagamento": formaPagamento,
+          "troco": "sem troco",
+        }).then((value) async {
+          QuerySnapshot cestaCompras = await FirebaseFirestore.instance
+              .collection("cesta")
+              .where("idUsuario", isEqualTo: uid)
+              .get();
+          cestaCompras.docs.forEach((element) {
+            FirebaseFirestore.instance
+                .collection("cesta")
+                .doc(element.reference.id)
+                .delete();
+          });
+
+          Navigator.pop(context);
+          _confirmaPedido();
+        }).catchError((erro) {
+          Navigator.pop(context);
+          _alertErro("Erro ao enviar seu pedido");
+        });
+      } else {
+        String verificaTroco = troco.toStringAsFixed(2);
+        _aguardandoFirebase();
+        String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+        Map<String, dynamic> mapUsuario;
+        Map<String, dynamic> mapEmpresa;
+
+        DocumentSnapshot dadosUsuario = await FirebaseFirestore.instance
+            .collection("usuarios")
+            .doc(uid)
+            .get();
+        mapUsuario = dadosUsuario.data();
+
+        DocumentSnapshot dadosEmpresa = await FirebaseFirestore.instance
+            .collection("usuarios")
+            .doc(_idEmpresa)
+            .get();
+        mapEmpresa = dadosEmpresa.data();
+
+        await FirebaseFirestore.instance.collection("pedidos").doc().set({
+          "status": "Aguardando",
+          "idEmpresa": _idEmpresa,
+          "nomeEmpresa": mapEmpresa["nomeFantasia"],
+          "idUsuario": uid,
+          "cliente": mapUsuario["nome"],
+          "telefoneUsuario": mapUsuario["telefone"],
+          "whatasappUsuario": mapUsuario["whatsapp"],
+          "enderecoUsuario": _enderecoFinal,
+          "bairroUsuario": _bairro,
+          "listaPedido": _listaCompras,
+          "totalPedido": _totalCompra,
+          "horaPedido": DateTime.now().toString(),
+          "formaPagamento": formaPagamento,
+          "troco": verificaTroco,
+        }).then((value) async {
+          QuerySnapshot cestaCompras = await FirebaseFirestore.instance
+              .collection("cesta")
+              .where("idUsuario", isEqualTo: uid)
+              .get();
+          cestaCompras.docs.forEach((element) {
+            FirebaseFirestore.instance
+                .collection("cesta")
+                .doc(element.reference.id)
+                .delete();
+          });
+
+          Navigator.pop(context);
+          _confirmaPedido();
+        }).catchError((erro) {
+          Navigator.pop(context);
+          _alertErro("Erro ao enviar seu pedido");
+        });
+      }
     }
   }
 
@@ -679,6 +681,23 @@ class _CarrinhoState extends State<Carrinho> {
         builder: (context) {
           return AlertDialog(
             title: Text("Enviando seu pedido..."),
+            content: Container(
+              height: 100,
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          );
+        });
+  }
+
+  _aguardandoLocalizacao() {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Recuperando Localização..."),
             content: Container(
               height: 100,
               child: Center(

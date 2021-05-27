@@ -2,7 +2,8 @@
     package="com.example.entrega">
 
      <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />  
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     
    <application
         android:label="entrega"
@@ -38,6 +39,8 @@
         </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
+               <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDYB2vbX1ZqPPexYA-aB9K5XDu-sQ3PYbg"/>
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
