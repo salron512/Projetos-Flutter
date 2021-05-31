@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:projeto_tiago/util/Localizacao.dart';
 import 'package:projeto_tiago/util/RecuperaDadosFirebase.dart';
 
 class ListaCategorias extends StatefulWidget {
@@ -77,15 +78,13 @@ class _ListaCategoriasState extends State<ListaCategorias> {
     });
   }
 
-
-
   @override
   void initState() {
     super.initState();
+     _recuperaUsuario();
     _recebeNot();
     _recuperaListaCategorias();
-    _recuperaUsuario();
-
+    Localizacao.verificaLocalizacao();
   }
 
   @override

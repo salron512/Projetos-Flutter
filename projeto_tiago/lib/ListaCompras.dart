@@ -444,6 +444,8 @@ class _ListaComprasState extends State<ListaCompras> {
     ));
   }
 
+
+
   _salvaPedido(String formaPagamento) {
     if (formaPagamento == "Dinheiro") {
       showDialog(
@@ -505,11 +507,12 @@ class _ListaComprasState extends State<ListaCompras> {
                 TextButton(
                   onPressed: () async {
                     if (_controllerTroco.text.contains(",")) {
-                      _mostraErro("O uso de virgula não é inválido");
+                      _mostraErro("O uso de virgula  é inválido");
                     } else {
-                      bool confirmarCompra =  _verificaEstoque();
+                      bool confirmarCompra = await _verificaEstoque();
                       if (confirmarCompra) {
                         if (_controllerTroco.text.isNotEmpty) {
+                        
                           double totalCompra =
                               double.tryParse(_totalCompra).toDouble();
                           double troco =

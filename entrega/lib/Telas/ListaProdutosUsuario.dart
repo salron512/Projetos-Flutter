@@ -145,32 +145,77 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
                       child: Text("Sem produtos cadastrados"),
                     );
                   } else {
-                    return ListView.builder(
+                    return ListView.separated(
+                      separatorBuilder: (context, index) => Divider(
+                        height: 4,
+                        color: Theme.of(context).primaryColor,
+                      ),
                       itemCount: listaProdutos.length,
                       // ignore: missing_return
                       itemBuilder: (context, indice) {
                         Produtos produtos = listaProdutos[indice];
+                        return Container(
+                            padding: EdgeInsets.all(4),
+                            child: GestureDetector(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.only(right: 8),
+                                    child: Image.network(
+                                      produtos.urlImagem,
+                                      fit: BoxFit.cover,
+                                      height: 120,
+                                      width: 120,
+                                    ),
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        produtos.nome,
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      Text("R\$ " + produtos.preco),
+                                      Text(produtos.descricao)
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              onTap: () {
+                                _alerQtd(produtos);
+                              },
+                            ));
 
-                        return Card(
-                          elevation: 8,
-                          child: ListTile(
-                            contentPadding: EdgeInsets.fromLTRB(5, 5, 5, 5),
-                            leading: produtos.urlImagem == null
-                                ? Image.asset("images/error.png")
-                                : Image.network(produtos.urlImagem),
-                            title: Text(produtos.nome),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("R\$ " + produtos.preco),
-                                Text(produtos.descricao)
-                              ],
-                            ),
-                            onTap: () {
-                              _alerQtd(produtos);
-                            },
+                        /*
+                         ListTile(
+                          contentPadding: EdgeInsets.fromLTRB(5, 5, 5, 5),
+                          leading: produtos.urlImagem == null
+                              ? Image.asset("images/error.png")
+                              : Container(
+                                  child: Image.network(
+                                    produtos.urlImagem,
+                                    fit: BoxFit.cover,
+                                    height: 450,
+                                    width: 150,
+                                  ),
+                                ),
+                          title: Text(produtos.nome),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("R\$ " + produtos.preco),
+                              Text(produtos.descricao)
+                            ],
                           ),
+                          onTap: () {
+                            _alerQtd(produtos);
+                          },
                         );
+                        */
                       },
                     );
                   }

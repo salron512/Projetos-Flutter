@@ -138,6 +138,10 @@ class _MinhasEntregasEntregadorState extends State<MinhasEntregasEntregador> {
                       "dataCancelamento": DateTime.now().toString()
                     }).then((value) {
                       BackgroundLocation.stopLocationService();
+                      FirebaseFirestore.instance
+                          .collection("localizacaoEntregador")
+                          .doc(entrega.reference.id)
+                          .delete();
                       Navigator.pop(context);
                     });
                   }
@@ -170,8 +174,8 @@ class _MinhasEntregasEntregadorState extends State<MinhasEntregasEntregador> {
               TextButton(
                 child: Text("Confirmar"),
                 onPressed: () {
-                  String mes = DateTime.now().month.toString();
-                  String ano = DateTime.now().year.toString();
+                  int mes = DateTime.now().month.toInt();
+                  int ano = DateTime.now().year.toInt();
                   FirebaseFirestore.instance
                       .collection("pedidos")
                       .doc(entrega.reference.id)
@@ -183,6 +187,10 @@ class _MinhasEntregasEntregadorState extends State<MinhasEntregasEntregador> {
                     "dataEntrega": DateTime.now().toString()
                   }).then((value) {
                     BackgroundLocation.stopLocationService();
+                    FirebaseFirestore.instance
+                        .collection("localizacaoEntregador")
+                        .doc(entrega.reference.id)
+                        .delete();
                     Navigator.pop(context);
                   });
                 },
@@ -267,22 +275,52 @@ class _MinhasEntregasEntregadorState extends State<MinhasEntregasEntregador> {
                           querySnapshot.docs.toList();
                       QueryDocumentSnapshot entrega = lista[indice];
                       return Card(
+                        color: entrega["status"] == "Iniciada"
+                            ? Colors.green
+                            : Theme.of(context).primaryColor,
                         elevation: 8,
                         child: ListTile(
-                          title: Text("Cliente " + entrega["cliente"]),
+                          title: Text(
+                            "Cliente " + entrega["cliente"],
+                            style: TextStyle(color: Colors.white),
+                          ),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("Estabelecimento " + entrega["nomeEmpresa"]),
-                              Text("Forma de pagamento " +
-                                  entrega["formaPagamento"]),
-                              Text("Troco R\$ " + entrega["troco"]),
-                              Text("Valor total R\$ " + entrega["totalPedido"]),
-                              Text("Endereço " + entrega["enderecoUsuario"]),
-                              Text("Bairro " + entrega["bairroUsuario"]),
-                              Text("Hora do pedido " +
-                                  _formatarData(entrega["horaPedido"])),
-                              Text("Status " + entrega["status"])
+                              Text(
+                                "Estabelecimento " + entrega["nomeEmpresa"],
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Text(
+                                "Forma de pagamento " +
+                                    entrega["formaPagamento"],
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Text(
+                                "Troco R\$ " + entrega["troco"],
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Text(
+                                "Valor total R\$ " + entrega["totalPedido"],
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Text(
+                                "Endereço " + entrega["enderecoUsuario"],
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Text(
+                                "Bairro " + entrega["bairroUsuario"],
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Text(
+                                "Hora do pedido " +
+                                    _formatarData(entrega["horaPedido"]),
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Text(
+                                "Status " + entrega["status"],
+                                style: TextStyle(color: Colors.white),
+                              )
                             ],
                           ),
                           onLongPress: () {

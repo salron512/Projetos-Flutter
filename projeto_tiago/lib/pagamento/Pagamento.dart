@@ -11,12 +11,11 @@ class Pagamento extends StatefulWidget {
 class _PagamentoState extends State<Pagamento> {
   _pagamento() async {
     String email = "andre.vicensotti@gmail.com";
+    String token = "";
     Uri urlBase = Uri.parse("https://ws.sandbox.pagseguro.uol.com.br/" +
         "{{api-endpoint}}?email={{$email}}" +
-        "&token={{token-sandbox}}");
-    Map<String, dynamic> dadosPagamento = {
-
-    };
+        "&token={{$token}}");
+    Map<String, dynamic> dadosPagamento = {};
 
     String corpo = jsonEncode(dadosPagamento);
     http.Response response = await http.post(urlBase,

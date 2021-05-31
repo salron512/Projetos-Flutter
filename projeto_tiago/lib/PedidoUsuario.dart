@@ -24,7 +24,7 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
         .snapshots()
         .listen((event) {
       if (mounted) {
-          _controller.add(event);
+        _controller.add(event);
       }
     });
   }
@@ -37,8 +37,8 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
     String dataFormatada = formatador.format(dataConvertida);
     return dataFormatada;
   }
-  /*
-  _apagaSolcilitacao(String id, String status) {
+
+  _apagaSolcilitacao(String id, String status, DocumentSnapshot dados) {
     if (status == "Pendente") {
       showDialog(
           context: context,
@@ -68,10 +68,34 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
                   child: Text("Cancelar"),
                 ),
                 TextButton(
-                  onPressed: () {
+                  onPressed: () async {
                     Navigator.pop(context);
                     FirebaseFirestore db = FirebaseFirestore.instance;
-                    db.collection("listaCompra").doc(id).delete();
+                    db
+                        .collection("listaCompra")
+                        .doc(dados.reference.id)
+                        .delete();
+                    List<dynamic> listaProduto = dados["listaProdutos"];
+                    for (var item in listaProduto) {
+                      Map<String, dynamic> dados;
+                      int estoque = 0;
+                      int qtdCompra = 0;
+                      qtdCompra = int.parse(item["quantidade"]).toInt();
+                      DocumentSnapshot query = await FirebaseFirestore.instance
+                          .collection("produtos")
+                          .doc(item["idProduto"])
+                          .get();
+                      dados = query.data();
+                      estoque = dados["quantidade"];
+                      estoque = estoque + qtdCompra;
+                      print("estoque atualizado" + estoque.toString());
+                      FirebaseFirestore.instance
+                          .collection("produtos")
+                          .doc(item["idProduto"])
+                          .update({
+                        "quantidade": estoque,
+                      });
+                    }
                   },
                   child: Text("Confirmar"),
                 ),
@@ -80,7 +104,6 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
           });
     }
   }
-  */
 
   @override
   void initState() {
@@ -144,144 +167,144 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
                                       ? Colors.green
                                       : Theme.of(context).primaryColor,
                                   child: ListTile(
-                                      onTap: () {
-                                        Navigator.pushNamed(
-                                            context, "/detalhesentrega",
-                                            arguments: dados["listaProdutos"]);
-                                      },
-                                      title: Text(
-                                        "Cliente: " + dados["nome"],
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                      subtitle: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: [
-                                          Text(
-                                            "Telefone: " + dados["telefone"],
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                          context, "/detalhesentrega",
+                                          arguments: dados["listaProdutos"]);
+                                    },
+                                    title: Text(
+                                      "Cliente: " + dados["nome"],
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: [
+                                        Text(
+                                          "Telefone: " + dados["telefone"],
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(top: 5),
+                                          child: Text(
+                                            "Whatsapp: " + dados["whatsapp"],
                                             style:
                                                 TextStyle(color: Colors.white),
                                           ),
-                                          Padding(
-                                            padding: EdgeInsets.only(top: 5),
-                                            child: Text(
-                                              "Whatsapp: " + dados["whatsapp"],
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(top: 5),
+                                          child: Text(
+                                            "Endereço: " + dados["endereco"],
+                                            style:
+                                                TextStyle(color: Colors.white),
                                           ),
-                                          Padding(
-                                            padding: EdgeInsets.only(top: 5),
-                                            child: Text(
-                                              "Endereço: " + dados["endereco"],
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(top: 5),
+                                          child: Text(
+                                            "Bairro: " + dados["bairro"],
+                                            style:
+                                                TextStyle(color: Colors.white),
                                           ),
-                                          Padding(
-                                            padding: EdgeInsets.only(top: 5),
-                                            child: Text(
-                                              "Bairro: " + dados["bairro"],
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(top: 5),
+                                          child: Text(
+                                            "Cidade: " + dados["cidade"],
+                                            style:
+                                                TextStyle(color: Colors.white),
                                           ),
-                                          Padding(
-                                            padding: EdgeInsets.only(top: 5),
-                                            child: Text(
-                                              "Cidade: " + dados["cidade"],
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(top: 5),
+                                          child: Text(
+                                            "Ponto de refêrencia: " +
+                                                dados["prontoReferencia"],
+                                            style:
+                                                TextStyle(color: Colors.white),
                                           ),
-                                          Padding(
-                                            padding: EdgeInsets.only(top: 5),
-                                            child: Text(
-                                              "Ponto de refêrencia: " +
-                                                  dados["prontoReferencia"],
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(top: 5),
+                                          child: Text(
+                                            "Valor total: R\$ " +
+                                                dados["totalCompra"],
+                                            style:
+                                                TextStyle(color: Colors.white),
                                           ),
-                                          Padding(
-                                            padding: EdgeInsets.only(top: 5),
-                                            child: Text(
-                                              "Valor total: R\$ " +
-                                                  dados["totalCompra"],
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(top: 5),
+                                          child: Text(
+                                            "Troco: R\$ " + dados["troco"],
+                                            style:
+                                                TextStyle(color: Colors.white),
                                           ),
-                                          Padding(
-                                            padding: EdgeInsets.only(top: 5),
-                                            child: Text(
-                                              "Troco: R\$ " + dados["troco"],
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(top: 5),
+                                          child: Text(
+                                            "Status: " + dados["status"],
+                                            style:
+                                                TextStyle(color: Colors.white),
                                           ),
-                                          Padding(
-                                            padding: EdgeInsets.only(top: 5),
-                                            child: Text(
-                                              "Status: " + dados["status"],
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(top: 5),
+                                          child: Text(
+                                            "Data da compra: " +
+                                                _formatarData(
+                                                    dados["dataCompra"]),
+                                            style:
+                                                TextStyle(color: Colors.white),
                                           ),
-                                          Padding(
-                                            padding: EdgeInsets.only(top: 5),
-                                            child: Text(
-                                              "Data da compra: " +
-                                                  _formatarData(
-                                                      dados["dataCompra"]),
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(top: 5),
+                                          child: Text(
+                                            "Entregador: " +
+                                                dados["nomeEntregador"],
+                                            style:
+                                                TextStyle(color: Colors.white),
                                           ),
-                                          Padding(
-                                            padding: EdgeInsets.only(top: 5),
-                                            child: Text(
-                                              "Entregador: " +
-                                                  dados["nomeEntregador"],
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(
+                                              top: 5, bottom: 10),
+                                          child: Text(
+                                            "Pedido recebido " +
+                                                _formatarData(
+                                                    dados["dataRecebimento"]),
+                                            style:
+                                                TextStyle(color: Colors.white),
                                           ),
-                                          Padding(
-                                            padding: EdgeInsets.only(
-                                                top: 5, bottom: 10),
-                                            child: Text(
-                                              "Pedido recebido " +
-                                                  _formatarData(
-                                                      dados["dataRecebimento"]),
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
-                                          ),
-                                          dados["entrega"] == "iniciada"
-                                              ? TextButton(
-                                                  onPressed: () {
-                                                    Navigator.pushNamed(
-                                                        context, "/mapa",
-                                                        arguments:
-                                                            dados.reference.id);
-                                                  },
-                                                  child: Text(
-                                                    "Acompanhar entrega",
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
+                                        ),
+                                        dados["entrega"] == "iniciada"
+                                            ? TextButton(
+                                                onPressed: () {
+                                                  Navigator.pushNamed(
+                                                      context, "/mapa",
+                                                      arguments:
+                                                          dados.reference.id);
+                                                },
+                                                child: Text(
+                                                  "Acompanhar entrega",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.bold,
                                                   ),
-                                                )
-                                              : Padding(
-                                                  padding: EdgeInsets.all(2),
-                                                  child: Text(" "),
                                                 ),
-                                        ],
-                                      )),
+                                              )
+                                            : Padding(
+                                                padding: EdgeInsets.all(2),
+                                                child: Text(" "),
+                                              ),
+                                      ],
+                                    ),
+                                   
+                                  ),
                                 )
                               : Card(
                                   elevation: 8,
@@ -382,7 +405,12 @@ class _PedidoUsuarioState extends State<PedidoUsuario> {
                                             ),
                                           ),
                                         ],
-                                      )),
+                                      ),
+                                      onLongPress: () {
+                                      _apagaSolcilitacao(dados.reference.id,
+                                          dados["status"], dados);
+                                    },
+                                      ),
                                 );
                         },
                       );

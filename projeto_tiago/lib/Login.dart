@@ -64,16 +64,7 @@ class _LoginState extends State<Login> {
     });
   }
 
-  _verificaUsuarioLogado() async {
-    FirebaseAuth auth = FirebaseAuth.instance;
-    // ignore: await_only_futures
-    var usuariologado = await  auth.currentUser;
 
-    if (usuariologado != null) {
-      Navigator.pushNamedAndRemoveUntil(context,"/listacategorias", (route) => false);
-      // Navigator.popAndPushNamed(context, "/carrinho");
-    }
-  }
 
   _recuperaIdNotificacao() async {
     var status = await OneSignal.shared.getPermissionSubscriptionState();
@@ -86,6 +77,16 @@ class _LoginState extends State<Login> {
     });
   }
 
+  _verificaUsuarioLogado() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    var usuarioLogado = await auth.currentUser;
+
+    if (usuarioLogado != null) {
+      Navigator.pushNamedAndRemoveUntil(
+          context, "/listacategorias", (route) => false);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -96,7 +97,7 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(color:Color(0xff201b21)),
+        decoration: BoxDecoration(color: Color(0xff201b21)),
         child: Center(
           child: SingleChildScrollView(
             padding: EdgeInsets.all(16),
@@ -111,7 +112,6 @@ class _LoginState extends State<Login> {
                       height: 150,
                     ),
                   ),
-                  
                   Padding(
                       padding: EdgeInsets.only(bottom: 8),
                       child: Center(

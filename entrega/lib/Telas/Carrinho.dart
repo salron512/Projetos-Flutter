@@ -396,12 +396,10 @@ class _CarrinhoState extends State<Carrinho> {
     } else {
       _aguardandoLocalizacao();
       Position position = await Geolocator.getCurrentPosition();
-      Position testePosition =
-          // ignore: missing_required_param
-          Position(latitude: -15.67934342388134, longitude: -58.09606548073397);
+      //Position testePosition = Position(latitude: -15.67934342388134, longitude: -58.09606548073397);
       //-15.67934342388134, -58.09606548073397
       List<Placemark> listaendereco = await placemarkFromCoordinates(
-          testePosition.latitude, testePosition.longitude);
+          position.latitude, position.longitude);
       Placemark endereco = listaendereco[0];
       _endereco = endereco.thoroughfare;
       _numero = endereco.subThoroughfare;
@@ -587,6 +585,7 @@ class _CarrinhoState extends State<Carrinho> {
 
         await FirebaseFirestore.instance.collection("pedidos").doc().set({
           "status": "Aguardando",
+          "andamento": true,
           "idEmpresa": _idEmpresa,
           "nomeEmpresa": mapEmpresa["nomeFantasia"],
           "idUsuario": uid,
@@ -639,6 +638,7 @@ class _CarrinhoState extends State<Carrinho> {
 
         await FirebaseFirestore.instance.collection("pedidos").doc().set({
           "status": "Aguardando",
+          "andamento": true,
           "idEmpresa": _idEmpresa,
           "nomeEmpresa": mapEmpresa["nomeFantasia"],
           "idUsuario": uid,

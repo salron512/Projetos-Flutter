@@ -22,8 +22,8 @@ class _HomeState extends State<Home> {
     "Lista entregador"
   ];
 
-  _deslogar() {
-    FirebaseAuth.instance.signOut().then((value) =>
+  _deslogar() async {
+    await FirebaseAuth.instance.signOut().then((value) =>
         Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false));
   }
 
@@ -190,7 +190,12 @@ class _HomeState extends State<Home> {
                           color: Colors.white,
                         ),
                         onPressed: () {
-                          Navigator.pushNamed(context, "/listapedidousuario");
+                          if (_empresa) {
+                            Navigator.popAndPushNamed(
+                                context, "/listapedidosempresa");
+                          } else {
+                            Navigator.pushNamed(context, "/listapedidousuario");
+                          }
                         }),
                     IconButton(
                         icon: Icon(
@@ -239,7 +244,7 @@ class _HomeState extends State<Home> {
                             Navigator.pushNamed(context, "/minhasentregas");
                           }),
                     ),
-                     Visibility(
+                    Visibility(
                       visible: _entregador,
                       child: IconButton(
                           icon: Icon(
