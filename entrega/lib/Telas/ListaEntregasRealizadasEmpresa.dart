@@ -1,22 +1,26 @@
 import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:entrega/util/RecupepraFirebase.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
-class ListaEntregasRealizadas extends StatefulWidget {
+class ListaEntregasRealizadasEmpresa extends StatefulWidget {
   @override
-  _ListaEntregasRealizadasState createState() =>
-      _ListaEntregasRealizadasState();
+  _ListaEntregasRealizadasEmpresaState createState() =>
+      _ListaEntregasRealizadasEmpresaState();
 }
 
-class _ListaEntregasRealizadasState extends State<ListaEntregasRealizadas> {
+class _ListaEntregasRealizadasEmpresaState
+    extends State<ListaEntregasRealizadasEmpresa> {
   String dropdownValue = '01';
   String dropdownValueAno = '2021';
-  double _vlrEntrega = 2;
+ 
   int _mes = DateTime.now().month.toInt();
   int _ano = DateTime.now().year.toInt();
+  double _resultado = 0;
+   double _vlrEntrega = 0;
   double _totalReceber = 0;
   int _qtd = 0;
   StreamController _streamController = StreamController.broadcast();
@@ -36,7 +40,7 @@ class _ListaEntregasRealizadasState extends State<ListaEntregasRealizadas> {
         FirebaseFirestore.instance.collection("pedidos");
 
     reference
-        .where("idEntregador", isEqualTo: uid)
+        .where("idEmpresa", isEqualTo: uid)
         .where("status", isEqualTo: "Entregue")
         .where("mes", isEqualTo: _mes)
         .where("ano", isEqualTo: _ano)
@@ -44,11 +48,15 @@ class _ListaEntregasRealizadasState extends State<ListaEntregasRealizadas> {
         .listen((event) {
       if (mounted) {
         _streamController.add(event);
-        print("teste stream");
       }
+      event.docs.forEach((element) {
+        Map<String, dynamic> dados = element.data();
+        _vlrEntrega = dados["taxaEntrega"];
+        _resultado = _resultado + _vlrEntrega;
+      });
       setState(() {
         _qtd = event.docs.length;
-        _totalReceber = _vlrEntrega * _qtd;
+        _totalReceber = _resultado;
       });
     });
   }
@@ -95,6 +103,8 @@ class _ListaEntregasRealizadasState extends State<ListaEntregasRealizadas> {
                       print(_mes.toString());
                       _recuperaEntregas();
                     });
+
+                    //print(dropdownValue);
                   },
                   items: <String>[
                     '01',
@@ -196,6 +206,10 @@ class _ListaEntregasRealizadasState extends State<ListaEntregasRealizadas> {
                                       "Troco R\$ " + entrega["troco"],
                                     ),
                                     Text(
+                                      "Entregue por " +
+                                          entrega["nomeEntregador"],
+                                    ),
+                                    Text(
                                       "Valor total R\$ " +
                                           entrega["totalPedido"],
                                     ),
@@ -238,7 +252,7 @@ class _ListaEntregasRealizadasState extends State<ListaEntregasRealizadas> {
                           style: TextStyle(color: Colors.white),
                         ),
                         Text(
-                          "Valor a receber R\$ " +
+                          "Valor a pagar R\$ " +
                               _totalReceber.toStringAsFixed(2),
                           style: TextStyle(color: Colors.white),
                         ),

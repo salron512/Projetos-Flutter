@@ -191,7 +191,7 @@ class _HomeState extends State<Home> {
                         ),
                         onPressed: () {
                           if (_empresa) {
-                            Navigator.popAndPushNamed(
+                            Navigator.pushNamed(
                                 context, "/listapedidosempresa");
                           } else {
                             Navigator.pushNamed(context, "/listapedidousuario");
@@ -253,6 +253,18 @@ class _HomeState extends State<Home> {
                           ),
                           onPressed: () {
                             Navigator.pushNamed(context, "/entregasrealizadas");
+                          }),
+                    ),
+                    Visibility(
+                      visible: _empresa,
+                      child: IconButton(
+                          icon: Icon(
+                            Icons.reorder,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            Navigator.pushNamed(
+                                context, "/listaentregasrealizadasempresa");
                           }),
                     ),
                     IconButton(

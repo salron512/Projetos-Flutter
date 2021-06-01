@@ -12,6 +12,7 @@ import 'package:entrega/Telas/ListaEmpresas.dart';
 import 'package:entrega/Telas/ListaEntregadores.dart';
 import 'package:entrega/Telas/ListaEntregasPendentes.dart';
 import 'package:entrega/Telas/ListaEntregasRealizadas.dart';
+import 'package:entrega/Telas/ListaEntregasRealizadasEmpresa.dart';
 import 'package:entrega/Telas/ListaPedidosEmpresa.dart';
 import 'package:entrega/Telas/ListaPedidosUsuario.dart';
 import 'package:entrega/Telas/ListaProdutos.dart';
@@ -79,6 +80,8 @@ class Rotas {
         return MaterialPageRoute(builder: (_) => ListaEntregasRealizadas());
             case "/listapedidosempresa":
         return MaterialPageRoute(builder: (_) => ListaPedidosEmpresa());
+          case "/listaentregasrealizadasempresa":
+        return MaterialPageRoute(builder: (_) => ListaEntregasRealizadasEmpresa());
 
       default:
         _erroRota();

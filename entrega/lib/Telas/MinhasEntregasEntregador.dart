@@ -132,7 +132,7 @@ class _MinhasEntregasEntregadorState extends State<MinhasEntregasEntregador> {
                         .doc(entrega.reference.id)
                         .update({
                       "IdUsuarioCancelamento": uid,
-                      "andamento": false,
+                      "andamento": true,
                       "status": "Cancelada",
                       "motivo": controllerMotivo.text,
                       "dataCancelamento": DateTime.now().toString()
@@ -180,7 +180,7 @@ class _MinhasEntregasEntregadorState extends State<MinhasEntregasEntregador> {
                       .collection("pedidos")
                       .doc(entrega.reference.id)
                       .update({
-                    "andamento": false,
+                    "andamento": true,
                     "mes": mes,
                     "ano": ano,
                     "status": "Finalizada",
@@ -215,7 +215,7 @@ class _MinhasEntregasEntregadorState extends State<MinhasEntregasEntregador> {
     await FirebaseFirestore.instance
         .collection("pedidos")
         .doc(idEntrega)
-        .update({"status": "Iniciada"});
+        .update({"status": "À caminho"});
 
     BackgroundLocation.getLocationUpdates((location) {
       print(location);
@@ -275,7 +275,7 @@ class _MinhasEntregasEntregadorState extends State<MinhasEntregasEntregador> {
                           querySnapshot.docs.toList();
                       QueryDocumentSnapshot entrega = lista[indice];
                       return Card(
-                        color: entrega["status"] == "Iniciada"
+                        color: entrega["status"] == "À caminho"
                             ? Colors.green
                             : Theme.of(context).primaryColor,
                         elevation: 8,

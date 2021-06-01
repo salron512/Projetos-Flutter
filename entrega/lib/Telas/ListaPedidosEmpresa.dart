@@ -95,7 +95,7 @@ class _ListaPedidosEmpresaState extends State<ListaPedidosEmpresa> {
               TextButton(
                 child: Text("Confirmar entrega"),
                 onPressed: () {
-                   Navigator.pop(context);
+                  Navigator.pop(context);
                   _confirmarRecebimento(entrega);
                 },
               ),
@@ -103,6 +103,7 @@ class _ListaPedidosEmpresaState extends State<ListaPedidosEmpresa> {
                 child: Text("Finalizar entrega"),
                 onPressed: () {
                   Navigator.pop(context);
+                  _finalizaEntrega(entrega);
                 },
               ),
               TextButton(
@@ -113,9 +114,24 @@ class _ListaPedidosEmpresaState extends State<ListaPedidosEmpresa> {
                 child: Text("Whatsapp cliente"),
                 onPressed: () {},
               ),
+              TextButton(
+                child: Text("Chamar Entregador"),
+                onPressed: () {},
+              ),
             ],
           );
         });
+  }
+
+  _finalizaEntrega(DocumentSnapshot pedido) {
+    FirebaseFirestore.instance
+        .collection("pedidos")
+        .doc(pedido.reference.id)
+        .update({
+      "status": "Entregue",
+      "andamento": false,
+      "taxaEntrega": 5
+    });
   }
 
   @override
@@ -164,7 +180,7 @@ class _ListaPedidosEmpresaState extends State<ListaPedidosEmpresa> {
                             querySnapshot.docs.toList();
                         QueryDocumentSnapshot entrega = lista[indice];
                         return Card(
-                          color: entrega["status"] == "Recebido"
+                          color: entrega["status"] != "Aguardando"
                               ? Colors.green
                               : Theme.of(context).primaryColor,
                           elevation: 8,
@@ -204,6 +220,11 @@ class _ListaPedidosEmpresaState extends State<ListaPedidosEmpresa> {
                                 Text(
                                   "Hora do pedido " +
                                       _formatarData(entrega["horaPedido"]),
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                Text(
+                                  "Nome entregador " +
+                                      entrega["nomeEntregador"],
                                   style: TextStyle(color: Colors.white),
                                 ),
                                 Text(

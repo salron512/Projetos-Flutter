@@ -11,13 +11,15 @@ class ListEntregasPendentes extends StatefulWidget {
 
 class _ListEntregasPendentesState extends State<ListEntregasPendentes> {
   StreamController _streamController = StreamController.broadcast();
+  String _nomeEntregador = "";
   _recuperaEntregas() {
     CollectionReference reference =
         FirebaseFirestore.instance.collection("pedidos");
 
     reference
         .orderBy("horaPedido", descending: true)
-        .where("status", isEqualTo: "Aguardando")
+        .where("status", isEqualTo: "Recebido")
+        .where("nomeEntregador", isEqualTo: "vazio")
         .snapshots()
         .listen((event) {
       if (mounted) {
@@ -52,9 +54,11 @@ class _ListEntregasPendentesState extends State<ListEntregasPendentes> {
                     FirebaseFirestore.instance
                         .collection("pedidos")
                         .doc(idDoc)
-                        .update({"idEntregador": uid,
-                        "status": "Recebido"
-                        });
+                        .update({
+                      "nomeEntregador": _nomeEntregador,
+                      "idEntregador": uid,
+                      "status": "Recebido"
+                    });
                     Navigator.pop(context);
                   },
                   child: Text("Confirmar")),
@@ -63,10 +67,19 @@ class _ListEntregasPendentesState extends State<ListEntregasPendentes> {
         });
   }
 
+  _recuperaUsuario() async {
+    String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+    DocumentSnapshot documentSnapshot =
+        await FirebaseFirestore.instance.collection("usuarios").doc(uid).get();
+    Map<String, dynamic> dados = documentSnapshot.data();
+    _nomeEntregador = dados["nome"];
+  }
+
   @override
   void initState() {
     super.initState();
     _recuperaEntregas();
+    _recuperaUsuario();
   }
 
   @override
