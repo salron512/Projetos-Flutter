@@ -14,7 +14,7 @@ class ListaEntregasRealizadas extends StatefulWidget {
 class _ListaEntregasRealizadasState extends State<ListaEntregasRealizadas> {
   String dropdownValue = '01';
   String dropdownValueAno = '2021';
-  double _vlrEntrega = 2;
+  double _vlrEntrega = 4;
   int _mes = DateTime.now().month.toInt();
   int _ano = DateTime.now().year.toInt();
   double _totalReceber = 0;

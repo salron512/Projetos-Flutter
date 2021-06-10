@@ -136,6 +136,10 @@ class _ListaPedidosEmpresaState extends State<ListaPedidosEmpresa> {
               TextButton(
                 child: Text("Cancelar entrega"),
                 onPressed: () {
+                  FirebaseFirestore.instance
+                      .collection("pedidos")
+                      .doc(entrega.reference.id)
+                      .delete();
                   Navigator.pop(context);
                 },
               ),

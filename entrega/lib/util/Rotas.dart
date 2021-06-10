@@ -7,6 +7,7 @@ import 'package:entrega/Telas/CadastroEntregador.dart';
 import 'package:entrega/Telas/CadastroProdutos.dart';
 import 'package:entrega/Telas/Carrinho.dart';
 import 'package:entrega/Telas/DetalhesEntrega.dart';
+import 'package:entrega/Telas/Financeiro.dart';
 import 'package:entrega/Telas/Home.dart';
 import 'package:entrega/Telas/ListaEmpresas.dart';
 import 'package:entrega/Telas/ListaEntregadores.dart';
@@ -21,6 +22,7 @@ import 'package:entrega/Telas/Login.dart';
 import 'package:entrega/Telas/Mapa.dart';
 import 'package:entrega/Telas/MinhasEntregasEntregador.dart';
 import 'package:entrega/Telas/PerfilProduto.dart';
+import 'package:entrega/Telas/RecuperaSenha.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -62,26 +64,31 @@ class Rotas {
         return MaterialPageRoute(builder: (_) => ListaProdutosUsuario(args));
       case "/carinho":
         return MaterialPageRoute(builder: (_) => Carrinho(args));
-         case "/cadastroentregador":
+      case "/cadastroentregador":
         return MaterialPageRoute(builder: (_) => CadastroEntregador());
-          case "/listapedidousuario":
+      case "/listapedidousuario":
         return MaterialPageRoute(builder: (_) => ListaPedidosUsuario());
-          case "/detalhesentrega":
+      case "/detalhesentrega":
         return MaterialPageRoute(builder: (_) => DetalhesEntrega(args));
-          case "/listaEntregadores":
+      case "/listaEntregadores":
         return MaterialPageRoute(builder: (_) => ListaEntregadores());
-         case "/listaEntregaPedentes":
+      case "/listaEntregaPedentes":
         return MaterialPageRoute(builder: (_) => ListEntregasPendentes());
-           case "/minhasentregas":
+      case "/minhasentregas":
         return MaterialPageRoute(builder: (_) => MinhasEntregasEntregador());
-           case "/mapa":
+      case "/mapa":
         return MaterialPageRoute(builder: (_) => Mapa(args));
-           case "/entregasrealizadas":
+      case "/entregasrealizadas":
         return MaterialPageRoute(builder: (_) => ListaEntregasRealizadas());
-            case "/listapedidosempresa":
+      case "/listapedidosempresa":
         return MaterialPageRoute(builder: (_) => ListaPedidosEmpresa());
-          case "/listaentregasrealizadasempresa":
-        return MaterialPageRoute(builder: (_) => ListaEntregasRealizadasEmpresa());
+      case "/listaentregasrealizadasempresa":
+        return MaterialPageRoute(
+            builder: (_) => ListaEntregasRealizadasEmpresa());
+      case "/financeiro":
+        return MaterialPageRoute(builder: (_) => Financeiro());
+      case "/reset":
+        return MaterialPageRoute(builder: (_) => RecuperaSenha());
 
       default:
         _erroRota();

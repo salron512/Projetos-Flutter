@@ -112,7 +112,7 @@ class _ListaPedidosUsuarioState extends State<ListaPedidosUsuario> {
                                     _formatarData(pedido["horaPedido"]),
                                 style: TextStyle(color: Colors.white),
                               ),
-                              pedido["status"] == "Iniciada"
+                              pedido["status"] == "À caminho"
                                   ? TextButton(
                                     
                                       onPressed: () {

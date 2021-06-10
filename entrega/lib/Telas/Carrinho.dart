@@ -21,7 +21,7 @@ class _CarrinhoState extends State<Carrinho> {
   var _mascaraQtd = MaskTextInputFormatter(
       mask: '#########', filter: {"#": RegExp(r'[0-9]')});
   StreamController _streamController = StreamController.broadcast();
-  double _taxa = 6;
+  double _taxa = 4;
   double _totalSoma = 0;
   String _totalCompra = "0";
   bool _mostraTotal = false;
@@ -248,6 +248,7 @@ class _CarrinhoState extends State<Carrinho> {
                           fontSize: 15,
                         ),
                         decoration: InputDecoration(
+                          prefix: Text("R\$ "),
                           //contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                           hintText: "Digite o troco",
                           filled: true,
@@ -385,7 +386,7 @@ class _CarrinhoState extends State<Carrinho> {
                     Navigator.pop(context);
                     _selecionaPagamentoAlert();
                   },
-                  child: Text('Localização cadastro'))
+                  child: Text('Endereço cadastro'))
             ],
           );
         });
@@ -913,6 +914,8 @@ class _CarrinhoState extends State<Carrinho> {
                           List<DocumentSnapshot> listaProdutos =
                               querySnapshot.docs.toList();
                           DocumentSnapshot produto = listaProdutos[indice];
+                          double precoUnitario = produto["precoUnitario"];
+                          double precoTotal = produto["precoTotal"];
                           return Slidable(
                             actionPane: SlidableDrawerActionPane(),
                             actionExtentRatio: 0.25,
@@ -930,12 +933,12 @@ class _CarrinhoState extends State<Carrinho> {
                                           produto["qtd"].toString(),
                                     ),
                                     Text(
-                                      "Valor unitario: " +
-                                          produto["precoUnitario"].toString(),
+                                      "Valor unitario R\$ " +
+                                          precoUnitario.toStringAsFixed(2),
                                     ),
                                     Text(
-                                      "Valor total: " +
-                                          produto["precoTotal"].toString(),
+                                      "Valor total R\$ " +
+                                          precoTotal.toStringAsFixed(2),
                                     )
                                   ],
                                 ),

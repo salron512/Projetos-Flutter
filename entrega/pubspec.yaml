@@ -74,6 +74,7 @@ flutter:
   - images/scart.png
   - images/pagamento-com-cartao-de-credito.png
   - images/localizacao.png
+  - images/fpassword.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

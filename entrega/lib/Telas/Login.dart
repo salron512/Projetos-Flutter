@@ -26,7 +26,7 @@ class _LoginState extends State<Login> {
           setState(() {
             _msg = "Entrando...";
           });
-          String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+          String uid = await RecuperaFirebase.RECUPERAIDUSUARIO();
           var status = await OneSignal.shared.getPermissionSubscriptionState();
           String playerId = status.subscriptionStatus.userId;
           FirebaseFirestore.instance.collection("usuarios").doc(uid).update({
@@ -181,7 +181,9 @@ class _LoginState extends State<Login> {
                   ),
                 ),
                 TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushNamed(context, "/reset");
+                    },
                     child: Text(
                       "Recuperar senha",
                       style: TextStyle(

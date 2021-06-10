@@ -1,19 +1,16 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:entrega/util/RecupepraFirebase.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
-class ListaEntregasRealizadasEmpresa extends StatefulWidget {
+class Financeiro extends StatefulWidget {
   @override
-  _ListaEntregasRealizadasEmpresaState createState() =>
-      _ListaEntregasRealizadasEmpresaState();
+  _FinanceiroState createState() => _FinanceiroState();
 }
 
-class _ListaEntregasRealizadasEmpresaState
-    extends State<ListaEntregasRealizadasEmpresa> {
+class _FinanceiroState extends State<Financeiro> {
+  StreamController _streamController = StreamController.broadcast();
   String dropdownValue = '01';
   String dropdownValueAno = '2021';
 
@@ -25,71 +22,156 @@ class _ListaEntregasRealizadasEmpresaState
   double _totalPagar = 0;
   double _taxa = 0.05;
   int _qtd = 0;
-  StreamController _streamController = StreamController.broadcast();
+  String _empresa = "";
+  List<String> _listaEmpresas = [];
+
+  _recuperaEntregas() {
+    CollectionReference reference =
+        FirebaseFirestore.instance.collection("pedidos");
+
+    if (_empresa.isEmpty) {
+      reference
+          .where("status", isEqualTo: "Entregue")
+          .where("mes", isEqualTo: _mes)
+          .where("ano", isEqualTo: _ano)
+          .snapshots()
+          .listen((event) {
+        if (mounted) {
+          _streamController.add(event);
+          print("teste stream");
+          setState(() {
+            _resultado = 0;
+            _vlrEntrega = 0;
+            _totalReceber = 0;
+            _totalPagar = 0;
+            _qtd = 0;
+          });
+          event.docs.forEach((element) {
+            Map<String, dynamic> dados = element.data();
+            _vlrEntrega = double.tryParse(dados["totalPedido"]).toDouble();
+            print("valor " + _vlrEntrega.toString());
+            _resultado = _resultado + _vlrEntrega;
+          });
+          setState(() {
+            _qtd = event.docs.length;
+            _totalReceber = _resultado;
+            _totalPagar = _resultado * _taxa;
+          });
+        }
+      });
+    } else {
+      
+      reference
+          .where("nomeEmpresa", isEqualTo: _empresa)
+          .where("status", isEqualTo: "Entregue")
+          .where("mes", isEqualTo: _mes)
+          .where("ano", isEqualTo: _ano)
+          .snapshots()
+          .listen((event) {
+        if (mounted) {
+          _streamController.add(event);
+          print("teste stream");
+          setState(() {
+            _resultado = 0;
+            _vlrEntrega = 0;
+            _totalReceber = 0;
+            _totalPagar = 0;
+            _qtd = 0;
+          });
+          event.docs.forEach((element) {
+            Map<String, dynamic> dados = element.data();
+            _vlrEntrega = double.tryParse(dados["totalPedido"]).toDouble();
+            print("valor " + _vlrEntrega.toString());
+            _resultado = _resultado + _vlrEntrega;
+          });
+          setState(() {
+            _qtd = event.docs.length;
+            _totalReceber = _resultado;
+            _totalPagar = _resultado * _taxa;
+          });
+        }
+      });
+      print("teste ok");
+    }
+  }
 
   _formatarData(String data) {
     initializeDateFormatting("pt_BR");
-    DateFormat formatador = DateFormat("dd/MM/y H:mm:s");
+    var formatador = DateFormat("dd/MM/y H:mm:s");
 
     DateTime dataConvertida = DateTime.parse(data);
     String dataFormatada = formatador.format(dataConvertida);
     return dataFormatada;
   }
 
-  _recuperaEntregas() async {
-    String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+  _recuperaEmpresas() async {
     CollectionReference reference =
-        FirebaseFirestore.instance.collection("pedidos");
+        FirebaseFirestore.instance.collection("usuarios");
 
-    reference
-        .orderBy("horaPedido", descending: false)
-        .where("idEmpresa", isEqualTo: uid)
-        .where("status", isEqualTo: "Entregue")
-        .where("mes", isEqualTo: _mes)
-        .where("ano", isEqualTo: _ano)
-        .snapshots()
-        .listen((event) {
-      if (mounted) {
-        _streamController.add(event);
-      }
-      setState(() {
-        _resultado = 0;
-        _vlrEntrega = 0;
-        _totalReceber = 0;
-        _totalPagar = 0;
-        _qtd = 0;
-      });
-      event.docs.forEach((element) {
-        Map<String, dynamic> dados = element.data();
-        _vlrEntrega = double.tryParse(dados["totalPedido"]).toDouble();
-        print("valor " + _vlrEntrega.toString());
-        _resultado = _resultado + _vlrEntrega;
-      });
-      setState(() {
-        _qtd = event.docs.length;
-        _totalReceber = _resultado;
-        _totalPagar = _resultado * _taxa;
-      });
-    });
+    QuerySnapshot querySnapshot = await reference
+        .orderBy("nomeFantasia", descending: false)
+        .where("tipoUsuario", isEqualTo: "empresa")
+        .where("ativa", isEqualTo: true)
+        .get();
+    for (var item in querySnapshot.docs) {
+      Map<String, dynamic> dadosEmpresa = item.data();
+      String nomeEmpresa = dadosEmpresa["nomeFantasia"];
+      _listaEmpresas.add(nomeEmpresa);
+    }
+  }
+
+  _alertListaEmpresas() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Selecione uma empresa"),
+            content: Container(
+                height: 150,
+                width: 100,
+                child: ListView.builder(
+                    itemCount: _listaEmpresas.length,
+                    // ignore: missing_return
+                    itemBuilder: (context, indice) {
+                      String empresa = _listaEmpresas[indice];
+                      return ListTile(
+                        title: Text(empresa),
+                        onTap: () {
+                          setState(() {
+                            _empresa = empresa;
+                          });
+                          _recuperaEntregas();
+                          Navigator.pop(context);
+                        },
+                      );
+                    })),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _empresa = "";
+                    });
+                     _recuperaEntregas();
+                    Navigator.pop(context);
+                  },
+                  child: Text("Limpar"))
+            ],
+          );
+        });
   }
 
   @override
   void initState() {
     super.initState();
     _recuperaEntregas();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _streamController.close();
+    _recuperaEmpresas();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Entregas realizadas"),
+        title: Text("Financeiro"),
       ),
       body: Container(
         padding: EdgeInsets.only(left: 5, right: 5),
@@ -115,8 +197,6 @@ class _ListaEntregasRealizadasEmpresaState
                       print(_mes.toString());
                       _recuperaEntregas();
                     });
-
-                    //print(dropdownValue);
                   },
                   items: <String>[
                     '01',
@@ -166,6 +246,15 @@ class _ListaEntregasRealizadasEmpresaState
                     );
                   }).toList(),
                 ),
+                IconButton(
+                    onPressed: () {
+                      _alertListaEmpresas();
+                    },
+                    icon: Icon(Icons.business)),
+                Padding(
+                  padding: EdgeInsets.only(left: 5),
+                  child: Text(_empresa),
+                )
               ],
             ),
             Expanded(
@@ -201,7 +290,8 @@ class _ListaEntregasRealizadasEmpresaState
                                   query.docs.toList();
                               QueryDocumentSnapshot entrega = lista[indice];
                               return ListTile(
-                                title: Text(entrega["nomeEmpresa"]),
+                                title:
+                                    Text("Cliente " + entrega["nomeEmpresa"]),
                                 subtitle: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -216,10 +306,6 @@ class _ListaEntregasRealizadasEmpresaState
                                     ),
                                     Text(
                                       "Troco R\$ " + entrega["troco"],
-                                    ),
-                                    Text(
-                                      "Entregue por " +
-                                          entrega["nomeEntregador"],
                                     ),
                                     Text(
                                       "Valor total R\$ " +
@@ -240,11 +326,6 @@ class _ListaEntregasRealizadasEmpresaState
                                     )
                                   ],
                                 ),
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                      context, "/detalhesentrega",
-                                      arguments: entrega["listaPedido"]);
-                                },
                               );
                             });
                       }
@@ -256,32 +337,31 @@ class _ListaEntregasRealizadasEmpresaState
             Card(
                 color: Theme.of(context).primaryColor,
                 child: ListTile(
-                  title: Text(
-                    "Total",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        "Valor total entregas R\$ " +
-                            _totalReceber.toStringAsFixed(2),
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      Text(
-                        "Valor total á pagar R\$ " +
-                            _totalPagar.toStringAsFixed(2),
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      Text(
-                        "Quantidade total de entregas " + _qtd.toString(),
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ],
-                  ),
-                  contentPadding:
-                      EdgeInsets.only(top: 5, bottom: 5, left: 5, right: 5),
-                ))
+                    title: Text(
+                      "Total",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          "Valor total entregas R\$ " +
+                              _totalReceber.toStringAsFixed(2),
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        Text(
+                          "Valor total á pagar R\$ " +
+                              _totalPagar.toStringAsFixed(2),
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        Text(
+                          "Quantidade total de entregas " + _qtd.toString(),
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ],
+                    ),
+                    contentPadding:
+                        EdgeInsets.only(top: 5, bottom: 5, left: 5, right: 5)))
           ],
         ),
       ),
