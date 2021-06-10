@@ -3,6 +3,7 @@ import 'package:entrega/util/RecupepraFirebase.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 class Cadastro extends StatefulWidget {
   @override
@@ -15,6 +16,15 @@ class _CadastroState extends State<Cadastro> {
   bool _mostrarSenha = false;
   bool _motrarSenhaConfirma = false;
   String _msgErro = "";
+  List<String> listaCidades = ["Mirassol d'Oeste"];
+  String _cidade = '';
+
+  _escolhaMenuCidade(String cidadeEscolhida) {
+    setState(() {
+      _cidade = cidadeEscolhida;
+    });
+  }
+
   TextEditingController _controllerNome = TextEditingController();
   TextEditingController _controllerEmail = TextEditingController();
   TextEditingController _controllerTelefone = TextEditingController();
@@ -44,32 +54,50 @@ class _CadastroState extends State<Cadastro> {
                   if (senha == confirmaSenha) {
                     if (email.isNotEmpty) {
                       if (email.contains("@")) {
-                        await FirebaseAuth.instance
-                            .createUserWithEmailAndPassword(
-                                email: email, password: senha)
-                            .then((value) async {
-                          String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
-                          await FirebaseFirestore.instance
-                              .collection("usuarios")
-                              .doc(uid)
-                              .set({
-                            "tipoUsuario": "cliente",
-                            "nome": nome,
-                            "email": email,
-                            "telefone": telefone,
-                            "whatsapp": whatsapp,
-                            "endereco": endereco,
-                            "bairro": bairro,
-                          }).then((value) {
-                            Navigator.pushNamedAndRemoveUntil(
-                                context, "/home", (route) => false);
+                        if (_cidade.isNotEmpty) {
+                          await FirebaseAuth.instance
+                              .createUserWithEmailAndPassword(
+                                  email: email, password: senha)
+                              .then((value) async {
+                            String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+                            await FirebaseFirestore.instance
+                                .collection("usuarios")
+                                .doc(uid)
+                                .set({
+                              "tipoUsuario": "cliente",
+                              "nome": nome,
+                              "email": email,
+                              "telefone": telefone,
+                              "whatsapp": whatsapp,
+                              "endereco": endereco,
+                              "bairro": bairro,
+                              "cidade": _cidade
+                            }).then((value) async {
+                              String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+                              var status = await OneSignal.shared
+                                  .getPermissionSubscriptionState();
+                              String playerId =
+                                  status.subscriptionStatus.userId;
+                              FirebaseFirestore.instance
+                                  .collection("usuarios")
+                                  .doc(uid)
+                                  .update({
+                                "playerId": playerId,
+                              });
+                              Navigator.pushNamedAndRemoveUntil(
+                                  context, "/home", (route) => false);
+                            });
+                          }).catchError((erro) {
+                            setState(() {
+                              _msgErro = "Falha ao cadastrar, por favor" +
+                                  "verifique suas informações";
+                            });
                           });
-                        }).catchError((erro) {
+                        } else {
                           setState(() {
-                            _msgErro = "Falha ao cadastrar, por favor" +
-                                "verifique suas informações";
+                            _msgErro = "Por favor escolha uma cidade";
                           });
-                        });
+                        }
                       } else {
                         setState(() {
                           _msgErro = "E-mail inválido";
@@ -337,6 +365,29 @@ class _CadastroState extends State<Cadastro> {
                       color: Colors.red,
                       fontSize: 15,
                       fontWeight: FontWeight.bold),
+                ),
+                Padding(
+                    padding: EdgeInsets.only(bottom: 5),
+                    child: PopupMenuButton<String>(
+                      color: Color(0xff37474f),
+                      icon: Text("Escolha sua cidade"),
+                      onSelected: _escolhaMenuCidade,
+                      // ignore: missing_return
+                      itemBuilder: (context) {
+                        return listaCidades.map((String item) {
+                          return PopupMenuItem<String>(
+                            value: item,
+                            child: Text(item,
+                                style: TextStyle(color: Colors.white)),
+                          );
+                        }).toList();
+                      },
+                    )),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Cidade escolhida: " + _cidade),
+                  ],
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: 10, bottom: 10),

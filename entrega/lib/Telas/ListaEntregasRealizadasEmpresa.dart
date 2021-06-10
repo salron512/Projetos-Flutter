@@ -16,18 +16,20 @@ class _ListaEntregasRealizadasEmpresaState
     extends State<ListaEntregasRealizadasEmpresa> {
   String dropdownValue = '01';
   String dropdownValueAno = '2021';
- 
+
   int _mes = DateTime.now().month.toInt();
   int _ano = DateTime.now().year.toInt();
   double _resultado = 0;
-   double _vlrEntrega = 0;
+  double _vlrEntrega = 0;
   double _totalReceber = 0;
+  double _totalPagar = 0;
+  double _taxa = 0.05;
   int _qtd = 0;
   StreamController _streamController = StreamController.broadcast();
 
   _formatarData(String data) {
     initializeDateFormatting("pt_BR");
-    var formatador = DateFormat("dd/MM/y H:mm:s");
+    DateFormat formatador = DateFormat("dd/MM/y H:mm:s");
 
     DateTime dataConvertida = DateTime.parse(data);
     String dataFormatada = formatador.format(dataConvertida);
@@ -40,6 +42,7 @@ class _ListaEntregasRealizadasEmpresaState
         FirebaseFirestore.instance.collection("pedidos");
 
     reference
+        .orderBy("horaPedido", descending: false)
         .where("idEmpresa", isEqualTo: uid)
         .where("status", isEqualTo: "Entregue")
         .where("mes", isEqualTo: _mes)
@@ -49,14 +52,23 @@ class _ListaEntregasRealizadasEmpresaState
       if (mounted) {
         _streamController.add(event);
       }
+      setState(() {
+         _resultado = 0;
+         _vlrEntrega = 0;
+         _totalReceber = 0;
+         _totalPagar = 0;
+         _qtd = 0;
+      });
       event.docs.forEach((element) {
         Map<String, dynamic> dados = element.data();
-        _vlrEntrega = dados["taxaEntrega"];
+        _vlrEntrega = double.tryParse(dados["totalPedido"]).toDouble();
+        print("valor " + _vlrEntrega.toString());
         _resultado = _resultado + _vlrEntrega;
       });
       setState(() {
         _qtd = event.docs.length;
         _totalReceber = _resultado;
+        _totalPagar = _resultado * _taxa;
       });
     });
   }
@@ -247,13 +259,13 @@ class _ListaEntregasRealizadasEmpresaState
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          "Valor por entrega R\$ " +
-                              _vlrEntrega.toStringAsFixed(2),
+                          "Valor total entregas R\$ " +
+                              _totalReceber.toStringAsFixed(2),
                           style: TextStyle(color: Colors.white),
                         ),
                         Text(
-                          "Valor a pagar R\$ " +
-                              _totalReceber.toStringAsFixed(2),
+                          "Valor total á pagar R\$ " +
+                              _totalPagar.toStringAsFixed(2),
                           style: TextStyle(color: Colors.white),
                         ),
                         Text(

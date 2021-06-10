@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:entrega/util/RecupepraFirebase.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -19,9 +22,15 @@ class _LoginState extends State<Login> {
       if (senha.isNotEmpty) {
         FirebaseAuth.instance
             .signInWithEmailAndPassword(email: email, password: senha)
-            .then((value) {
+            .then((value) async {
           setState(() {
             _msg = "Entrando...";
+          });
+          String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+          var status = await OneSignal.shared.getPermissionSubscriptionState();
+          String playerId = status.subscriptionStatus.userId;
+          FirebaseFirestore.instance.collection("usuarios").doc(uid).update({
+            "playerId": playerId,
           });
           _controllerSenha.clear();
           Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);

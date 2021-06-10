@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:entrega/util/RecupepraFirebase.dart';
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class ListEntregasPendentes extends StatefulWidget {
   @override
   _ListEntregasPendentesState createState() => _ListEntregasPendentesState();
@@ -12,6 +13,7 @@ class ListEntregasPendentes extends StatefulWidget {
 class _ListEntregasPendentesState extends State<ListEntregasPendentes> {
   StreamController _streamController = StreamController.broadcast();
   String _nomeEntregador = "";
+  String _cidade = "";
   _recuperaEntregas() {
     CollectionReference reference =
         FirebaseFirestore.instance.collection("pedidos");
@@ -19,6 +21,7 @@ class _ListEntregasPendentesState extends State<ListEntregasPendentes> {
     reference
         .orderBy("horaPedido", descending: true)
         .where("status", isEqualTo: "Recebido")
+        .where("cidade", isEqualTo: _cidade)
         .where("nomeEntregador", isEqualTo: "vazio")
         .snapshots()
         .listen((event) {
@@ -73,12 +76,14 @@ class _ListEntregasPendentesState extends State<ListEntregasPendentes> {
         await FirebaseFirestore.instance.collection("usuarios").doc(uid).get();
     Map<String, dynamic> dados = documentSnapshot.data();
     _nomeEntregador = dados["nome"];
+    _cidade = dados["cidade"];
+    _recuperaEntregas();
   }
 
   @override
   void initState() {
     super.initState();
-    _recuperaEntregas();
+
     _recuperaUsuario();
   }
 

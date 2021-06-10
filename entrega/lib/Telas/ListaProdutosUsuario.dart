@@ -160,15 +160,24 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Container(
-                                    padding: EdgeInsets.only(right: 8),
-                                    child: Image.network(
-                                      produtos.urlImagem,
-                                      fit: BoxFit.cover,
-                                      height: 120,
-                                      width: 120,
-                                    ),
-                                  ),
+                                  produtos.urlImagem != null
+                                      ? Container(
+                                          padding: EdgeInsets.only(right: 8),
+                                          child: Image.network(
+                                            produtos.urlImagem,
+                                            fit: BoxFit.cover,
+                                            height: 120,
+                                            width: 120,
+                                          ),
+                                        )
+                                      : Container(
+                                          padding: EdgeInsets.only(right: 8),
+                                          child: Image.asset(
+                                            "images/error.png",
+                                            fit: BoxFit.cover,
+                                            height: 120,
+                                            width: 120,
+                                          )),
                                   Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,

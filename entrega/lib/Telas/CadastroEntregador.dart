@@ -23,6 +23,15 @@ class _CadastroEntregadorState extends State<CadastroEntregador> {
   TextEditingController _controllerBairro = TextEditingController();
   TextEditingController _controllerSenha = TextEditingController();
   TextEditingController _controllerConfirmaSenha = TextEditingController();
+  List<String> listaCidades = ["Mirassol d'Oeste"];
+  String _cidade = '';
+
+  _escolhaMenuCidade(String cidadeEscolhida) {
+    setState(() {
+      _cidade = cidadeEscolhida;
+    });
+  }
+
   _verificaCampos() async {
     String nome = _controllerNome.text;
     String telefone = _controllerTelefone.text;
@@ -43,34 +52,41 @@ class _CadastroEntregadorState extends State<CadastroEntregador> {
                   if (senha == confirmaSenha) {
                     if (email.isNotEmpty) {
                       if (email.contains("@")) {
-                        await FirebaseAuth.instance
-                            .createUserWithEmailAndPassword(
-                                email: email, password: senha)
-                            .then((value) async {
-                          String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
-                          await FirebaseFirestore.instance
-                              .collection("usuarios")
-                              .doc(uid)
-                              .set({
-                            "idUsuario": uid,
-                            "tipoUsuario": "entregador",
-                            "ativo": true,
-                            "nome": nome,
-                            "email": email,
-                            "telefone": telefone,
-                            "whatsapp": whatsapp,
-                            "endereco": endereco,
-                            "bairro": bairro,
-                          }).then((value) {
-                            Navigator.pushNamedAndRemoveUntil(
-                                context, "/home", (route) => false);
+                        if (_cidade.isNotEmpty) {
+                          await FirebaseAuth.instance
+                              .createUserWithEmailAndPassword(
+                                  email: email, password: senha)
+                              .then((value) async {
+                            String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+                            await FirebaseFirestore.instance
+                                .collection("usuarios")
+                                .doc(uid)
+                                .set({
+                              "idUsuario": uid,
+                              "tipoUsuario": "entregador",
+                              "ativo": true,
+                              "nome": nome,
+                              "email": email,
+                              "telefone": telefone,
+                              "whatsapp": whatsapp,
+                              "endereco": endereco,
+                              "cidade": _cidade,
+                              "bairro": bairro,
+                            }).then((value) {
+                              Navigator.pushNamedAndRemoveUntil(
+                                  context, "/home", (route) => false);
+                            });
+                          }).catchError((erro) {
+                            setState(() {
+                              _msgErro = "Falha ao cadastrar, por favor" +
+                                  "verifique suas informações";
+                            });
                           });
-                        }).catchError((erro) {
+                        } else {
                           setState(() {
-                            _msgErro = "Falha ao cadastrar, por favor" +
-                                "verifique suas informações";
+                            _msgErro = "Por favor escolha uma cidade";
                           });
-                        });
+                        }
                       } else {
                         setState(() {
                           _msgErro = "E-mail inválido";
@@ -338,6 +354,29 @@ class _CadastroEntregadorState extends State<CadastroEntregador> {
                       color: Colors.red,
                       fontSize: 15,
                       fontWeight: FontWeight.bold),
+                ),
+                Padding(
+                    padding: EdgeInsets.only(bottom: 5),
+                    child: PopupMenuButton<String>(
+                      color: Color(0xff37474f),
+                      icon: Text("Escolha sua cidade"),
+                      onSelected: _escolhaMenuCidade,
+                      // ignore: missing_return
+                      itemBuilder: (context) {
+                        return listaCidades.map((String item) {
+                          return PopupMenuItem<String>(
+                            value: item,
+                            child: Text(item,
+                                style: TextStyle(color: Colors.white)),
+                          );
+                        }).toList();
+                      },
+                    )),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Cidade escolhida: " + _cidade),
+                  ],
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: 10, bottom: 10),

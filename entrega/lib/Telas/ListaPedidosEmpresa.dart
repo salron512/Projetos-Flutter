@@ -1,10 +1,11 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:entrega/util/RecupepraFirebase.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ListaPedidosEmpresa extends StatefulWidget {
   @override
@@ -40,6 +41,52 @@ class _ListaPedidosEmpresaState extends State<ListaPedidosEmpresa> {
     DateTime dataConvertida = DateTime.parse(data);
     String dataFormatada = formatador.format(dataConvertida);
     return dataFormatada;
+  }
+
+  _abrirWhatsApp(String telefone) async {
+    var whatsappUrl = "whatsapp://send?phone=+55$telefone=Olá,tudo bem ?";
+
+    if (await canLaunch(whatsappUrl)) {
+      await launch(whatsappUrl);
+    } else {
+      throw 'Could not launch $whatsappUrl';
+    }
+  }
+
+  _abrirTelefone(String telefone) async {
+    var telefoneUrl = "tel:$telefone";
+
+    if (await canLaunch(telefoneUrl)) {
+      await launch(telefoneUrl);
+    } else {
+      throw 'Could not launch $telefoneUrl';
+    }
+  }
+
+  _avisaEntregador() async {
+    String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+    List<String> list = [];
+    DocumentSnapshot snapshot =
+        await FirebaseFirestore.instance.collection("usuarios").doc(uid).get();
+
+    Map<String, dynamic> dadosUsuario = snapshot.data();
+    String cidade = dadosUsuario["cidade"];
+
+    var dadosFirebase = await FirebaseFirestore.instance
+        .collection("usuarios")
+        .where("tipoUsuario", isEqualTo: "entregador")
+        .where("cidade", isEqualTo: cidade)
+        .get();
+    for (var item in dadosFirebase.docs) {
+      Map<String, dynamic> dados = item.data();
+      String playerId = dados["playerId"];
+      list.add(playerId);
+    }
+    OneSignal.shared.postNotification(OSCreateNotification(
+      playerIds: list,
+      heading: "Nova entrega",
+      content: "Você tem uma nova entrega!",
+    ));
   }
 
   _confirmarRecebimento(DocumentSnapshot pedido) {
@@ -97,6 +144,7 @@ class _ListaPedidosEmpresaState extends State<ListaPedidosEmpresa> {
                 onPressed: () {
                   Navigator.pop(context);
                   _confirmarRecebimento(entrega);
+                  _avisaEntregador();
                 },
               ),
               TextButton(
@@ -108,15 +156,17 @@ class _ListaPedidosEmpresaState extends State<ListaPedidosEmpresa> {
               ),
               TextButton(
                 child: Text("Telefone cliente"),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pop(context);
+                  _abrirTelefone(entrega["telefoneUsuario"]);
+                },
               ),
               TextButton(
                 child: Text("Whatsapp cliente"),
-                onPressed: () {},
-              ),
-              TextButton(
-                child: Text("Chamar Entregador"),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pop(context);
+                  _abrirWhatsApp(entrega["whatsappUsuario"]);
+                },
               ),
             ],
           );
@@ -127,11 +177,7 @@ class _ListaPedidosEmpresaState extends State<ListaPedidosEmpresa> {
     FirebaseFirestore.instance
         .collection("pedidos")
         .doc(pedido.reference.id)
-        .update({
-      "status": "Entregue",
-      "andamento": false,
-      "taxaEntrega": 5
-    });
+        .update({"status": "Entregue", "andamento": false, "taxaEntrega": 5});
   }
 
   @override
@@ -222,11 +268,16 @@ class _ListaPedidosEmpresaState extends State<ListaPedidosEmpresa> {
                                       _formatarData(entrega["horaPedido"]),
                                   style: TextStyle(color: Colors.white),
                                 ),
-                                Text(
-                                  "Nome entregador " +
-                                      entrega["nomeEntregador"],
-                                  style: TextStyle(color: Colors.white),
-                                ),
+                                entrega["nomeEntregador"] == "vazio"
+                                    ? Text(
+                                        "Aguardando entregador",
+                                        style: TextStyle(color: Colors.white),
+                                      )
+                                    : Text(
+                                        "Nome entregador " +
+                                            entrega["nomeEntregador"],
+                                        style: TextStyle(color: Colors.white),
+                                      ),
                                 Text(
                                   "Status " + entrega["status"],
                                   style: TextStyle(color: Colors.white),

@@ -236,7 +236,72 @@ class _ListaProdutosState extends State<ListaProdutos> {
                       List<DocumentSnapshot> listadados =
                           querySnapshot.docs.toList();
                       DocumentSnapshot dados = listadados[indice];
-                      return ListTile(
+                      return Container(
+                          padding: EdgeInsets.all(4),
+                          child: GestureDetector(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                dados["urlImagem"] != null
+                                    ? Container(
+                                        child: Image.network(
+                                          dados["urlImagem"],
+                                          fit: BoxFit.cover,
+                                          height: 120,
+                                          width: 120,
+                                        ),
+                                      )
+                                    : Container(
+                                        child: Image.asset(
+                                        "images/error.png",
+                                        fit: BoxFit.cover,
+                                        height: 120,
+                                        width: 120,
+                                      )),
+                                Padding(
+                                  padding: EdgeInsets.only(left: 5),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(dados["nome"]),
+                                      Text("Preço: R\$ " + dados["preco"]),
+                                      Text(dados["descricao"]),
+                                    ],
+                                  ),
+                                ),
+                                 Row(
+                                   mainAxisAlignment: MainAxisAlignment.end,
+                                   children: [
+                                      IconButton(
+                                    icon: Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                    ),
+                                    onPressed: () {
+                                      _excluirProduto(dados.reference.id);
+                                    })
+                                   ],
+                                 )
+                              ],
+                            ),
+                            onLongPress: () {
+                              String idDocumento = dados.reference.id;
+                              Navigator.pushNamed(context, "/perfilproduto",
+                                  arguments: idDocumento);
+                            },
+                            onTap: () {
+                              _editaProduto(
+                                dados.reference.id,
+                                dados["nome"],
+                                dados["descricao"],
+                                dados["preco"],
+                              );
+                            },
+                          ));
+
+                      /*
+                       ListTile(
                         contentPadding: EdgeInsets.fromLTRB(0, 15, 15, 15),
                         leading: CircleAvatar(
                             backgroundImage: dados["urlImagem"] != null
@@ -279,6 +344,7 @@ class _ListaProdutosState extends State<ListaProdutos> {
                               arguments: idDocumento);
                         },
                       );
+                      */
                     });
               }
               break;

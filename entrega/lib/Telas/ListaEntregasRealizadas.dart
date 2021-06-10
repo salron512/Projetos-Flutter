@@ -45,11 +45,12 @@ class _ListaEntregasRealizadasState extends State<ListaEntregasRealizadas> {
       if (mounted) {
         _streamController.add(event);
         print("teste stream");
+
+        setState(() {
+          _qtd = event.docs.length;
+          _totalReceber = _vlrEntrega * _qtd;
+        });
       }
-      setState(() {
-        _qtd = event.docs.length;
-        _totalReceber = _vlrEntrega * _qtd;
-      });
     });
   }
 

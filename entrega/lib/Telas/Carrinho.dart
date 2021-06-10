@@ -7,6 +7,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 // ignore: must_be_immutable
 class Carrinho extends StatefulWidget {
@@ -24,6 +25,7 @@ class _CarrinhoState extends State<Carrinho> {
   double _totalSoma = 0;
   String _totalCompra = "0";
   bool _mostraTotal = false;
+  String _cidade = '';
   String _idEmpresa;
   String _numero = "";
   String _endereco = "";
@@ -31,6 +33,7 @@ class _CarrinhoState extends State<Carrinho> {
   String _enderecoFinal = "vazio";
   List<dynamic> _listaCompras = [];
   TextEditingController _controllerEndereco = TextEditingController();
+  TextEditingController _controllerBairro = TextEditingController();
 
   _recuperaCesta() {
     String idEmpresa = widget.idEmpresa;
@@ -395,7 +398,8 @@ class _CarrinhoState extends State<Carrinho> {
       permission = await Geolocator.requestPermission();
     } else {
       _aguardandoLocalizacao();
-      Position position = await Geolocator.getCurrentPosition();
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.best);
       //Position testePosition = Position(latitude: -15.67934342388134, longitude: -58.09606548073397);
       //-15.67934342388134, -58.09606548073397
       List<Placemark> listaendereco =
@@ -404,12 +408,20 @@ class _CarrinhoState extends State<Carrinho> {
       _endereco = endereco.thoroughfare;
       _numero = endereco.subThoroughfare;
       _bairro = endereco.subLocality;
+      _cidade = endereco.subAdministrativeArea;
+      String cidade = endereco.subAdministrativeArea;
 
       print("Teste Endereco " + _endereco);
       print("Teste numero " + _numero);
       print("Teste bairro " + _bairro);
+      print("logitude " +
+          position.longitude.toString() +
+          " laditude " +
+          position.latitude.toString());
+      print("Teste cidade " + cidade);
       _enderecoFinal = "$_endereco " + "$_numero";
       _controllerEndereco.text = _enderecoFinal;
+      _controllerBairro.text = _bairro;
       Navigator.pop(context);
       _confirmaEndereco();
     }
@@ -438,6 +450,19 @@ class _CarrinhoState extends State<Carrinho> {
                         fillColor: Colors.white,
                       ),
                       controller: _controllerEndereco),
+                  TextField(
+                      keyboardType: TextInputType.url,
+                      textCapitalization: TextCapitalization.sentences,
+                      style: TextStyle(
+                        fontSize: 15,
+                      ),
+                      decoration: InputDecoration(
+                        //contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                        hintText: "Bairro",
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                      controller: _controllerBairro),
                 ],
               ),
             ),
@@ -449,8 +474,16 @@ class _CarrinhoState extends State<Carrinho> {
                   child: Text("Cancelar")),
               TextButton(
                   onPressed: () {
-                    Navigator.pop(context);
-                    _selecionaPagamentoAlert();
+                    if (_controllerEndereco.text.isNotEmpty) {
+                      if (_controllerBairro.text.isNotEmpty) {
+                        Navigator.pop(context);
+                        _selecionaPagamentoAlert();
+                      } else {
+                        _alertErro("Por favor preencha o bairro");
+                      }
+                    } else {
+                      _alertErro("Por favor preencha o endereço");
+                    }
                   },
                   child: Text("Confirmar"))
             ],
@@ -481,13 +514,14 @@ class _CarrinhoState extends State<Carrinho> {
           "status": "Aguardando",
           "andamento": true,
           "nomeEntregador": "vazio",
+          "cidade": _cidade,
           "taxaEntrega": 5,
           "idEmpresa": _idEmpresa,
           "nomeEmpresa": mapEmpresa["nomeFantasia"],
           "idUsuario": uid,
           "cliente": mapUsuario["nome"],
           "telefoneUsuario": mapUsuario["telefone"],
-          "whatasappUsuario": mapUsuario["whatsapp"],
+          "whatsappUsuario": mapUsuario["whatsapp"],
           "enderecoUsuario": mapUsuario["endereco"],
           "bairroUsuario": mapUsuario["bairro"],
           "listaPedido": _listaCompras,
@@ -500,6 +534,7 @@ class _CarrinhoState extends State<Carrinho> {
               .collection("cesta")
               .where("idUsuario", isEqualTo: uid)
               .get();
+          _avisaEmpresa();
           cestaCompras.docs.forEach((element) {
             FirebaseFirestore.instance
                 .collection("cesta")
@@ -535,6 +570,7 @@ class _CarrinhoState extends State<Carrinho> {
         await FirebaseFirestore.instance.collection("pedidos").doc().set({
           "status": "Aguardando",
           "idEmpresa": _idEmpresa,
+          "cidade": _cidade,
           "taxaEntrega": 5,
           "andamento": true,
           "nomeEntregador": "vazio",
@@ -542,7 +578,7 @@ class _CarrinhoState extends State<Carrinho> {
           "idUsuario": uid,
           "cliente": mapUsuario["nome"],
           "telefoneUsuario": mapUsuario["telefone"],
-          "whatasappUsuario": mapUsuario["whatsapp"],
+          "whatsappUsuario": mapUsuario["whatsapp"],
           "enderecoUsuario": mapUsuario["endereco"],
           "bairroUsuario": mapUsuario["bairro"],
           "listaPedido": _listaCompras,
@@ -551,6 +587,7 @@ class _CarrinhoState extends State<Carrinho> {
           "formaPagamento": formaPagamento,
           "troco": verificaTroco,
         }).then((value) async {
+          _avisaEmpresa();
           QuerySnapshot cestaCompras = await FirebaseFirestore.instance
               .collection("cesta")
               .where("idUsuario", isEqualTo: uid)
@@ -591,21 +628,23 @@ class _CarrinhoState extends State<Carrinho> {
           "status": "Aguardando",
           "andamento": true,
           "nomeEntregador": "vazio",
+          "cidade": _cidade,
           "taxaEntrega": 5,
           "idEmpresa": _idEmpresa,
           "nomeEmpresa": mapEmpresa["nomeFantasia"],
           "idUsuario": uid,
           "cliente": mapUsuario["nome"],
           "telefoneUsuario": mapUsuario["telefone"],
-          "whatasappUsuario": mapUsuario["whatsapp"],
+          "whatsappUsuario": mapUsuario["whatsapp"],
           "enderecoUsuario": _enderecoFinal,
-          "bairroUsuario": _bairro,
+          "bairroUsuario": _controllerBairro.text,
           "listaPedido": _listaCompras,
           "totalPedido": _totalCompra,
           "horaPedido": DateTime.now().toString(),
           "formaPagamento": formaPagamento,
           "troco": "sem troco",
         }).then((value) async {
+          _avisaEmpresa();
           QuerySnapshot cestaCompras = await FirebaseFirestore.instance
               .collection("cesta")
               .where("idUsuario", isEqualTo: uid)
@@ -645,6 +684,7 @@ class _CarrinhoState extends State<Carrinho> {
         await FirebaseFirestore.instance.collection("pedidos").doc().set({
           "status": "Aguardando",
           "nomeEntregador": "vazio",
+          "cidade": _cidade,
           "taxaEntrega": 5,
           "andamento": true,
           "idEmpresa": _idEmpresa,
@@ -652,15 +692,16 @@ class _CarrinhoState extends State<Carrinho> {
           "idUsuario": uid,
           "cliente": mapUsuario["nome"],
           "telefoneUsuario": mapUsuario["telefone"],
-          "whatasappUsuario": mapUsuario["whatsapp"],
+          "whatsappUsuario": mapUsuario["whatsapp"],
           "enderecoUsuario": _enderecoFinal,
-          "bairroUsuario": _bairro,
+          "bairroUsuario": _controllerBairro.text,
           "listaPedido": _listaCompras,
           "totalPedido": _totalCompra,
           "horaPedido": DateTime.now().toString(),
           "formaPagamento": formaPagamento,
           "troco": verificaTroco,
         }).then((value) async {
+          _avisaEmpresa();
           QuerySnapshot cestaCompras = await FirebaseFirestore.instance
               .collection("cesta")
               .where("idUsuario", isEqualTo: uid)
@@ -697,6 +738,26 @@ class _CarrinhoState extends State<Carrinho> {
             ),
           );
         });
+  }
+
+  _avisaEmpresa() async {
+    String idEmpresa = widget.idEmpresa;
+    List<String> list = [];
+    var dadosFirebase = await FirebaseFirestore.instance
+        .collection("usuarios")
+        .where("idEmpresa", isEqualTo: idEmpresa)
+        .get();
+
+    for (var item in dadosFirebase.docs) {
+      Map<String, dynamic> dados = item.data();
+      list.add(dados["playerId"]);
+    }
+    OneSignal.shared.postNotification(OSCreateNotification(
+      playerIds: list,
+      heading: "Novo pedido",
+      content: "Você tem um novo pedido!",
+    ));
+    print("ENVIADO!!!");
   }
 
   _aguardandoLocalizacao() {
@@ -790,9 +851,18 @@ class _CarrinhoState extends State<Carrinho> {
         });
   }
 
+  _recuperaUsuario() async {
+    String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+    DocumentSnapshot daddosFirebase =
+        await FirebaseFirestore.instance.collection('usuarios').doc(uid).get();
+    Map<String, dynamic> dadosUsuario = daddosFirebase.data();
+    _cidade = dadosUsuario["cidade"];
+  }
+
   @override
   void initState() {
     super.initState();
+    _recuperaUsuario();
     _recuperaCesta();
   }
 

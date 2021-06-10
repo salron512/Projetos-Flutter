@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -87,11 +88,37 @@ class _HomeState extends State<Home> {
     }
   }
 
+  _recebeNot() {
+    OneSignal.shared.setNotificationOpenedHandler(
+        (OSNotificationOpenedResult result) async {
+      // será chamado sempre que uma notificação for aberta / botão pressionado.
+      // sempre que o content da notificação for aterado é necessario alterar o
+      // o switch
+      if (result != null) {
+        String dados = result.notification.payload.body;
+
+        print("ok " + dados);
+        switch (dados) {
+          
+
+          case "Você tem uma nova entrega!":
+            Navigator.pushNamed(context, "/listaEntregaPedentes");
+            break;
+
+          case "Você tem um novo pedido!":
+            Navigator.pushNamed(context, "/listapedidosempresa");
+            break;
+        }
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     Localizacao.verificaLocalizacao();
     _recuperaUsuario();
+    _recebeNot();
   }
 
   @override

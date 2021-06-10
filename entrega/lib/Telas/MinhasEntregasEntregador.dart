@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MinhasEntregasEntregador extends StatefulWidget {
   @override
@@ -80,7 +81,10 @@ class _MinhasEntregasEntregadorState extends State<MinhasEntregasEntregador> {
               ),
               TextButton(
                 child: Text("Whatsapp cliente"),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pop(context);
+                  _abrirWhatsApp(entrega["telefoneUsuario"]);
+                },
               ),
             ],
           );
@@ -198,6 +202,16 @@ class _MinhasEntregasEntregadorState extends State<MinhasEntregasEntregador> {
             ],
           );
         });
+  }
+
+  _abrirWhatsApp(String telefone) async {
+    var whatsappUrl = "whatsapp://send?phone=+55$telefone=Olá,tudo bem ?";
+
+    if (await canLaunch(whatsappUrl)) {
+      await launch(whatsappUrl);
+    } else {
+      throw 'Could not launch $whatsappUrl';
+    }
   }
 
   _obtemLocalizacao(DocumentSnapshot dados) async {
