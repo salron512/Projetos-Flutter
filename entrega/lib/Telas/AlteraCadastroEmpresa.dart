@@ -30,7 +30,7 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
   bool _aberto = false;
   String _urlImagem;
   File _imagem;
-  List<String> listaCidades = ["Mirassol D'Oeste"];
+  List<String> listaCidades = ["Mirassol d'Oeste"];
   String _cidade = "";
   TextEditingController _controllerRazaoSocial = TextEditingController();
   TextEditingController _controllerNomeFantasia = TextEditingController();

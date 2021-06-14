@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     
    <application
-        android:label="Express Delivery"
+        android:label="Eclipse Delivery"
         android:icon="@mipmap/fd">
         <activity
             android:name=".MainActivity"

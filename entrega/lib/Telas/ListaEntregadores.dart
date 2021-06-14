@@ -157,7 +157,8 @@ class _ListaEntregadoresState extends State<ListaEntregadores> {
                             setState(() {
                               entregador.ativo = value;
                             });
-                          });
+                          }
+                          );
                     },
                   );
                 } else {

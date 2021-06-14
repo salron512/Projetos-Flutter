@@ -9,10 +9,20 @@ class Empresa {
   String _diasFunc;
   String _idEmpresa;
   bool _estado;
+  bool _ativo;
+  String _telefone;
   
- bool get estado => this._estado;
+ String get telefone => this._telefone;
 
- set estado(bool value) => this._estado = value;
+ set telefone(String value) => this._telefone = value;
+
+  bool get ativo => this._ativo;
+
+  set ativo(bool value) => this._ativo = value;
+
+  bool get estado => this._estado;
+
+  set estado(bool value) => this._estado = value;
 
   String get idEmpresa => this._idEmpresa;
 

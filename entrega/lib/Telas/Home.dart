@@ -21,6 +21,7 @@ class _HomeState extends State<Home> {
     "Cadastrar empresa",
     "Cadastrar entregador",
     "Lista entregador",
+    "Lista empresas",
     "Financeiro"
   ];
 
@@ -42,6 +43,9 @@ class _HomeState extends State<Home> {
         break;
           case "Financeiro":
         Navigator.pushNamed(context, "/financeiro");
+        break;
+           case "Lista empresas":
+        Navigator.pushNamed(context, "/listaempresacadastro");
         break;
     }
   }
