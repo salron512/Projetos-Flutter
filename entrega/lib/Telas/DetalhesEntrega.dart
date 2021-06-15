@@ -25,6 +25,8 @@ class _DetalhesEntregaState extends State<DetalhesEntrega> {
           itemBuilder: (context, indice) {
             var requisicoes = widget.dados;
             var dados = requisicoes[indice];
+            double precoUnitario = dados["precoUnitario"];
+            double precoTotal = dados["precoTotal"];
             return ListTile(
               title: Text(
                 "Produto: " + dados["produto"],
@@ -36,11 +38,14 @@ class _DetalhesEntregaState extends State<DetalhesEntrega> {
                     "quantidade: " + dados["qtd"].toString(),
                   ),
                   Text(
-                    "Preço unitário: R\$: " + dados["precoUnitario"].toString(),
+                    "Preço unitário: R\$: " + precoUnitario.toStringAsFixed(2)
                   ),
                   Text(
-                    "Preço total: R\$: " + dados["precoTotal"].toString(),
-                  )
+                    "Preço total: R\$: " + precoTotal.toStringAsFixed(2)
+                  ),
+                  dados["observacao"] == ""
+                      ? Text("")
+                      : Text('Oberservação ' + dados["observacao"])
                 ],
               ),
             );

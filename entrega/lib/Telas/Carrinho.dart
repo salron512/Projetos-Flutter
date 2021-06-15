@@ -80,15 +80,17 @@ class _CarrinhoState extends State<Carrinho> {
     });
   }
 
-  _editaProduto(String idProduto, String nome, String qtd, double preco) {
+  _editaProduto(
+      String obs, String idProduto, String nome, String qtd, double preco) {
     TextEditingController controllerQtd = TextEditingController(text: qtd);
+    TextEditingController controllerobs = TextEditingController(text: obs);
     showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
             title: Text("Editar quantidade"),
             content: Container(
-              height: 230,
+              height: 260,
               child: Column(
                 children: [
                   Container(
@@ -119,6 +121,18 @@ class _CarrinhoState extends State<Carrinho> {
                     ),
                     controller: controllerQtd,
                   ),
+                  TextField(
+                      keyboardType: TextInputType.number,
+                      style: TextStyle(
+                        fontSize: 15,
+                      ),
+                      decoration: InputDecoration(
+                        //contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                        hintText: "Digite a quantidade",
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                      controller: controllerobs),
                 ],
               ),
             ),
@@ -939,7 +953,11 @@ class _CarrinhoState extends State<Carrinho> {
                                     Text(
                                       "Valor total R\$ " +
                                           precoTotal.toStringAsFixed(2),
-                                    )
+                                    ),
+                                    produto["observacao"] == ""
+                                        ? Text("")
+                                        : Text('Oberservação ' +
+                                            produto["observacao"])
                                   ],
                                 ),
                               ),
@@ -950,6 +968,7 @@ class _CarrinhoState extends State<Carrinho> {
                                 color: Colors.green,
                                 icon: Icons.edit,
                                 onTap: () => _editaProduto(
+                                    produto["observacao"],
                                     produto.reference.id,
                                     produto["produto"],
                                     produto["qtd"].toString(),

@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:entrega/util/RecupepraFirebase.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 class CadastroEmpresa extends StatefulWidget {
   @override
@@ -82,11 +84,18 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
                                       .createUserWithEmailAndPassword(
                                           email: email, password: senha)
                                       .then((value) async {
+                                   
+                                    var status = await OneSignal.shared
+                                        .getPermissionSubscriptionState();
+                                    String playerId =
+                                        status.subscriptionStatus.userId;
+
                                     idUsurio = value.user.uid;
-                                   await FirebaseFirestore.instance
+                                    await FirebaseFirestore.instance
                                         .collection("usuarios")
                                         .doc(idUsurio)
                                         .set({
+                                      "playerId": playerId,
                                       "idEmpresa": idUsurio,
                                       "aberto": false,
                                       "tipoUsuario": "empresa",
@@ -506,7 +515,6 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
                     controller: _controllerConfirmaSenha,
                   ),
                 ),
-              
                 Padding(
                     padding: EdgeInsets.only(bottom: 5),
                     child: PopupMenuButton<String>(

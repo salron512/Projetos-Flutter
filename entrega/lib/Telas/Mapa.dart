@@ -87,7 +87,7 @@ class _MapaState extends State<Mapa> {
             markers: _marcadores,
             initialCameraPosition: _posicaoCamera,
             onMapCreated: _onMapCreated,
-            mapType: MapType.hybrid,
+            mapType: MapType.normal,
             myLocationEnabled: true,
           ),
         ));

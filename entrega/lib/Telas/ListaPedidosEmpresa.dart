@@ -82,11 +82,13 @@ class _ListaPedidosEmpresaState extends State<ListaPedidosEmpresa> {
       String playerId = dados["playerId"];
       list.add(playerId);
     }
-    OneSignal.shared.postNotification(OSCreateNotification(
-      playerIds: list,
-      heading: "Nova entrega",
-      content: "Você tem uma nova entrega!",
-    ));
+    if (list.isNotEmpty) {
+      OneSignal.shared.postNotification(OSCreateNotification(
+        playerIds: list,
+        heading: "Nova entrega",
+        content: "Você tem uma nova entrega!",
+      ));
+    }
   }
 
   _confirmarRecebimento(DocumentSnapshot pedido) {

@@ -5,6 +5,7 @@ import 'package:entrega/util/RecupepraFirebase.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -65,6 +66,7 @@ class _MinhasEntregasEntregadorState extends State<MinhasEntregasEntregador> {
                 child: Text("Iniciar entrega"),
                 onPressed: () {
                   Navigator.pop(context);
+                  _alertUsuario(entrega);
                   _obtemLocalizacao(entrega);
                 },
               ),
@@ -202,6 +204,27 @@ class _MinhasEntregasEntregadorState extends State<MinhasEntregasEntregador> {
             ],
           );
         });
+  }
+
+  _alertUsuario(QueryDocumentSnapshot entrega) async {
+    List<String> list = [];
+    var dadosFirebase = await FirebaseFirestore.instance
+        .collection("usuarios")
+        .doc(entrega.reference.id)
+        .get();
+
+    Map<String, dynamic> dados = dadosFirebase.data();
+    list.add(dados["playerId"]);
+    print("ID USUARIO " + dados["playerId"]);
+
+    if (list.isNotEmpty) {
+      OneSignal.shared.postNotification(OSCreateNotification(
+      playerIds: list,
+      heading: "Novo pedido",
+      content: "Você tem um novo pedido!",
+    ));
+    }
+    print("ENVIADO!!!");
   }
 
   _abrirWhatsApp(String telefone) async {

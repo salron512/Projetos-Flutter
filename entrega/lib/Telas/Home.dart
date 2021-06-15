@@ -132,6 +132,9 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Home"),
+      ),
       body: SafeArea(
         child: Container(
           child: FutureBuilder(
@@ -161,7 +164,11 @@ class _HomeState extends State<Home> {
                           child: ListTile(
                             contentPadding: EdgeInsets.fromLTRB(20, 16, 20, 16),
                             leading: Image.network(dados.urlImagem),
-                            title: Text(dados.categoria),
+                            title: Text(dados.categoria,
+                            style: TextStyle(
+                              fontWeight:  FontWeight.bold
+                            ),
+                            ),
                             onTap: () async {
                               LocationPermission permission =
                                   await Geolocator.checkPermission();
@@ -193,6 +200,7 @@ class _HomeState extends State<Home> {
       ),
       bottomNavigationBar: BottomAppBar(
           child: Container(
+            width: 30,
               decoration: BoxDecoration(color: Theme.of(context).primaryColor),
               child: Padding(
                 padding: EdgeInsets.only(left: 10, right: 10),

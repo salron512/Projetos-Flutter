@@ -19,7 +19,7 @@ class _ListaEmpressasState extends State<ListaEmpressas> {
 
     String categoria = widget.categoria;
     CollectionReference reference =
-         FirebaseFirestore.instance.collection("usuarios");
+        FirebaseFirestore.instance.collection("usuarios");
 
     QuerySnapshot querySnapshot = await reference
         .orderBy("aberto", descending: true)
@@ -44,12 +44,6 @@ class _ListaEmpressasState extends State<ListaEmpressas> {
     return listaRecuperada;
   }
 
-/*
-  _recuperaHora(String abertura, String fechamento) {
-    int hora = DateTime.now().hour.toInt();
-    int minutos = DateTime.now().minute.toInt();
-  }
-*/
   @override
   void initState() {
     super.initState();
@@ -58,6 +52,9 @@ class _ListaEmpressasState extends State<ListaEmpressas> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Lista de opções"),
+      ),
       body: Container(
         child: FutureBuilder(
           future: _recuperaListaEmpresas(),
@@ -115,7 +112,9 @@ class _ListaEmpressasState extends State<ListaEmpressas> {
                             children: [
                               Text(
                                 "Aberto de: " + dadosEmpresa.diasFunc,
-                                style: TextStyle(color: Colors.white),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
                               ),
                               Text(
                                 "Horário de funcionamento ${dadosEmpresa.hAbertura} á ${dadosEmpresa.hFechamento} ",

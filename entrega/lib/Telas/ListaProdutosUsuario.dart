@@ -16,6 +16,7 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
   String _idEmpresa;
   var _mascaraQtd = MaskTextInputFormatter(
       mask: '#########', filter: {"#": RegExp(r'[0-9]')});
+  TextEditingController _controllerObj = TextEditingController();
   Future _recuperaProdutos() async {
     List<Produtos> listaProdutos = [];
     String idEmpresa = widget.id;
@@ -42,6 +43,7 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
   }
 
   _addCesta(Produtos produto, int qtd) {
+    String observacao = _controllerObj.text;
     double precoUnitario = double.parse(produto.preco).toDouble();
     double precoTotal = precoUnitario * qtd;
     String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
@@ -51,6 +53,7 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
       "precoTotal": precoTotal,
       "qtd": qtd,
       "produto": produto.nome,
+      "observacao": observacao,
       "idEmpresa": produto.idEmpresa
     });
   }
@@ -63,14 +66,13 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
           return AlertDialog(
             title: Text("Adicione a quantidade"),
             content: Container(
-              width: 200,
-              height: 230,
+              height: 250,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
-                    width: 80,
-                    height: 80,
+                    width: 40,
+                    height: 40,
                     child: Image.asset("images/produto.png"),
                   ),
                   Padding(
@@ -81,6 +83,7 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
                   Padding(
                     padding: EdgeInsets.only(bottom: 5),
                     child: TextField(
+                      autofocus: true,
                       inputFormatters: [_mascaraQtd],
                       keyboardType: TextInputType.number,
                       style: TextStyle(
@@ -101,20 +104,33 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
                       controller: controllerQtd,
                     ),
                   ),
+                  TextField(
+                    textCapitalization: TextCapitalization.sentences,
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(
+                      hintText: "Observação",
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                    controller: _controllerObj,
+                  ),
                 ],
               ),
             ),
             actions: [
               TextButton(
-                child: Text("Cancelar"),
-                onPressed: () => Navigator.pop(context),
-              ),
+                  child: Text("Cancelar"),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _controllerObj.clear();
+                  }),
               TextButton(
                 child: Text("Confirmar"),
                 onPressed: () {
                   int qtd = int.parse(controllerQtd.text).toInt();
                   _addCesta(produto, qtd);
                   Navigator.pop(context);
+                  _controllerObj.clear();
                 },
               ),
             ],
@@ -125,6 +141,7 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: Text("Produto"),),
       body: SafeArea(
         child: Container(
           child: FutureBuilder(
