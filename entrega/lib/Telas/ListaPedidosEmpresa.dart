@@ -213,7 +213,9 @@ class _ListaPedidosEmpresaState extends State<ListaPedidosEmpresa> {
                 case ConnectionState.none:
                 case ConnectionState.waiting:
                   return Center(
-                    child: CircularProgressIndicator(),
+                    child: CircularProgressIndicator(
+                      color: Theme.of(context).primaryColor,
+                    ),
                   );
                   break;
                 case ConnectionState.active:

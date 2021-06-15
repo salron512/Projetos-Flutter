@@ -152,7 +152,9 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
                 case ConnectionState.none:
                 case ConnectionState.waiting:
                   return Center(
-                    child: CircularProgressIndicator(),
+                    child: CircularProgressIndicator(
+                      color: Theme.of(context).primaryColor,
+                    ),
                   );
                 case ConnectionState.active:
                 case ConnectionState.done:

@@ -66,7 +66,9 @@ class _ListaPedidosUsuarioState extends State<ListaPedidosUsuario> {
             switch (snapshot.connectionState) {
               case ConnectionState.none:
               case ConnectionState.waiting:
-                return Center(child: CircularProgressIndicator());
+                return Center(child: CircularProgressIndicator(
+                  color: Theme.of(context).primaryColor,
+                ));
                 break;
               case ConnectionState.active:
               case ConnectionState.done:

@@ -748,7 +748,9 @@ class _CarrinhoState extends State<Carrinho> {
             content: Container(
               height: 100,
               child: Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(
+                  color: Theme.of(context).primaryColor,
+                ),
               ),
             ),
           );
@@ -785,7 +787,9 @@ class _CarrinhoState extends State<Carrinho> {
             content: Container(
               height: 100,
               child: Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(
+                  color: Theme.of(context).primaryColor,
+                ),
               ),
             ),
           );
@@ -906,7 +910,9 @@ class _CarrinhoState extends State<Carrinho> {
                   case ConnectionState.none:
                   case ConnectionState.waiting:
                     return Center(
-                      child: CircularProgressIndicator(),
+                      child: CircularProgressIndicator(
+                        color: Theme.of(context).primaryColor,
+                      ),
                     );
                     break;
                   case ConnectionState.active:
