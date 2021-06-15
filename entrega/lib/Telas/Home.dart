@@ -41,10 +41,10 @@ class _HomeState extends State<Home> {
       case "Lista entregador":
         Navigator.pushNamed(context, "/listaEntregadores");
         break;
-          case "Financeiro":
+      case "Financeiro":
         Navigator.pushNamed(context, "/financeiro");
         break;
-           case "Lista empresas":
+      case "Lista empresas":
         Navigator.pushNamed(context, "/listaempresacadastro");
         break;
     }
@@ -107,8 +107,6 @@ class _HomeState extends State<Home> {
 
         print("ok " + dados);
         switch (dados) {
-          
-
           case "Você tem uma nova entrega!":
             Navigator.pushNamed(context, "/listaEntregaPedentes");
             break;
@@ -134,6 +132,16 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Home"),
+        actions: [
+          IconButton(
+              icon: Icon(
+                Icons.exit_to_app,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                _deslogar();
+              }),
+        ],
       ),
       body: SafeArea(
         child: Container(
@@ -166,10 +174,9 @@ class _HomeState extends State<Home> {
                           child: ListTile(
                             contentPadding: EdgeInsets.fromLTRB(20, 16, 20, 16),
                             leading: Image.network(dados.urlImagem),
-                            title: Text(dados.categoria,
-                            style: TextStyle(
-                              fontWeight:  FontWeight.bold
-                            ),
+                            title: Text(
+                              dados.categoria,
+                              style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             onTap: () async {
                               LocationPermission permission =
@@ -202,7 +209,7 @@ class _HomeState extends State<Home> {
       ),
       bottomNavigationBar: BottomAppBar(
           child: Container(
-            width: 30,
+              width: 30,
               decoration: BoxDecoration(color: Theme.of(context).primaryColor),
               child: Padding(
                 padding: EdgeInsets.only(left: 10, right: 10),
@@ -312,14 +319,6 @@ class _HomeState extends State<Home> {
                                 context, "/listaentregasrealizadasempresa");
                           }),
                     ),
-                    IconButton(
-                        icon: Icon(
-                          Icons.exit_to_app,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {
-                          _deslogar();
-                        }),
                   ],
                 ),
               ))),
