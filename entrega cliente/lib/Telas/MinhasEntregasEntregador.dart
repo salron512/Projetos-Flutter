@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:background_location/background_location.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:entrega/util/RecupepraFirebase.dart';
 import 'package:flutter/material.dart';
@@ -62,7 +62,6 @@ class _MinhasEntregasEntregadorState extends State<MinhasEntregasEntregador> {
                   _cancelaEntrega(entrega);
                 },
               ),
-              /*
               TextButton(
                 child: Text("Iniciar entrega"),
                 onPressed: () {
@@ -71,7 +70,6 @@ class _MinhasEntregasEntregadorState extends State<MinhasEntregasEntregador> {
                   _obtemLocalizacao(entrega);
                 },
               ),
-               */
               TextButton(
                 child: Text("Finalizar entrega"),
                 onPressed: () {
@@ -145,7 +143,7 @@ class _MinhasEntregasEntregadorState extends State<MinhasEntregasEntregador> {
                       "motivo": controllerMotivo.text,
                       "dataCancelamento": DateTime.now().toString()
                     }).then((value) {
-                      //BackgroundLocation.stopLocationService();
+                      BackgroundLocation.stopLocationService();
                       FirebaseFirestore.instance
                           .collection("localizacaoEntregador")
                           .doc(entrega.reference.id)
@@ -194,7 +192,7 @@ class _MinhasEntregasEntregadorState extends State<MinhasEntregasEntregador> {
                     "status": "Finalizada",
                     "dataEntrega": DateTime.now().toString()
                   }).then((value) {
-                    //BackgroundLocation.stopLocationService();
+                    BackgroundLocation.stopLocationService();
                     FirebaseFirestore.instance
                         .collection("localizacaoEntregador")
                         .doc(entrega.reference.id)
@@ -222,8 +220,8 @@ class _MinhasEntregasEntregadorState extends State<MinhasEntregasEntregador> {
     if (list.isNotEmpty) {
       OneSignal.shared.postNotification(OSCreateNotification(
       playerIds: list,
-      heading: "Entrega á caminho",
-      content: "Acompanhe sua entrega em tempo real!",
+      heading: "Novo pedido",
+      content: "Você tem um novo pedido!",
     ));
     }
     print("ENVIADO!!!");
@@ -238,7 +236,7 @@ class _MinhasEntregasEntregadorState extends State<MinhasEntregasEntregador> {
       throw 'Could not launch $whatsappUrl';
     }
   }
-/*
+
   _obtemLocalizacao(DocumentSnapshot dados) async {
     bool permisao = await Permission.location.isRestricted;
     if (permisao) {
@@ -267,8 +265,6 @@ class _MinhasEntregasEntregadorState extends State<MinhasEntregasEntregador> {
       print("EXECUTANDO!!!!!");
     });
   }
-
- */
 
   @override
   void initState() {

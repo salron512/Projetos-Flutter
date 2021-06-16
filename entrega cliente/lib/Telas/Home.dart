@@ -23,7 +23,6 @@ class _HomeState extends State<Home> {
     "Lista entregador",
     "Lista empresas",
     "Financeiro"
-
   ];
 
   _deslogar() async {
@@ -48,7 +47,6 @@ class _HomeState extends State<Home> {
       case "Lista empresas":
         Navigator.pushNamed(context, "/listaempresacadastro");
         break;
-
     }
   }
 
@@ -96,7 +94,6 @@ class _HomeState extends State<Home> {
         _entregador = true;
       });
     }
-
   }
 
   _recebeNot() {
@@ -116,10 +113,6 @@ class _HomeState extends State<Home> {
 
           case "Você tem um novo pedido!":
             Navigator.pushNamed(context, "/listapedidosempresa");
-            break;
-
-          case "Acompanhe sua entrega em tempo real!":
-            Navigator.pushNamed(context, "/listapedidousuario");
             break;
         }
       }
