@@ -1,4 +1,4 @@
-package com.example.entrega
+package com.arv.entrega
 
 import io.flutter.embedding.android.FlutterActivity
 

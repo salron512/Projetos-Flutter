@@ -114,6 +114,9 @@ class _HomeState extends State<Home> {
           case "Você tem um novo pedido!":
             Navigator.pushNamed(context, "/listapedidosempresa");
             break;
+          case "Acompanhe sua entrega em tempo real!":
+            Navigator.pushNamed(context, "/listapedidousuario");
+            break;
         }
       }
     });

@@ -210,7 +210,7 @@ class _MinhasEntregasEntregadorState extends State<MinhasEntregasEntregador> {
     List<String> list = [];
     var dadosFirebase = await FirebaseFirestore.instance
         .collection("usuarios")
-        .doc(entrega.reference.id)
+        .doc(entrega["idUsuario"])
         .get();
 
     Map<String, dynamic> dados = dadosFirebase.data();
@@ -220,12 +220,13 @@ class _MinhasEntregasEntregadorState extends State<MinhasEntregasEntregador> {
     if (list.isNotEmpty) {
       OneSignal.shared.postNotification(OSCreateNotification(
       playerIds: list,
-      heading: "Novo pedido",
-      content: "Você tem um novo pedido!",
+      heading: "Entrega á caminho",
+      content: "Acompanhe sua entrega em tempo real!",
     ));
     }
     print("ENVIADO!!!");
   }
+
 
   _abrirWhatsApp(String telefone) async {
     var whatsappUrl = "whatsapp://send?phone=+55$telefone=Olá,tudo bem ?";
