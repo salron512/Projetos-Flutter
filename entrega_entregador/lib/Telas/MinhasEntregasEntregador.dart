@@ -222,6 +222,8 @@ class _MinhasEntregasEntregadorState extends State<MinhasEntregasEntregador> {
       playerIds: list,
       heading: "Entrega á caminho",
       content: "Acompanhe sua entrega em tempo real!",
+      
+      
     ));
     }
     print("ENVIADO!!!");

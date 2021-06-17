@@ -28,8 +28,10 @@ class Empresa {
 
   set idEmpresa(String value) => this._idEmpresa = value;
 
+  // ignore: unnecessary_getters_setters
   String get diasFunc => _diasFunc;
 
+  // ignore: unnecessary_getters_setters
   set diasFunc(String value) {
     _diasFunc = value;
   }

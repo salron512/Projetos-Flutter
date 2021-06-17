@@ -11,8 +11,7 @@ class AlteraCadastro extends StatefulWidget {
 class _AlteraCadastroState extends State<AlteraCadastro> {
   var _mascaraTelefone = new MaskTextInputFormatter(
       mask: '(##) #####-####', filter: {"#": RegExp(r'[0-9]')});
-  bool _mostrarSenha = false;
-  bool _motrarSenhaConfirma = false;
+ 
   String _msgErro = "";
 
   TextEditingController _controllerNome = TextEditingController();

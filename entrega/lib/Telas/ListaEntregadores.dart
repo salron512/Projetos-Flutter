@@ -54,7 +54,7 @@ class _ListaEntregadoresState extends State<ListaEntregadores> {
       throw 'Could not launch $telefoneUrl';
     }
   }
-
+/*
   _selecionaOpcao({String telefone, String whatsapp}) {
     // ignore: missing_return
     showDialog(
@@ -83,6 +83,7 @@ class _ListaEntregadoresState extends State<ListaEntregadores> {
           );
         });
   }
+  */
 
   @override
   Widget build(BuildContext context) {

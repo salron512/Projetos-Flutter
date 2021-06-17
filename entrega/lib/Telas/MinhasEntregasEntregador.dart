@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MinhasEntregasEntregador extends StatefulWidget {
@@ -208,6 +207,7 @@ class _MinhasEntregasEntregadorState extends State<MinhasEntregasEntregador> {
         });
   }
 
+  // ignore: unused_element
   _alertUsuario(QueryDocumentSnapshot entrega) async {
     List<String> list = [];
     var dadosFirebase = await FirebaseFirestore.instance

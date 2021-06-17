@@ -1,8 +1,6 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:entrega/util/RecupepraFirebase.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -24,8 +22,8 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
   String _msgErro = "";
   String _escolhaCategoria = "";
   List<String> itensMenu = [];
-  bool _mostrarSenha = false;
-  bool _motrarSenhaConfirma = false;
+  
+  // ignore: unused_field
   bool _subindoImagem = false;
   bool _aberto = false;
   String _urlImagem;

@@ -26,8 +26,9 @@ class _HomeState extends State<Home> {
   ];
 
   _deslogar() async {
-    await FirebaseAuth.instance.signOut().then((value) =>
-        Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false));
+    await FirebaseAuth.instance.signOut().then((value) {
+      Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
+    });
   }
 
   _escolhaMenuItem(String itemEscolhido) {
