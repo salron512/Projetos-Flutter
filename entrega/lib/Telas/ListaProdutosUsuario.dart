@@ -18,6 +18,7 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
   var _mascaraQtd = MaskTextInputFormatter(
       mask: '#########', filter: {"#": RegExp(r'[0-9]')});
   TextEditingController _controllerObj = TextEditingController();
+
   Future _recuperaProdutos() async {
     List<Produtos> listaProdutos = [];
     String idEmpresa = widget.id;
@@ -33,11 +34,15 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
     for (var item in snapshot.docs) {
       Map<String, dynamic> dados = item.data();
       Produtos produtos = Produtos();
+      if (dados["estoque"] < 1 && dados["estoqueAtivo"]) continue;
       produtos.nome = dados["nome"];
+      produtos.estoque = dados["estoque"];
+      produtos.estoqueAtivo = dados["estoqueAtivo"];
       produtos.preco = dados["preco"];
       produtos.descricao = dados["descricao"];
       produtos.urlImagem = dados["urlImagem"];
       produtos.idEmpresa = dados["idEmpresa"];
+      produtos.id = item.reference.id;
       _idEmpresa = dados["idEmpresa"];
       listaProdutos.add(produtos);
     }
@@ -45,11 +50,19 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
   }
 
   _addCesta(Produtos produto, int qtd) {
+    String idProduto = produto.id;
     String observacao = _controllerObj.text;
     double precoUnitario = double.parse(produto.preco).toDouble();
     double precoTotal = precoUnitario * qtd;
     String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
-    FirebaseFirestore.instance.collection("cesta").doc().set({
+    FirebaseFirestore.instance
+        .collection("cesta")
+        .doc(uid)
+        .collection(uid)
+        .doc(idProduto)
+        .set({
+      "estoqueAtivo": produto.estoqueAtivo,
+      'idProduto': idProduto,
       "idUsuario": uid,
       "precoUnitario": precoUnitario,
       "precoTotal": precoTotal,
@@ -58,6 +71,41 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
       "observacao": observacao,
       "idEmpresa": produto.idEmpresa
     });
+  }
+
+  _alertErro(String erro) {
+    print("alert");
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Erro"),
+            content: Container(
+              height: 150,
+              child: Column(
+                children: [
+                  Container(
+                    width: 80,
+                    height: 80,
+                    child: Image.asset("images/error.png"),
+                  ),
+                  Text(
+                    erro,
+                    style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold),
+                  )
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text("Confirmar"))
+            ],
+          );
+        });
   }
 
   _alerQtd(Produtos produto) {
@@ -129,8 +177,19 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
               TextButton(
                 child: Text("Confirmar"),
                 onPressed: () {
-                  int qtd = int.parse(controllerQtd.text).toInt();
-                  _addCesta(produto, qtd);
+                  int qtd = 0;
+                  if (controllerQtd.text.isNotEmpty) {
+                    qtd = int.parse(controllerQtd.text).toInt();
+                    if (produto.estoqueAtivo && produto.estoque < qtd) {
+                      print("teste01");
+                      _alertErro("Preencha a quantidade");
+                    } else {
+                      _addCesta(produto, qtd);
+                    }
+                  } else {
+                    print("teste");
+                    _alertErro("Preencha a quantidade");
+                  }
                   Navigator.pop(context);
                   _controllerObj.clear();
                 },
@@ -146,12 +205,11 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
         await FirebaseFirestore.instance.collection("usuarios").doc(uid).get();
     Map<String, dynamic> dadosUsuario = dadosFirebase.data();
 
-    _tipoUsuario = dadosFirebase["tipoUsuario"];
+    _tipoUsuario = dadosUsuario["tipoUsuario"];
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _recuperaUsuario();
   }
@@ -160,7 +218,7 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Produto"),
+        title: Text("Produtos"),
       ),
       body: SafeArea(
         child: Container(
@@ -228,7 +286,11 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
                                             fontWeight: FontWeight.bold),
                                       ),
                                       Text("R\$ " + produtos.preco),
-                                      Text(produtos.descricao)
+                                      Text(produtos.descricao),
+                                      produtos.estoqueAtivo == true
+                                          ? Text("Quantidade disponínel " +
+                                              produtos.estoque.toString())
+                                          : Text("")
                                     ],
                                   ),
                                 ],

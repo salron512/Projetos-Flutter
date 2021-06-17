@@ -13,7 +13,7 @@ class _CadastraProdutosState extends State<CadastraProdutos> {
   TextEditingController _controllerPreco = TextEditingController();
   TextEditingController _controllerDescicao = TextEditingController();
   TextEditingController _controllerQtdEstoque =
-      TextEditingController(text: "0");
+      TextEditingController(text: '0');
   var _mascaraQtd = MaskTextInputFormatter(
       mask: '#########', filter: {"#": RegExp(r'[0-9]')});
   String _msgErro = "";
@@ -23,7 +23,7 @@ class _CadastraProdutosState extends State<CadastraProdutos> {
     String nome = _controllerNome.text;
     String preco = _controllerPreco.text;
     String descricao = _controllerDescicao.text;
-    int qtdEstoque = int.parse(_controllerQtdEstoque.text).toInt();
+
     if (nome.isNotEmpty) {
       if (preco.isNotEmpty) {
         if (preco.contains(",")) {
@@ -32,19 +32,28 @@ class _CadastraProdutosState extends State<CadastraProdutos> {
           });
         } else {
           if (descricao.isNotEmpty) {
+            if (_controllerQtdEstoque.text.isEmpty) {
+              setState(() {
+                _controllerQtdEstoque.text = '0';
+              });
+            }
+
             String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+            int qtdEstoque = int.parse(_controllerQtdEstoque.text).toInt();
             double precoFirebase = double.tryParse(preco).toDouble();
             String idDoc = DateTime.now().microsecondsSinceEpoch.toString();
             await FirebaseFirestore.instance.collection("produtos").doc().set({
               'status': true,
-              'estoque'
-                  "id": idDoc,
+              'estoqueAtivo': _estoque,
+              'estoque': qtdEstoque,
+              "id": idDoc,
               "idEmpresa": uid,
               "nome": nome,
               "descricao": descricao,
               "preco": precoFirebase.toStringAsFixed(2),
               "urlImagem": null,
             }).catchError((erro) {
+              
               setState(() {
                 _msgErro =
                     "Falha ao salvar os dados por favor verifique sua conexão";
@@ -98,17 +107,23 @@ class _CadastraProdutosState extends State<CadastraProdutos> {
                 height: 150,
                 child: Image.asset("images/produto.png"),
               ),
-              Padding(
-                padding: EdgeInsets.only(bottom: 8, top: 15),
-                child: Checkbox(
-                  checkColor: Theme.of(context).primaryColor,
-                  value: _estoque,
-                  onChanged: (value) {
-                    setState(() {
-                      _estoque = value;
-                    });
-                  },
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 8, top: 15),
+                    child: Checkbox(
+                      activeColor: Theme.of(context).primaryColor,
+                      value: _estoque,
+                      onChanged: (value) {
+                        setState(() {
+                          _estoque = value;
+                        });
+                      },
+                    ),
+                  ),
+                  Text("Estoque")
+                ],
               ),
               Padding(
                 padding: EdgeInsets.only(bottom: 8, top: 15),
@@ -163,22 +178,25 @@ class _CadastraProdutosState extends State<CadastraProdutos> {
                   controller: _controllerPreco,
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.only(bottom: 8),
-                child: TextField(
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [_mascaraQtd],
-                  style: TextStyle(
-                    fontSize: 20,
+              Visibility(
+                visible: _estoque,
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: 8),
+                  child: TextField(
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [_mascaraQtd],
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                    decoration: InputDecoration(
+                        contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                        labelText: "Quantidade em estoque",
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15))),
+                    controller: _controllerQtdEstoque,
                   ),
-                  decoration: InputDecoration(
-                      contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                      labelText: "Quantidade em estoque",
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15))),
-                  controller: _controllerQtdEstoque,
                 ),
               ),
               Text(

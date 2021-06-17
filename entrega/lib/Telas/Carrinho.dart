@@ -35,11 +35,50 @@ class _CarrinhoState extends State<Carrinho> {
   TextEditingController _controllerEndereco = TextEditingController();
   TextEditingController _controllerBairro = TextEditingController();
 
+  _verificaEstoque() async {
+    String idEmpresa = widget.idEmpresa;
+    bool confirmarCompra = true;
+    int estoqueFinal;
+
+    String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+    CollectionReference ref =
+        FirebaseFirestore.instance.collection("cesta").doc(uid).collection(uid);
+
+    var lista = await ref
+        .where("idEmpresa", isEqualTo: idEmpresa)
+        .where("idUsuario", isEqualTo: uid)
+        .where("estoqueAtivo", isEqualTo: true)
+        .get();
+
+    for (var item in lista.docs) {
+      if (item["estoqueAtivo"]) {
+        var produto = await FirebaseFirestore.instance
+            .collection("produtos")
+            .doc(item["idProduto"])
+            .get();
+        if (item["qtd"] < produto["estoque"]) {
+          confirmarCompra = false;
+        } else {
+          estoqueFinal = produto["estoque"] - item["qtd"];
+          FirebaseFirestore.instance
+              .collection("produtos")
+              .doc(item["idProduto"])
+              .update({
+            'estoque': estoqueFinal,
+          });
+        }
+      }
+    }
+    print(confirmarCompra.toString());
+    return confirmarCompra;
+  }
+
   _recuperaCesta() {
     String idEmpresa = widget.idEmpresa;
     double soma = 0;
     String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
-    CollectionReference ref = FirebaseFirestore.instance.collection("cesta");
+    CollectionReference ref =
+        FirebaseFirestore.instance.collection("cesta").doc(uid).collection(uid);
 
     ref
         .where("idEmpresa", isEqualTo: idEmpresa)
@@ -94,8 +133,8 @@ class _CarrinhoState extends State<Carrinho> {
               child: Column(
                 children: [
                   Container(
-                      width: 100,
-                      height: 100,
+                      width: 60,
+                      height: 60,
                       child: Image.asset("images/scart.png")),
                   Padding(
                     padding: EdgeInsets.only(top: 5, bottom: 5),
@@ -121,18 +160,21 @@ class _CarrinhoState extends State<Carrinho> {
                     ),
                     controller: controllerQtd,
                   ),
-                  TextField(
-                      keyboardType: TextInputType.number,
-                      style: TextStyle(
-                        fontSize: 15,
-                      ),
-                      decoration: InputDecoration(
-                        //contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                        hintText: "Digite a quantidade",
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
-                      controller: controllerobs),
+                  Padding(
+                    padding: EdgeInsets.only(top: 5),
+                    child: TextField(
+                        keyboardType: TextInputType.text,
+                        style: TextStyle(
+                          fontSize: 15,
+                        ),
+                        decoration: InputDecoration(
+                          //contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                          hintText: "Observação",
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                        controller: controllerobs),
+                  )
                 ],
               ),
             ),
@@ -142,14 +184,21 @@ class _CarrinhoState extends State<Carrinho> {
                   child: Text("Cancelar")),
               TextButton(
                   onPressed: () {
+                    String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
                     if (controllerQtd.text.isNotEmpty) {
                       int qtd = int.parse(controllerQtd.text).toInt();
                       double vlrTotal = preco * qtd;
                       if (qtd > 0) {
                         FirebaseFirestore.instance
                             .collection("cesta")
+                            .doc(uid)
+                            .collection(uid)
                             .doc(idProduto)
-                            .update({"qtd": qtd, "precoTotal": vlrTotal});
+                            .update({
+                          'observacao': controllerobs.text,
+                          "qtd": qtd,
+                          "precoTotal": vlrTotal
+                        });
                         Navigator.pop(context);
                       } else {
                         _alertErro("Quantidade inválida");
@@ -231,8 +280,11 @@ class _CarrinhoState extends State<Carrinho> {
                   child: Text("Cancelar")),
               TextButton(
                   onPressed: () {
+                    String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
                     FirebaseFirestore.instance
                         .collection("cesta")
+                        .doc(uid)
+                        .collection(uid)
                         .doc(idProduto)
                         .delete();
                     Navigator.pop(context);
@@ -510,6 +562,7 @@ class _CarrinhoState extends State<Carrinho> {
     if (_enderecoFinal == "vazio") {
       if (troco < 0) {
         _aguardandoFirebase();
+        _verificaEstoque();
         String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
         Map<String, dynamic> mapUsuario;
         Map<String, dynamic> mapEmpresa;
@@ -545,14 +598,21 @@ class _CarrinhoState extends State<Carrinho> {
           "formaPagamento": formaPagamento,
           "troco": "sem troco",
         }).then((value) async {
+          String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+          String idEmpresa = widget.idEmpresa;
           QuerySnapshot cestaCompras = await FirebaseFirestore.instance
               .collection("cesta")
+              .doc(uid)
+              .collection(uid)
+              .where("idEmpresa", isEqualTo: idEmpresa)
               .where("idUsuario", isEqualTo: uid)
               .get();
           _avisaEmpresa();
           cestaCompras.docs.forEach((element) {
             FirebaseFirestore.instance
                 .collection("cesta")
+                .doc(uid)
+                .collection(uid)
                 .doc(element.reference.id)
                 .delete();
           });
@@ -566,6 +626,7 @@ class _CarrinhoState extends State<Carrinho> {
       } else {
         String verificaTroco = troco.toStringAsFixed(2);
         _aguardandoFirebase();
+        _verificaEstoque();
         String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
         Map<String, dynamic> mapUsuario;
         Map<String, dynamic> mapEmpresa;
@@ -602,14 +663,21 @@ class _CarrinhoState extends State<Carrinho> {
           "formaPagamento": formaPagamento,
           "troco": verificaTroco,
         }).then((value) async {
-          _avisaEmpresa();
+          String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+          String idEmpresa = widget.idEmpresa;
           QuerySnapshot cestaCompras = await FirebaseFirestore.instance
               .collection("cesta")
+              .doc(uid)
+              .collection(uid)
+              .where("idEmpresa", isEqualTo: idEmpresa)
               .where("idUsuario", isEqualTo: uid)
               .get();
+          _avisaEmpresa();
           cestaCompras.docs.forEach((element) {
             FirebaseFirestore.instance
                 .collection("cesta")
+                .doc(uid)
+                .collection(uid)
                 .doc(element.reference.id)
                 .delete();
           });
@@ -624,6 +692,7 @@ class _CarrinhoState extends State<Carrinho> {
     } else {
       if (troco < 0) {
         _aguardandoFirebase();
+        _verificaEstoque();
         String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
         Map<String, dynamic> mapUsuario;
         Map<String, dynamic> mapEmpresa;
@@ -659,14 +728,21 @@ class _CarrinhoState extends State<Carrinho> {
           "formaPagamento": formaPagamento,
           "troco": "sem troco",
         }).then((value) async {
-          _avisaEmpresa();
+          String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+          String idEmpresa = widget.idEmpresa;
           QuerySnapshot cestaCompras = await FirebaseFirestore.instance
               .collection("cesta")
+              .doc(uid)
+              .collection(uid)
+              .where("idEmpresa", isEqualTo: idEmpresa)
               .where("idUsuario", isEqualTo: uid)
               .get();
+          _avisaEmpresa();
           cestaCompras.docs.forEach((element) {
             FirebaseFirestore.instance
                 .collection("cesta")
+                .doc(uid)
+                .collection(uid)
                 .doc(element.reference.id)
                 .delete();
           });
@@ -680,6 +756,7 @@ class _CarrinhoState extends State<Carrinho> {
       } else {
         String verificaTroco = troco.toStringAsFixed(2);
         _aguardandoFirebase();
+        _verificaEstoque();
         String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
         Map<String, dynamic> mapUsuario;
         Map<String, dynamic> mapEmpresa;
@@ -716,14 +793,21 @@ class _CarrinhoState extends State<Carrinho> {
           "formaPagamento": formaPagamento,
           "troco": verificaTroco,
         }).then((value) async {
-          _avisaEmpresa();
+          String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+          String idEmpresa = widget.idEmpresa;
           QuerySnapshot cestaCompras = await FirebaseFirestore.instance
               .collection("cesta")
+              .doc(uid)
+              .collection(uid)
+              .where("idEmpresa", isEqualTo: idEmpresa)
               .where("idUsuario", isEqualTo: uid)
               .get();
+          _avisaEmpresa();
           cestaCompras.docs.forEach((element) {
             FirebaseFirestore.instance
                 .collection("cesta")
+                .doc(uid)
+                .collection(uid)
                 .doc(element.reference.id)
                 .delete();
           });
