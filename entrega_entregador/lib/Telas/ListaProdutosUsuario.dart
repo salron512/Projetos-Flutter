@@ -214,7 +214,7 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
                                 ],
                               ),
                               onTap: () {
-                                _alerQtd(produtos);
+                               // _alerQtd(produtos);
                               },
                             ));
 
@@ -253,6 +253,7 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
           ),
         ),
       ),
+      /*
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).primaryColor,
         child: Icon(Icons.shopping_cart),
@@ -260,6 +261,7 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
           Navigator.pushNamed(context, "/carinho", arguments: _idEmpresa);
         },
       ),
+      */
     );
   }
 }

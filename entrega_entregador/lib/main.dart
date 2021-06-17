@@ -30,7 +30,7 @@ void main() async {
   runApp(MaterialApp(
     home: Login(),
     theme: temaPatrao,
-    title: "Projeto Entrega",
+    title: "Projeto Entrega Entregador",
     debugShowCheckedModeBanner: false,
     onGenerateRoute: Rotas.generateRoute,
     initialRoute: "/",

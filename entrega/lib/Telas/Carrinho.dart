@@ -283,7 +283,7 @@ class _CarrinhoState extends State<Carrinho> {
                       onPressed: () {
                         if (controllerTroco.text.isNotEmpty) {
                           if (controllerTroco.text.contains(",")) {
-                            _alertErro("Uso de vírgula não é inválido");
+                            _alertErro("Uso de vírgula não é válido");
                           } else {
                             double troco =
                                 double.parse(controllerTroco.text).toDouble();

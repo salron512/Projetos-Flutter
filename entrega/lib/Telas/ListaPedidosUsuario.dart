@@ -86,7 +86,7 @@ class _ListaPedidosUsuarioState extends State<ListaPedidosUsuario> {
                           query.docs.toList();
                       QueryDocumentSnapshot pedido = listQuery[indice];
                       return Card(
-                        color: pedido["status"] == "Iniciada"
+                        color: pedido["status"] == "À caminho"
                             ? Colors.green
                             : Theme.of(context).primaryColor,
                         child: ListTile(

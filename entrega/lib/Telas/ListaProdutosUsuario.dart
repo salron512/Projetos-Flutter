@@ -14,12 +14,14 @@ class ListaProdutosUsuario extends StatefulWidget {
 
 class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
   String _idEmpresa;
+  String _tipoUsuario = '';
   var _mascaraQtd = MaskTextInputFormatter(
       mask: '#########', filter: {"#": RegExp(r'[0-9]')});
   TextEditingController _controllerObj = TextEditingController();
   Future _recuperaProdutos() async {
     List<Produtos> listaProdutos = [];
     String idEmpresa = widget.id;
+
     CollectionReference reference =
         FirebaseFirestore.instance.collection("produtos");
 
@@ -138,10 +140,28 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
         });
   }
 
+  _recuperaUsuario() async {
+    String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+    var dadosFirebase =
+        await FirebaseFirestore.instance.collection("usuarios").doc(uid).get();
+    Map<String, dynamic> dadosUsuario = dadosFirebase.data();
+
+    _tipoUsuario = dadosFirebase["tipoUsuario"];
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _recuperaUsuario();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Produto"),),
+      appBar: AppBar(
+        title: Text("Produto"),
+      ),
       body: SafeArea(
         child: Container(
           child: FutureBuilder(
@@ -214,7 +234,9 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
                                 ],
                               ),
                               onTap: () {
-                                _alerQtd(produtos);
+                                if (_tipoUsuario != "empresa") {
+                                  _alerQtd(produtos);
+                                }
                               },
                             ));
 
@@ -257,7 +279,9 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
         backgroundColor: Theme.of(context).primaryColor,
         child: Icon(Icons.shopping_cart),
         onPressed: () {
-          Navigator.pushNamed(context, "/carinho", arguments: _idEmpresa);
+          if (_tipoUsuario != "empresa") {
+            Navigator.pushNamed(context, "/carinho", arguments: _idEmpresa);
+          }
         },
       ),
     );

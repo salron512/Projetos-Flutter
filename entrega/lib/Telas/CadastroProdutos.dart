@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:entrega/util/RecupepraFirebase.dart';
 import 'package:flutter/material.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class CadastraProdutos extends StatefulWidget {
   @override
@@ -11,12 +12,18 @@ class _CadastraProdutosState extends State<CadastraProdutos> {
   TextEditingController _controllerNome = TextEditingController();
   TextEditingController _controllerPreco = TextEditingController();
   TextEditingController _controllerDescicao = TextEditingController();
+  TextEditingController _controllerQtdEstoque =
+      TextEditingController(text: "0");
+  var _mascaraQtd = MaskTextInputFormatter(
+      mask: '#########', filter: {"#": RegExp(r'[0-9]')});
   String _msgErro = "";
+  bool _estoque = false;
 
   _verificaCampos() async {
     String nome = _controllerNome.text;
     String preco = _controllerPreco.text;
     String descricao = _controllerDescicao.text;
+    int qtdEstoque = int.parse(_controllerQtdEstoque.text).toInt();
     if (nome.isNotEmpty) {
       if (preco.isNotEmpty) {
         if (preco.contains(",")) {
@@ -29,7 +36,9 @@ class _CadastraProdutosState extends State<CadastraProdutos> {
             double precoFirebase = double.tryParse(preco).toDouble();
             String idDoc = DateTime.now().microsecondsSinceEpoch.toString();
             await FirebaseFirestore.instance.collection("produtos").doc().set({
-              "id": idDoc,
+              'status': true,
+              'estoque'
+                  "id": idDoc,
               "idEmpresa": uid,
               "nome": nome,
               "descricao": descricao,
@@ -91,6 +100,18 @@ class _CadastraProdutosState extends State<CadastraProdutos> {
               ),
               Padding(
                 padding: EdgeInsets.only(bottom: 8, top: 15),
+                child: Checkbox(
+                  checkColor: Theme.of(context).primaryColor,
+                  value: _estoque,
+                  onChanged: (value) {
+                    setState(() {
+                      _estoque = value;
+                    });
+                  },
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(bottom: 8, top: 15),
                 child: TextField(
                   textCapitalization: TextCapitalization.sentences,
                   keyboardType: TextInputType.text,
@@ -140,6 +161,24 @@ class _CadastraProdutosState extends State<CadastraProdutos> {
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15))),
                   controller: _controllerPreco,
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(bottom: 8),
+                child: TextField(
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [_mascaraQtd],
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                  decoration: InputDecoration(
+                      contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                      labelText: "Quantidade em estoque",
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15))),
+                  controller: _controllerQtdEstoque,
                 ),
               ),
               Text(
