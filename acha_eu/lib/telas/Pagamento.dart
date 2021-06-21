@@ -92,7 +92,8 @@ class _PagamentoState extends State<Pagamento> {
         "country": "br",
         "email": usuario.email,
         "documents": [
-          {"type": "cpf", "number": _mascaraCpf.unmaskText(cpf)}
+          {"type": "cpf", 
+          "number": _mascaraCpf.unmaskText(cpf)}
         ],
         "phone_numbers": ["+55" + usuario.telefone, "+55" + usuario.whatsapp],
         "birthday": "1972-01-08"
@@ -129,7 +130,7 @@ class _PagamentoState extends State<Pagamento> {
     String status = dados["status"];
     print("Status " + status);
 
-    if (response.statusCode == 200 && status != "refused") {
+    if (response.statusCode == 200 && status == "paid") {
       FirebaseFirestore db = FirebaseFirestore.instance;
 
       db.collection("ultimoPagamento").doc(id).set({

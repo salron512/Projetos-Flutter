@@ -146,7 +146,8 @@ class _ConfiguracaoState extends State<Configuracao> {
                       .doc(_idUsuarioLogado)
                       .update(dadosAtualizar);
 
-               Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, "/", (route) => false);
                   setState(() {
                     _mensagemErro = "";
                   });
@@ -378,7 +379,7 @@ class _ConfiguracaoState extends State<Configuracao> {
       setState(() {
         _listaCidades = listaCidadesRecuperadas;
       });
-     // _mostraListaCidade();
+      // _mostraListaCidade();
     });
   }
 
@@ -485,7 +486,7 @@ class _ConfiguracaoState extends State<Configuracao> {
   void initState() {
     super.initState();
     _recuperaDadosUsuario();
-   _recuperaCategorias();
+    _recuperaCategorias();
   }
 
   @override
@@ -493,6 +494,13 @@ class _ConfiguracaoState extends State<Configuracao> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Perfil"),
+        actions: [
+          IconButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/pagamento');
+              },
+              icon: Icon(Icons.ac_unit))
+        ],
       ),
       body: cond == null
           ? Center(

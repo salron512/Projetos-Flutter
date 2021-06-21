@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:entrega/util/RecupepraFirebase.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class ListaProdutos extends StatefulWidget {
   @override
@@ -11,6 +12,9 @@ class ListaProdutos extends StatefulWidget {
 
 class _ListaProdutosState extends State<ListaProdutos> {
   StreamController _streamController = StreamController.broadcast();
+
+  var _mascaraQtd = MaskTextInputFormatter(
+      mask: '#########', filter: {"#": RegExp(r'[0-9]')});
 
   _recuperaListaProdutos() {
     String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
@@ -27,74 +31,95 @@ class _ListaProdutosState extends State<ListaProdutos> {
     });
   }
 
-  _editaProduto(String id, String nome, String descricao, String preco) {
+  _editaProduto(
+      String id, String nome, String descricao, String preco, int estoque) {
     TextEditingController controllerNome = TextEditingController(text: nome);
     TextEditingController controllerDescricao =
         TextEditingController(text: descricao);
     TextEditingController controllerPreco = TextEditingController(text: preco);
+    TextEditingController controllerEstoque =
+        TextEditingController(text: estoque.toString());
     showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
             title: Text("Editar informações"),
             content: Container(
-              width: 200,
-              height: 200,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 5),
-                    child: TextField(
-                      keyboardType: TextInputType.name,
-                      style: TextStyle(
-                        fontSize: 20,
+                width: 200,
+                height: 200,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 5),
+                        child: TextField(
+                          keyboardType: TextInputType.name,
+                          style: TextStyle(
+                            fontSize: 20,
+                          ),
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                            hintText: "Nome produto",
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
+                          controller: controllerNome,
+                        ),
                       ),
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                        hintText: "Nome produto",
-                        filled: true,
-                        fillColor: Colors.white,
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 5),
+                        child: TextField(
+                          keyboardType: TextInputType.number,
+                          style: TextStyle(
+                            fontSize: 20,
+                          ),
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                            prefix: Text("R\$ "),
+                            hintText: "Preço",
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
+                          controller: controllerPreco,
+                        ),
                       ),
-                      controller: controllerNome,
-                    ),
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 5),
+                        child: TextField(
+                          keyboardType: TextInputType.text,
+                          style: TextStyle(
+                            fontSize: 20,
+                          ),
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                            hintText: "Descrição",
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
+                          controller: controllerDescricao,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 5),
+                        child: TextField(
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [_mascaraQtd],
+                            style: TextStyle(
+                              fontSize: 20,
+                            ),
+                            decoration: InputDecoration(
+                              contentPadding:
+                                  EdgeInsets.fromLTRB(32, 16, 32, 16),
+                              hintText: "Estoque",
+                              filled: true,
+                              fillColor: Colors.white,
+                            ),
+                            controller: controllerEstoque),
+                      ),
+                    ],
                   ),
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 5),
-                    child: TextField(
-                      keyboardType: TextInputType.number,
-                      style: TextStyle(
-                        fontSize: 20,
-                      ),
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                        prefix: Text("R\$ "),
-                        hintText: "Preço",
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
-                      controller: controllerPreco,
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 5),
-                    child: TextField(
-                      keyboardType: TextInputType.name,
-                      style: TextStyle(
-                        fontSize: 20,
-                      ),
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                        hintText: "Descrição",
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
-                      controller: controllerDescricao,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                )),
             actions: [
               TextButton(
                 child: Text("Cancelar"),
@@ -110,6 +135,7 @@ class _ListaProdutosState extends State<ListaProdutos> {
                     controllerNome.text,
                     controllerDescricao.text,
                     controllerPreco.text,
+                    controllerEstoque.text,
                   );
                   Navigator.pop(context);
                 },
@@ -120,11 +146,13 @@ class _ListaProdutosState extends State<ListaProdutos> {
   }
 
   _salvaAlteracaoProduto(
-      String id, String nome, String descricao, String preco) {
-    FirebaseFirestore.instance
-        .collection("produtos")
-        .doc(id)
-        .update({"nome": nome, "descricao": descricao, "preco": preco});
+      String id, String nome, String descricao, String preco, String estoque) {
+    FirebaseFirestore.instance.collection("produtos").doc(id).update({
+      "nome": nome,
+      "descricao": descricao,
+      "preco": preco,
+      "estoque": int.parse(estoque).toInt()
+    });
   }
 
   _excluirProduto(String idDoc) {
@@ -238,6 +266,7 @@ class _ListaProdutosState extends State<ListaProdutos> {
                       List<DocumentSnapshot> listadados =
                           querySnapshot.docs.toList();
                       DocumentSnapshot dados = listadados[indice];
+                      bool estoqueAtivo = dados['estoqueAtivo'];
                       return Container(
                           padding: EdgeInsets.all(4),
                           child: GestureDetector(
@@ -263,28 +292,51 @@ class _ListaProdutosState extends State<ListaProdutos> {
                                 Padding(
                                   padding: EdgeInsets.only(left: 5),
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(dados["nome"]),
-                                      Text("Preço: R\$ " + dados["preco"]),
-                                      Text(dados["descricao"]),
-                                    ],
-                                  ),
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(dados["nome"]),
+                                        Text("Preço: R\$ " + dados["preco"]),
+                                        Text(dados["descricao"]),
+                                        dados['estoqueAtivo'] == true
+                                            ? Text("Estoque " +
+                                                dados['estoque'].toString())
+                                            : Text(''),
+                                        Row(
+                                          children: [
+                                            Checkbox(
+                                                activeColor: Theme.of(context)
+                                                    .primaryColor,
+                                                value: estoqueAtivo,
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    FirebaseFirestore.instance
+                                                        .collection('produtos')
+                                                        .doc(dados.reference.id)
+                                                        .update({
+                                                      'estoqueAtivo': value
+                                                    });
+                                                    estoqueAtivo = value;
+                                                  });
+                                                }),
+                                            Text("Estoque ativo")
+                                          ],
+                                        )
+                                      ]),
                                 ),
-                                 Row(
-                                   mainAxisAlignment: MainAxisAlignment.end,
-                                   children: [
-                                      IconButton(
-                                    icon: Icon(
-                                      Icons.delete,
-                                      color: Colors.red,
-                                    ),
-                                    onPressed: () {
-                                      _excluirProduto(dados.reference.id);
-                                    })
-                                   ],
-                                 )
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    IconButton(
+                                        icon: Icon(
+                                          Icons.delete,
+                                          color: Colors.red,
+                                        ),
+                                        onPressed: () {
+                                          _excluirProduto(dados.reference.id);
+                                        })
+                                  ],
+                                )
                               ],
                             ),
                             onLongPress: () {
@@ -294,59 +346,13 @@ class _ListaProdutosState extends State<ListaProdutos> {
                             },
                             onTap: () {
                               _editaProduto(
-                                dados.reference.id,
-                                dados["nome"],
-                                dados["descricao"],
-                                dados["preco"],
-                              );
+                                  dados.reference.id,
+                                  dados["nome"],
+                                  dados["descricao"],
+                                  dados["preco"],
+                                  dados['estoque']);
                             },
                           ));
-
-                      /*
-                       ListTile(
-                        contentPadding: EdgeInsets.fromLTRB(0, 15, 15, 15),
-                        leading: CircleAvatar(
-                            backgroundImage: dados["urlImagem"] != null
-                                ? NetworkImage(dados["urlImagem"])
-                                : null,
-                            maxRadius: 50,
-                            backgroundColor: Colors.grey),
-                        title: Text(dados["nome"]),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text("Preço: R\$ " + dados["preco"]),
-                            Text(dados["descricao"]),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                IconButton(
-                                    icon: Icon(
-                                      Icons.delete,
-                                      color: Colors.red,
-                                    ),
-                                    onPressed: () {
-                                      _excluirProduto(dados.reference.id);
-                                    })
-                              ],
-                            ),
-                          ],
-                        ),
-                        onTap: () {
-                          _editaProduto(
-                            dados.reference.id,
-                            dados["nome"],
-                            dados["descricao"],
-                            dados["preco"],
-                          );
-                        },
-                        onLongPress: () {
-                          String idDocumento = dados.reference.id;
-                          Navigator.pushNamed(context, "/perfilproduto",
-                              arguments: idDocumento);
-                        },
-                      );
-                      */
                     });
               }
               break;

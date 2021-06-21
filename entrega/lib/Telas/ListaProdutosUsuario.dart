@@ -181,14 +181,12 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
                   if (controllerQtd.text.isNotEmpty) {
                     qtd = int.parse(controllerQtd.text).toInt();
                     if (produto.estoqueAtivo && produto.estoque < qtd) {
-                      print("teste01");
-                      _alertErro("Preencha a quantidade");
+                      return _alertErro("Quantidade não permitidacle");
                     } else {
                       _addCesta(produto, qtd);
                     }
                   } else {
-                    print("teste");
-                    _alertErro("Preencha a quantidade");
+                    return _alertErro("Preencha a quantidade");
                   }
                   Navigator.pop(context);
                   _controllerObj.clear();

@@ -123,6 +123,13 @@ class _ListaPedidosEmpresaState extends State<ListaPedidosEmpresa> {
         });
   }
 
+  _cancelarEntrega(QueryDocumentSnapshot entrega) {
+    FirebaseFirestore.instance
+        .collection('pedidos')
+        .doc(entrega.reference.id)
+        .update({'andamento': false, 'status': "Cancelada"});
+  }
+
   _selecionaOpcao(QueryDocumentSnapshot entrega) {
     showDialog(
         context: context,
@@ -138,10 +145,7 @@ class _ListaPedidosEmpresaState extends State<ListaPedidosEmpresa> {
               TextButton(
                 child: Text("Cancelar entrega"),
                 onPressed: () {
-                  FirebaseFirestore.instance
-                      .collection("pedidos")
-                      .doc(entrega.reference.id)
-                      .delete();
+                  _cancelarEntrega(entrega);
                   Navigator.pop(context);
                 },
               ),

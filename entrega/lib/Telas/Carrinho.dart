@@ -51,18 +51,22 @@ class _CarrinhoState extends State<Carrinho> {
         .get();
 
     for (var item in lista.docs) {
-      if (item["estoqueAtivo"]) {
+      print("for");
+      Map<String, dynamic> dadosCesta = item.data();
+      if (dadosCesta["estoqueAtivo"]) {
         var produto = await FirebaseFirestore.instance
             .collection("produtos")
-            .doc(item["idProduto"])
+            .doc(dadosCesta["idProduto"])
             .get();
-        if (item["qtd"] < produto["estoque"]) {
+
+        Map<String, dynamic> dadosProduto = produto.data();
+        if (dadosCesta["qtd"] > dadosProduto["estoque"]) {
           confirmarCompra = false;
         } else {
-          estoqueFinal = produto["estoque"] - item["qtd"];
+          estoqueFinal = dadosProduto["estoque"] - dadosCesta["qtd"];
           FirebaseFirestore.instance
               .collection("produtos")
-              .doc(item["idProduto"])
+              .doc(dadosCesta["idProduto"])
               .update({
             'estoque': estoqueFinal,
           });
@@ -562,262 +566,288 @@ class _CarrinhoState extends State<Carrinho> {
     if (_enderecoFinal == "vazio") {
       if (troco < 0) {
         _aguardandoFirebase();
-        _verificaEstoque();
-        String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
-        Map<String, dynamic> mapUsuario;
-        Map<String, dynamic> mapEmpresa;
-        DocumentSnapshot dadosUsuario = await FirebaseFirestore.instance
-            .collection("usuarios")
-            .doc(uid)
-            .get();
-        mapUsuario = dadosUsuario.data();
+        bool verificaCompra = await _verificaEstoque();
 
-        DocumentSnapshot dadosEmpresa = await FirebaseFirestore.instance
-            .collection("usuarios")
-            .doc(_idEmpresa)
-            .get();
-        mapEmpresa = dadosEmpresa.data();
-
-        await FirebaseFirestore.instance.collection("pedidos").doc().set({
-          "status": "Aguardando",
-          "andamento": true,
-          "nomeEntregador": "vazio",
-          "cidade": _cidade,
-          "taxaEntrega": 5,
-          "idEmpresa": _idEmpresa,
-          "nomeEmpresa": mapEmpresa["nomeFantasia"],
-          "idUsuario": uid,
-          "cliente": mapUsuario["nome"],
-          "telefoneUsuario": mapUsuario["telefone"],
-          "whatsappUsuario": mapUsuario["whatsapp"],
-          "enderecoUsuario": mapUsuario["endereco"],
-          "bairroUsuario": mapUsuario["bairro"],
-          "listaPedido": _listaCompras,
-          "totalPedido": _totalCompra,
-          "horaPedido": DateTime.now().toString(),
-          "formaPagamento": formaPagamento,
-          "troco": "sem troco",
-        }).then((value) async {
+        if (verificaCompra) {
           String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
-          String idEmpresa = widget.idEmpresa;
-          QuerySnapshot cestaCompras = await FirebaseFirestore.instance
-              .collection("cesta")
+          Map<String, dynamic> mapUsuario;
+          Map<String, dynamic> mapEmpresa;
+          DocumentSnapshot dadosUsuario = await FirebaseFirestore.instance
+              .collection("usuarios")
               .doc(uid)
-              .collection(uid)
-              .where("idEmpresa", isEqualTo: idEmpresa)
-              .where("idUsuario", isEqualTo: uid)
               .get();
-          _avisaEmpresa();
-          cestaCompras.docs.forEach((element) {
-            FirebaseFirestore.instance
+          mapUsuario = dadosUsuario.data();
+
+          DocumentSnapshot dadosEmpresa = await FirebaseFirestore.instance
+              .collection("usuarios")
+              .doc(_idEmpresa)
+              .get();
+          mapEmpresa = dadosEmpresa.data();
+
+          await FirebaseFirestore.instance.collection("pedidos").doc().set({
+            "status": "Aguardando",
+            "andamento": true,
+            "nomeEntregador": "vazio",
+            "cidade": _cidade,
+            "taxaEntrega": 5,
+            "idEmpresa": _idEmpresa,
+            "nomeEmpresa": mapEmpresa["nomeFantasia"],
+            "idUsuario": uid,
+            "cliente": mapUsuario["nome"],
+            "telefoneUsuario": mapUsuario["telefone"],
+            "whatsappUsuario": mapUsuario["whatsapp"],
+            "enderecoUsuario": mapUsuario["endereco"],
+            "bairroUsuario": mapUsuario["bairro"],
+            "listaPedido": _listaCompras,
+            "totalPedido": _totalCompra,
+            "horaPedido": DateTime.now().toString(),
+            "formaPagamento": formaPagamento,
+            "troco": "sem troco",
+          }).then((value) async {
+            String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+            String idEmpresa = widget.idEmpresa;
+            QuerySnapshot cestaCompras = await FirebaseFirestore.instance
                 .collection("cesta")
                 .doc(uid)
                 .collection(uid)
-                .doc(element.reference.id)
-                .delete();
-          });
+                .where("idEmpresa", isEqualTo: idEmpresa)
+                .where("idUsuario", isEqualTo: uid)
+                .get();
+            _avisaEmpresa();
+            cestaCompras.docs.forEach((element) {
+              FirebaseFirestore.instance
+                  .collection("cesta")
+                  .doc(uid)
+                  .collection(uid)
+                  .doc(element.reference.id)
+                  .delete();
+            });
 
-          Navigator.pop(context);
-          _confirmaPedido();
-        }).catchError((erro) {
-          Navigator.pop(context);
-          _alertErro("Erro ao enviar seu pedido");
-        });
+            Navigator.pop(context);
+            _confirmaPedido();
+          }).catchError((erro) {
+            Navigator.pop(context);
+            _alertErro("Erro ao enviar seu pedido");
+          });
+        } else {
+           Navigator.pop(context);
+          _alertErro(
+              'Existe produtos sem estoque na sua compra, por favor verifique seus itens');
+        }
       } else {
         String verificaTroco = troco.toStringAsFixed(2);
         _aguardandoFirebase();
-        _verificaEstoque();
-        String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
-        Map<String, dynamic> mapUsuario;
-        Map<String, dynamic> mapEmpresa;
-
-        DocumentSnapshot dadosUsuario = await FirebaseFirestore.instance
-            .collection("usuarios")
-            .doc(uid)
-            .get();
-        mapUsuario = dadosUsuario.data();
-
-        DocumentSnapshot dadosEmpresa = await FirebaseFirestore.instance
-            .collection("usuarios")
-            .doc(_idEmpresa)
-            .get();
-        mapEmpresa = dadosEmpresa.data();
-
-        await FirebaseFirestore.instance.collection("pedidos").doc().set({
-          "status": "Aguardando",
-          "idEmpresa": _idEmpresa,
-          "cidade": _cidade,
-          "taxaEntrega": 5,
-          "andamento": true,
-          "nomeEntregador": "vazio",
-          "nomeEmpresa": mapEmpresa["nomeFantasia"],
-          "idUsuario": uid,
-          "cliente": mapUsuario["nome"],
-          "telefoneUsuario": mapUsuario["telefone"],
-          "whatsappUsuario": mapUsuario["whatsapp"],
-          "enderecoUsuario": mapUsuario["endereco"],
-          "bairroUsuario": mapUsuario["bairro"],
-          "listaPedido": _listaCompras,
-          "totalPedido": _totalCompra,
-          "horaPedido": DateTime.now().toString(),
-          "formaPagamento": formaPagamento,
-          "troco": verificaTroco,
-        }).then((value) async {
+        bool verificacao = await _verificaEstoque();
+        if (verificacao) {
           String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
-          String idEmpresa = widget.idEmpresa;
-          QuerySnapshot cestaCompras = await FirebaseFirestore.instance
-              .collection("cesta")
+          Map<String, dynamic> mapUsuario;
+          Map<String, dynamic> mapEmpresa;
+
+          DocumentSnapshot dadosUsuario = await FirebaseFirestore.instance
+              .collection("usuarios")
               .doc(uid)
-              .collection(uid)
-              .where("idEmpresa", isEqualTo: idEmpresa)
-              .where("idUsuario", isEqualTo: uid)
               .get();
-          _avisaEmpresa();
-          cestaCompras.docs.forEach((element) {
-            FirebaseFirestore.instance
+          mapUsuario = dadosUsuario.data();
+
+          DocumentSnapshot dadosEmpresa = await FirebaseFirestore.instance
+              .collection("usuarios")
+              .doc(_idEmpresa)
+              .get();
+          mapEmpresa = dadosEmpresa.data();
+
+          await FirebaseFirestore.instance.collection("pedidos").doc().set({
+            "status": "Aguardando",
+            "idEmpresa": _idEmpresa,
+            "cidade": _cidade,
+            "taxaEntrega": 5,
+            "andamento": true,
+            "nomeEntregador": "vazio",
+            "nomeEmpresa": mapEmpresa["nomeFantasia"],
+            "idUsuario": uid,
+            "cliente": mapUsuario["nome"],
+            "telefoneUsuario": mapUsuario["telefone"],
+            "whatsappUsuario": mapUsuario["whatsapp"],
+            "enderecoUsuario": mapUsuario["endereco"],
+            "bairroUsuario": mapUsuario["bairro"],
+            "listaPedido": _listaCompras,
+            "totalPedido": _totalCompra,
+            "horaPedido": DateTime.now().toString(),
+            "formaPagamento": formaPagamento,
+            "troco": verificaTroco,
+          }).then((value) async {
+            String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+            String idEmpresa = widget.idEmpresa;
+            QuerySnapshot cestaCompras = await FirebaseFirestore.instance
                 .collection("cesta")
                 .doc(uid)
                 .collection(uid)
-                .doc(element.reference.id)
-                .delete();
-          });
+                .where("idEmpresa", isEqualTo: idEmpresa)
+                .where("idUsuario", isEqualTo: uid)
+                .get();
+            _avisaEmpresa();
+            cestaCompras.docs.forEach((element) {
+              FirebaseFirestore.instance
+                  .collection("cesta")
+                  .doc(uid)
+                  .collection(uid)
+                  .doc(element.reference.id)
+                  .delete();
+            });
 
-          Navigator.pop(context);
-          _confirmaPedido();
-        }).catchError((erro) {
-          Navigator.pop(context);
-          _alertErro("Erro ao enviar seu pedido");
-        });
+            Navigator.pop(context);
+            _confirmaPedido();
+          }).catchError((erro) {
+            Navigator.pop(context);
+            _alertErro("Erro ao enviar seu pedido");
+          });
+        } else {
+           Navigator.pop(context);
+          _alertErro(
+              'Existe produtos sem estoque na sua compra, por favor verifique seus itens');
+        }
       }
     } else {
       if (troco < 0) {
         _aguardandoFirebase();
-        _verificaEstoque();
-        String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
-        Map<String, dynamic> mapUsuario;
-        Map<String, dynamic> mapEmpresa;
-        DocumentSnapshot dadosUsuario = await FirebaseFirestore.instance
-            .collection("usuarios")
-            .doc(uid)
-            .get();
-        mapUsuario = dadosUsuario.data();
-
-        DocumentSnapshot dadosEmpresa = await FirebaseFirestore.instance
-            .collection("usuarios")
-            .doc(_idEmpresa)
-            .get();
-        mapEmpresa = dadosEmpresa.data();
-
-        await FirebaseFirestore.instance.collection("pedidos").doc().set({
-          "status": "Aguardando",
-          "andamento": true,
-          "nomeEntregador": "vazio",
-          "cidade": _cidade,
-          "taxaEntrega": 5,
-          "idEmpresa": _idEmpresa,
-          "nomeEmpresa": mapEmpresa["nomeFantasia"],
-          "idUsuario": uid,
-          "cliente": mapUsuario["nome"],
-          "telefoneUsuario": mapUsuario["telefone"],
-          "whatsappUsuario": mapUsuario["whatsapp"],
-          "enderecoUsuario": _enderecoFinal,
-          "bairroUsuario": _controllerBairro.text,
-          "listaPedido": _listaCompras,
-          "totalPedido": _totalCompra,
-          "horaPedido": DateTime.now().toString(),
-          "formaPagamento": formaPagamento,
-          "troco": "sem troco",
-        }).then((value) async {
+        bool verificacao = await _verificaEstoque();
+        if (verificacao) {
           String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
-          String idEmpresa = widget.idEmpresa;
-          QuerySnapshot cestaCompras = await FirebaseFirestore.instance
-              .collection("cesta")
+          Map<String, dynamic> mapUsuario;
+          Map<String, dynamic> mapEmpresa;
+          DocumentSnapshot dadosUsuario = await FirebaseFirestore.instance
+              .collection("usuarios")
               .doc(uid)
-              .collection(uid)
-              .where("idEmpresa", isEqualTo: idEmpresa)
-              .where("idUsuario", isEqualTo: uid)
               .get();
-          _avisaEmpresa();
-          cestaCompras.docs.forEach((element) {
-            FirebaseFirestore.instance
+          mapUsuario = dadosUsuario.data();
+
+          DocumentSnapshot dadosEmpresa = await FirebaseFirestore.instance
+              .collection("usuarios")
+              .doc(_idEmpresa)
+              .get();
+          mapEmpresa = dadosEmpresa.data();
+
+          await FirebaseFirestore.instance.collection("pedidos").doc().set({
+            "status": "Aguardando",
+            "andamento": true,
+            "nomeEntregador": "vazio",
+            "cidade": _cidade,
+            "taxaEntrega": 5,
+            "idEmpresa": _idEmpresa,
+            "nomeEmpresa": mapEmpresa["nomeFantasia"],
+            "idUsuario": uid,
+            "cliente": mapUsuario["nome"],
+            "telefoneUsuario": mapUsuario["telefone"],
+            "whatsappUsuario": mapUsuario["whatsapp"],
+            "enderecoUsuario": _enderecoFinal,
+            "bairroUsuario": _controllerBairro.text,
+            "listaPedido": _listaCompras,
+            "totalPedido": _totalCompra,
+            "horaPedido": DateTime.now().toString(),
+            "formaPagamento": formaPagamento,
+            "troco": "sem troco",
+          }).then((value) async {
+            String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+            String idEmpresa = widget.idEmpresa;
+            QuerySnapshot cestaCompras = await FirebaseFirestore.instance
                 .collection("cesta")
                 .doc(uid)
                 .collection(uid)
-                .doc(element.reference.id)
-                .delete();
-          });
+                .where("idEmpresa", isEqualTo: idEmpresa)
+                .where("idUsuario", isEqualTo: uid)
+                .get();
+            _avisaEmpresa();
+            cestaCompras.docs.forEach((element) {
+              FirebaseFirestore.instance
+                  .collection("cesta")
+                  .doc(uid)
+                  .collection(uid)
+                  .doc(element.reference.id)
+                  .delete();
+            });
 
-          Navigator.pop(context);
-          _confirmaPedido();
-        }).catchError((erro) {
-          Navigator.pop(context);
-          _alertErro("Erro ao enviar seu pedido");
-        });
+            Navigator.pop(context);
+            _confirmaPedido();
+          }).catchError((erro) {
+            Navigator.pop(context);
+            _alertErro("Erro ao enviar seu pedido");
+          });
+        } else {
+           Navigator.pop(context);
+          _alertErro(
+              'Existe produtos sem estoque na sua compra, por favor verifique seus itens');
+        }
       } else {
         String verificaTroco = troco.toStringAsFixed(2);
         _aguardandoFirebase();
-        _verificaEstoque();
-        String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
-        Map<String, dynamic> mapUsuario;
-        Map<String, dynamic> mapEmpresa;
-
-        DocumentSnapshot dadosUsuario = await FirebaseFirestore.instance
-            .collection("usuarios")
-            .doc(uid)
-            .get();
-        mapUsuario = dadosUsuario.data();
-
-        DocumentSnapshot dadosEmpresa = await FirebaseFirestore.instance
-            .collection("usuarios")
-            .doc(_idEmpresa)
-            .get();
-        mapEmpresa = dadosEmpresa.data();
-
-        await FirebaseFirestore.instance.collection("pedidos").doc().set({
-          "status": "Aguardando",
-          "nomeEntregador": "vazio",
-          "cidade": _cidade,
-          "taxaEntrega": 5,
-          "andamento": true,
-          "idEmpresa": _idEmpresa,
-          "nomeEmpresa": mapEmpresa["nomeFantasia"],
-          "idUsuario": uid,
-          "cliente": mapUsuario["nome"],
-          "telefoneUsuario": mapUsuario["telefone"],
-          "whatsappUsuario": mapUsuario["whatsapp"],
-          "enderecoUsuario": _enderecoFinal,
-          "bairroUsuario": _controllerBairro.text,
-          "listaPedido": _listaCompras,
-          "totalPedido": _totalCompra,
-          "horaPedido": DateTime.now().toString(),
-          "formaPagamento": formaPagamento,
-          "troco": verificaTroco,
-        }).then((value) async {
+        bool verificacao = await _verificaEstoque();
+        if (verificacao) {
           String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
-          String idEmpresa = widget.idEmpresa;
-          QuerySnapshot cestaCompras = await FirebaseFirestore.instance
-              .collection("cesta")
+          Map<String, dynamic> mapUsuario;
+          Map<String, dynamic> mapEmpresa;
+
+          DocumentSnapshot dadosUsuario = await FirebaseFirestore.instance
+              .collection("usuarios")
               .doc(uid)
-              .collection(uid)
-              .where("idEmpresa", isEqualTo: idEmpresa)
-              .where("idUsuario", isEqualTo: uid)
               .get();
-          _avisaEmpresa();
-          cestaCompras.docs.forEach((element) {
-            FirebaseFirestore.instance
+          mapUsuario = dadosUsuario.data();
+
+          DocumentSnapshot dadosEmpresa = await FirebaseFirestore.instance
+              .collection("usuarios")
+              .doc(_idEmpresa)
+              .get();
+          mapEmpresa = dadosEmpresa.data();
+
+          await FirebaseFirestore.instance.collection("pedidos").doc().set({
+            "status": "Aguardando",
+            "nomeEntregador": "vazio",
+            "cidade": _cidade,
+            "taxaEntrega": 5,
+            "andamento": true,
+            "idEmpresa": _idEmpresa,
+            "nomeEmpresa": mapEmpresa["nomeFantasia"],
+            "idUsuario": uid,
+            "cliente": mapUsuario["nome"],
+            "telefoneUsuario": mapUsuario["telefone"],
+            "whatsappUsuario": mapUsuario["whatsapp"],
+            "enderecoUsuario": _enderecoFinal,
+            "bairroUsuario": _controllerBairro.text,
+            "listaPedido": _listaCompras,
+            "totalPedido": _totalCompra,
+            "horaPedido": DateTime.now().toString(),
+            "formaPagamento": formaPagamento,
+            "troco": verificaTroco,
+          }).then((value) async {
+            String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+            String idEmpresa = widget.idEmpresa;
+            QuerySnapshot cestaCompras = await FirebaseFirestore.instance
                 .collection("cesta")
                 .doc(uid)
                 .collection(uid)
-                .doc(element.reference.id)
-                .delete();
-          });
+                .where("idEmpresa", isEqualTo: idEmpresa)
+                .where("idUsuario", isEqualTo: uid)
+                .get();
+            _avisaEmpresa();
+            cestaCompras.docs.forEach((element) {
+              FirebaseFirestore.instance
+                  .collection("cesta")
+                  .doc(uid)
+                  .collection(uid)
+                  .doc(element.reference.id)
+                  .delete();
+            });
 
+            Navigator.pop(context);
+            _confirmaPedido();
+          }).catchError((erro) {
+            Navigator.pop(context);
+            _alertErro("Erro ao enviar seu pedido");
+          });
+        } else {
           Navigator.pop(context);
-          _confirmaPedido();
-        }).catchError((erro) {
-          Navigator.pop(context);
-          _alertErro("Erro ao enviar seu pedido");
-        });
+
+          _alertErro(
+              'Existe produtos sem estoque na sua compra, por favor verifique seus itens');
+        }
       }
     }
   }
