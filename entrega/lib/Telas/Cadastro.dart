@@ -13,6 +13,8 @@ class Cadastro extends StatefulWidget {
 class _CadastroState extends State<Cadastro> {
   var _mascaraTelefone = MaskTextInputFormatter(
       mask: '(##) #####-####', filter: {"#": RegExp(r'[0-9]')});
+  var _mascaraCpf = MaskTextInputFormatter(
+      mask: '###.###.###-##', filter: {"#": RegExp(r'[0-9]')});
   bool _mostrarSenha = false;
   bool _motrarSenhaConfirma = false;
   String _msgErro = "";
@@ -33,6 +35,7 @@ class _CadastroState extends State<Cadastro> {
   TextEditingController _controllerBairro = TextEditingController();
   TextEditingController _controllerSenha = TextEditingController();
   TextEditingController _controllerConfirmaSenha = TextEditingController();
+  TextEditingController _controllerCpf = TextEditingController();
 
   _verificaCampos() async {
     String nome = _controllerNome.text;
@@ -43,6 +46,7 @@ class _CadastroState extends State<Cadastro> {
     String senha = _controllerSenha.text;
     String confirmaSenha = _controllerConfirmaSenha.text;
     String email = _controllerEmail.text;
+    String cpf = _controllerCpf.text;
 
     if (nome.isNotEmpty) {
       if (telefone.isNotEmpty) {
@@ -55,44 +59,52 @@ class _CadastroState extends State<Cadastro> {
                     if (email.isNotEmpty) {
                       if (email.contains("@")) {
                         if (_cidade.isNotEmpty) {
-                          await FirebaseAuth.instance
-                              .createUserWithEmailAndPassword(
-                                  email: email, password: senha)
-                              .then((value) async {
-                            String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
-                            await FirebaseFirestore.instance
-                                .collection("usuarios")
-                                .doc(uid)
-                                .set({
-                              "tipoUsuario": "cliente",
-                              "nome": nome,
-                              "email": email,
-                              "telefone": telefone,
-                              "whatsapp": whatsapp,
-                              "endereco": endereco,
-                              "bairro": bairro,
-                              "cidade": _cidade
-                            }).then((value) async {
+                          if (cpf.isNotEmpty) {
+                            await FirebaseAuth.instance
+                                .createUserWithEmailAndPassword(
+                                    email: email, password: senha)
+                                .then((value) async {
                               String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
-                              var status = await OneSignal.shared
-                                  .getPermissionSubscriptionState();
-                              String playerId =
-                                  status.subscriptionStatus.userId;
-                              FirebaseFirestore.instance
+                              await FirebaseFirestore.instance
                                   .collection("usuarios")
                                   .doc(uid)
-                                  .update({
-                                "playerId": playerId,
+                                  .set({
+                                "tipoUsuario": "cliente",
+                                "nome": nome,
+                                "email": email,
+                                "telefone": telefone,
+                                "whatsapp": whatsapp,
+                                "endereco": endereco,
+                                "bairro": bairro,
+                                "cidade": _cidade,
+                                'cpf': _mascaraCpf.unmaskText(cpf),
+                              }).then((value) async {
+                                String uid =
+                                    RecuperaFirebase.RECUPERAIDUSUARIO();
+                                var status = await OneSignal.shared
+                                    .getPermissionSubscriptionState();
+                                String playerId =
+                                    status.subscriptionStatus.userId;
+                                FirebaseFirestore.instance
+                                    .collection("usuarios")
+                                    .doc(uid)
+                                    .update({
+                                  "playerId": playerId,
+                                });
+                                Navigator.pushNamedAndRemoveUntil(
+                                    context, "/home", (route) => false);
                               });
-                              Navigator.pushNamedAndRemoveUntil(
-                                  context, "/home", (route) => false);
+                            }).catchError((erro) {
+                              setState(() {
+                                _msgErro = "Falha ao cadastrar, por favor" +
+                                    "verifique suas informações";
+                              });
                             });
-                          }).catchError((erro) {
+                          } else {
                             setState(() {
-                              _msgErro = "Falha ao cadastrar, por favor" +
-                                  "verifique suas informações";
+                              _msgErro = 'Por favor preencha o campo cpf';
                             });
-                          });
+                          }
                         } else {
                           setState(() {
                             _msgErro = "Por favor escolha uma cidade";
@@ -235,6 +247,23 @@ class _CadastroState extends State<Cadastro> {
                             borderRadius: BorderRadius.circular(15))),
                     controller: _controllerTelefone,
                   ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 8),
+                  child: TextField(
+                      inputFormatters: [_mascaraCpf],
+                      keyboardType: TextInputType.number,
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                      decoration: InputDecoration(
+                          contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                          labelText: "Cpf",
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15))),
+                      controller: _controllerCpf),
                 ),
                 Padding(
                   padding: EdgeInsets.only(bottom: 8),

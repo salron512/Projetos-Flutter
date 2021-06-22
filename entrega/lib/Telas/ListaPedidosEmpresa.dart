@@ -114,7 +114,12 @@ class _ListaPedidosEmpresaState extends State<ListaPedidosEmpresa> {
                     FirebaseFirestore.instance
                         .collection("pedidos")
                         .doc(pedido.reference.id)
-                        .update({"status": "Recebido"});
+                        .update({
+                      "status": "Recebido",
+                      'andamento': false,
+                      'mes': DateTime.now().month.toInt(),
+                      'ano': DateTime.now().year.toInt(),
+                    });
                     Navigator.pop(context);
                   },
                   child: Text("Confirmar"))
@@ -123,11 +128,34 @@ class _ListaPedidosEmpresaState extends State<ListaPedidosEmpresa> {
         });
   }
 
-  _cancelarEntrega(QueryDocumentSnapshot entrega) {
+  _cancelarEntrega(QueryDocumentSnapshot entrega) async {
     FirebaseFirestore.instance
         .collection('pedidos')
         .doc(entrega.reference.id)
-        .update({'andamento': false, 'status': "Cancelada"});
+        .update({
+      'status': "Cancelada",
+      'andamento': false,
+      'mes': DateTime.now().month.toInt(),
+      'ano': DateTime.now().year.toInt(),
+    });
+
+    Map<String, dynamic> daddosEntrega = entrega.data();
+    List<dynamic> listaPedido = daddosEntrega['listaPedido'];
+
+    for (var item in listaPedido) {
+      if (item["estoqueAtivo"]) {
+        var produto = await FirebaseFirestore.instance
+            .collection('produtos')
+            .doc(item['idProduto'])
+            .get();
+
+        int somaEstoque = produto['estoque'] + item['qtd'];
+        FirebaseFirestore.instance
+            .collection('produtos')
+            .doc(item['idProduto'])
+            .update({'estoque': somaEstoque});
+      }
+    }
   }
 
   _selecionaOpcao(QueryDocumentSnapshot entrega) {
@@ -187,7 +215,12 @@ class _ListaPedidosEmpresaState extends State<ListaPedidosEmpresa> {
     FirebaseFirestore.instance
         .collection("pedidos")
         .doc(pedido.reference.id)
-        .update({"status": "Entregue", "andamento": false, "taxaEntrega": 5});
+        .update({
+      "status": "Entregue",
+      'andamento': false,
+      'mes': DateTime.now().month.toInt(),
+      'ano': DateTime.now().year.toInt(),
+    });
   }
 
   @override

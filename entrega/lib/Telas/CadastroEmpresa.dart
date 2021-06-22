@@ -14,6 +14,8 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
       mask: '(##) #####-####', filter: {"#": RegExp(r'[0-9]')});
   var _mascaraCnpj = MaskTextInputFormatter(
       mask: '##.###.###/####-##', filter: {"#": RegExp(r'[0-9]')});
+  var _mascaraCep = MaskTextInputFormatter(
+      mask: '#####-###', filter: {"#": RegExp(r'[0-9]')});
 
   var _mascaraHorario =
       MaskTextInputFormatter(mask: '##:##', filter: {"#": RegExp(r'[0-9]')});
@@ -36,6 +38,8 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
   TextEditingController _controllerSenha = TextEditingController();
   TextEditingController _controllerConfirmaSenha = TextEditingController();
   TextEditingController _controllerDiasFuncionamento = TextEditingController();
+  TextEditingController _controllerCep = TextEditingController();
+  TextEditingController _controllerApiPagamento = TextEditingController();
 
   _escolhaMenuItem(String itemEscolhido) {
     setState(() {
@@ -63,6 +67,8 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
     String senha = _controllerSenha.text;
     String confirmarSenha = _controllerConfirmaSenha.text;
     String diasFuncionamento = _controllerDiasFuncionamento.text;
+    String cep = _controllerCep.text;
+    String apiPagamento = _controllerApiPagamento.text;
 
     if (razaoSocial.isNotEmpty) {
       if (nomeFantasia.isNotEmpty) {
@@ -79,49 +85,57 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
                             if (_escolhaCategoria.isNotEmpty) {
                               if (_cidade.isNotEmpty) {
                                 if (diasFuncionamento.isNotEmpty) {
-                                  await FirebaseAuth.instance
-                                      .createUserWithEmailAndPassword(
-                                          email: email, password: senha)
-                                      .then((value) async {
-                                   
-                                    var status = await OneSignal.shared
-                                        .getPermissionSubscriptionState();
-                                    String playerId =
-                                        status.subscriptionStatus.userId;
+                                  if (cep.isNotEmpty) {
+                                    await FirebaseAuth.instance
+                                        .createUserWithEmailAndPassword(
+                                            email: email, password: senha)
+                                        .then((value) async {
+                                      var status = await OneSignal.shared
+                                          .getPermissionSubscriptionState();
+                                      String playerId =
+                                          status.subscriptionStatus.userId;
 
-                                    idUsurio = value.user.uid;
-                                    await FirebaseFirestore.instance
-                                        .collection("usuarios")
-                                        .doc(idUsurio)
-                                        .set({
-                                      "playerId": playerId,
-                                      "idEmpresa": idUsurio,
-                                      "aberto": false,
-                                      "tipoUsuario": "empresa",
-                                      "razaoSocial": razaoSocial,
-                                      "nomeFantasia": nomeFantasia,
-                                      "ativa": true,
-                                      "telefone": telefone,
-                                      "cnpj": cnpj,
-                                      "endereco": endereco,
-                                      "bairro": bairro,
-                                      "cidade": _cidade,
-                                      "hAbertura": hAbertura,
-                                      "hFechamento": hFechamento,
-                                      "diasFunc": diasFuncionamento,
-                                      "categoria": _escolhaCategoria,
-                                      "urlImagem": null,
+                                      idUsurio = value.user.uid;
+                                      await FirebaseFirestore.instance
+                                          .collection("usuarios")
+                                          .doc(idUsurio)
+                                          .set({
+                                        "cep": _mascaraCep.unmaskText(cep),
+                                        'chaveApi': apiPagamento,
+                                        "playerId": playerId,
+                                        "idEmpresa": idUsurio,
+                                        "aberto": false,
+                                        "tipoUsuario": "empresa",
+                                        "razaoSocial": razaoSocial,
+                                        "nomeFantasia": nomeFantasia,
+                                        "ativa": true,
+                                        "telefone": telefone,
+                                        "cnpj": cnpj,
+                                        "endereco": endereco,
+                                        "bairro": bairro,
+                                        "cidade": _cidade,
+                                        "hAbertura": hAbertura,
+                                        "hFechamento": hFechamento,
+                                        "diasFunc": diasFuncionamento,
+                                        "categoria": _escolhaCategoria,
+                                        "urlImagem": null,
+                                        'chaveApi': ''
+                                      });
+                                    }).catchError((erro) {
+                                      setState(() {
+                                        _msgErro =
+                                            "Falha ao salvar o cadastro por"
+                                            "favor verifique sua conexão";
+                                      });
                                     });
-                                  }).catchError((erro) {
+                                    Navigator.pushNamed(
+                                        context, "/cadastroperfil",
+                                        arguments: idUsurio);
+                                  } else {
                                     setState(() {
-                                      _msgErro =
-                                          "Falha ao salvar o cadastro por"
-                                          "favor verifique sua conexão";
+                                      _msgErro = 'Por favor informe o CEP';
                                     });
-                                  });
-                                  Navigator.pushNamed(
-                                      context, "/cadastroperfil",
-                                      arguments: idUsurio);
+                                  }
                                 } else {
                                   setState(() {
                                     _msgErro =
@@ -512,6 +526,24 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15))),
                     controller: _controllerConfirmaSenha,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 8),
+                  child: TextField(
+                    inputFormatters: [_mascaraCep],
+                    keyboardType: TextInputType.number,
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                    decoration: InputDecoration(
+                        contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                        labelText: "Cep",
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15))),
+                    controller: _controllerCep,
                   ),
                 ),
                 Padding(

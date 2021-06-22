@@ -19,10 +19,14 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
 
   var _mascaraHorario =
       MaskTextInputFormatter(mask: '##:##', filter: {"#": RegExp(r'[0-9]')});
+
+  var _mascaraCep = MaskTextInputFormatter(
+      mask: '#####-###', filter: {"#": RegExp(r'[0-9]')});
+
   String _msgErro = "";
   String _escolhaCategoria = "";
   List<String> itensMenu = [];
-  
+
   // ignore: unused_field
   bool _subindoImagem = false;
   bool _aberto = false;
@@ -39,6 +43,8 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
   TextEditingController _controllerHoraAbertura = TextEditingController();
   TextEditingController _controllerHoraFechamento = TextEditingController();
   TextEditingController _controllerDiasFuncionamento = TextEditingController();
+  TextEditingController _controllerApiPamento = TextEditingController();
+  TextEditingController _controllerCep = TextEditingController();
 
   _verificaCampos() async {
     String idUsurio = RecuperaFirebase.RECUPERAIDUSUARIO();
@@ -51,6 +57,8 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
     String hAbertura = _controllerHoraAbertura.text;
     String hFechamento = _controllerHoraFechamento.text;
     String diasFuncionamento = _controllerDiasFuncionamento.text;
+    String chaveApi = _controllerApiPamento.text;
+    String cep = _controllerCep.text;
 
     if (razaoSocial.isNotEmpty) {
       if (nomeFantasia.isNotEmpty) {
@@ -63,32 +71,40 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
                     if (diasFuncionamento.isNotEmpty) {
                       if (_cidade.isNotEmpty) {
                         if (_escolhaCategoria.isNotEmpty) {
-                          FirebaseFirestore.instance
-                              .collection("usuarios")
-                              .doc(idUsurio)
-                              .update({
-                            "razaoSocial": razaoSocial,
-                            "nomeFantasia": nomeFantasia,
-                            "telefone": telefone,
-                            "cnpj": cnpj,
-                            "endereco": endereco,
-                            "bairro": bairro,
-                            "cidade": _cidade,
-                            "hAbertura": hAbertura,
-                            "hFechamento": hFechamento,
-                            "diasFunc": diasFuncionamento,
-                            "categoria": _escolhaCategoria,
-                            "aberto": _aberto,
-                          }).catchError((erro) {
-                            setState(() {
+                          if (cep.isNotEmpty) {
+                            FirebaseFirestore.instance
+                                .collection("usuarios")
+                                .doc(idUsurio)
+                                .update({
+                              "razaoSocial": razaoSocial,
+                              "nomeFantasia": nomeFantasia,
+                              "telefone": telefone,
+                              "cnpj": cnpj,
+                              "endereco": endereco,
+                              "bairro": bairro,
+                              "cidade": _cidade,
+                              "hAbertura": hAbertura,
+                              "hFechamento": hFechamento,
+                              "diasFunc": diasFuncionamento,
+                              "categoria": _escolhaCategoria,
+                              "aberto": _aberto,
+                              'chaveApi': chaveApi,
+                              'cep': cep,
+                            }).catchError((erro) {
                               setState(() {
-                                _msgErro =
-                                    "Falha ao salvar verifique sua conexão";
+                                setState(() {
+                                  _msgErro =
+                                      "Falha ao salvar verifique sua conexão";
+                                });
                               });
                             });
-                          });
-                          Navigator.pushNamedAndRemoveUntil(
-                              context, "/home", (route) => false);
+                            Navigator.pushNamedAndRemoveUntil(
+                                context, "/home", (route) => false);
+                          } else {
+                            setState(() {
+                              _msgErro = "Por favor preencha o cep";
+                            });
+                          }
                         } else {
                           setState(() {
                             _msgErro = "Por favor escolha uma categoria";
@@ -226,7 +242,7 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
     });
   }
 
-  _recuperadados() async {
+  _recuperaDados() async {
     String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
     Map<String, dynamic> map;
     var snapshot =
@@ -246,13 +262,15 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
       _cidade = map["cidade"];
       _escolhaCategoria = map["categoria"];
       _aberto = map["aberto"];
+      _controllerApiPamento.text = map['chaveApi'];
+      _controllerCep.text = map['cep'];
     });
   }
 
   @override
   void initState() {
     super.initState();
-    _recuperadados();
+    _recuperaDados();
   }
 
   @override
@@ -452,6 +470,24 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
                 Padding(
                   padding: EdgeInsets.only(bottom: 8),
                   child: TextField(
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [_mascaraCep],
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                    decoration: InputDecoration(
+                        contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                        labelText: "Cep",
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15))),
+                    controller: _controllerCep,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 8),
+                  child: TextField(
                     keyboardType: TextInputType.text,
                     textCapitalization: TextCapitalization.sentences,
                     style: TextStyle(
@@ -521,6 +557,23 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15))),
                     controller: _controllerHoraFechamento,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 8),
+                  child: TextField(
+                    keyboardType: TextInputType.number,
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                    decoration: InputDecoration(
+                        contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                        labelText: "Chave para pagamentos",
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15))),
+                    controller: _controllerApiPamento,
                   ),
                 ),
                 Padding(

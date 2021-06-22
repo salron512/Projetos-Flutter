@@ -45,7 +45,7 @@ dependencies:
   onesignal_flutter: ^2.0.0
   url_launcher: ^6.0.3
   geocoding: ^2.0.0
-
+  http: ^0.13.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

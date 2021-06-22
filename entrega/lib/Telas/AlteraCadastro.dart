@@ -11,7 +11,8 @@ class AlteraCadastro extends StatefulWidget {
 class _AlteraCadastroState extends State<AlteraCadastro> {
   var _mascaraTelefone = new MaskTextInputFormatter(
       mask: '(##) #####-####', filter: {"#": RegExp(r'[0-9]')});
- 
+  var _mascaraCpf = MaskTextInputFormatter(
+      mask: '###.###.###-##', filter: {"#": RegExp(r'[0-9]')});
   String _msgErro = "";
 
   TextEditingController _controllerNome = TextEditingController();
@@ -19,6 +20,8 @@ class _AlteraCadastroState extends State<AlteraCadastro> {
   TextEditingController _controllerWhatsapp = TextEditingController();
   TextEditingController _controllerEndereco = TextEditingController();
   TextEditingController _controllerBairro = TextEditingController();
+  TextEditingController _controllerCpf = TextEditingController();
+  
 
   _recuperaDadosUsuaurio() async {
     String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
@@ -31,6 +34,7 @@ class _AlteraCadastroState extends State<AlteraCadastro> {
     _controllerWhatsapp.text = dadosUsuario["whatsapp"];
     _controllerEndereco.text = dadosUsuario["endereco"];
     _controllerBairro.text = dadosUsuario["bairro"];
+    _controllerCpf.text = dadosUsuario["cpf"];
   }
 
   _verificaCampos() {
@@ -39,24 +43,32 @@ class _AlteraCadastroState extends State<AlteraCadastro> {
     String whatsapp = _controllerWhatsapp.text;
     String endereco = _controllerEndereco.text;
     String bairro = _controllerBairro.text;
+    String cpf = _controllerCpf.text;
 
     if (nome.isNotEmpty) {
       if (telefone.isNotEmpty) {
         if (whatsapp.isNotEmpty) {
           if (endereco.isNotEmpty) {
             if (bairro.isNotEmpty) {
-              String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
-              FirebaseFirestore.instance
-                  .collection("usuarios")
-                  .doc(uid)
-                  .update({
-                "nome": nome,
-                "telefone": telefone,
-                "whatsapp": whatsapp,
-                "endereco": endereco,
-                "bairro": bairro,
-              }).then((value) => Navigator.pushNamedAndRemoveUntil(
-                      context, "/home", (route) => false));
+              if (cpf.isNotEmpty) {
+                String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+                FirebaseFirestore.instance
+                    .collection("usuarios")
+                    .doc(uid)
+                    .update({
+                  "nome": nome,
+                  "telefone": telefone,
+                  "whatsapp": whatsapp,
+                  "endereco": endereco,
+                  "bairro": bairro,
+                  'cpf': cpf,
+                }).then((value) => Navigator.pushNamedAndRemoveUntil(
+                        context, "/home", (route) => false));
+              } else {
+                setState(() {
+                  _msgErro = "Por favor preencha o campo cpf";
+                });
+              }
             } else {
               setState(() {
                 _msgErro = "Por favor preencha o campo bairro";
@@ -157,6 +169,24 @@ class _AlteraCadastroState extends State<AlteraCadastro> {
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15))),
                     controller: _controllerTelefone,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 8),
+                  child: TextField(
+                    inputFormatters: [_mascaraCpf],
+                    keyboardType: TextInputType.number,
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                    decoration: InputDecoration(
+                        contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                        labelText: "Cpf",
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15))),
+                    controller: _controllerCpf,
                   ),
                 ),
                 Padding(

@@ -1,13 +1,16 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:entrega/util/RecupepraFirebase.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:http/http.dart' as http;
 
 // ignore: must_be_immutable
 class Carrinho extends StatefulWidget {
@@ -32,8 +35,23 @@ class _CarrinhoState extends State<Carrinho> {
   String _bairro = "";
   String _enderecoFinal = "vazio";
   List<dynamic> _listaCompras = [];
+  var _mascaraCartao = MaskTextInputFormatter(
+      mask: '#### #### #### ####', filter: {"#": RegExp(r'[0-9]')});
+
+  var _mascaraCodigo =
+      new MaskTextInputFormatter(mask: '###', filter: {"#": RegExp(r'[0-9]')});
+  var _mascaraVencimento =
+      MaskTextInputFormatter(mask: '##/##', filter: {"#": RegExp(r'[0-9]')});
+
+  var _mascaraCpf = MaskTextInputFormatter(
+      mask: '###.###.###-##', filter: {"#": RegExp(r'[0-9]')});
   TextEditingController _controllerEndereco = TextEditingController();
   TextEditingController _controllerBairro = TextEditingController();
+  TextEditingController _controllerCartao = TextEditingController();
+
+  TextEditingController _controllerCodigoSeguracao = TextEditingController();
+  TextEditingController _controllerNomeCartao = TextEditingController();
+  TextEditingController _controllerCartaoVencimento = TextEditingController();
 
   _verificaEstoque() async {
     String idEmpresa = widget.idEmpresa;
@@ -421,6 +439,115 @@ class _CarrinhoState extends State<Carrinho> {
     }
   }
 
+  _salvaPagamentoOnline() async {
+    String nomeCartao = _controllerNomeCartao.text;
+    String numeroCartao = _mascaraCartao.unmaskText(_controllerCartao.text);
+    String vencimento =
+        _mascaraCartao.unmaskText(_controllerCartaoVencimento.text);
+    String codigoSeguranca =
+        _mascaraCartao.unmaskText(_controllerCodigoSeguracao.text);
+    String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+
+    if (nomeCartao.isNotEmpty) {
+      if (nomeCartao.isNotEmpty) {
+        if (vencimento.isNotEmpty) {
+          if (codigoSeguranca.isNotEmpty) {
+            _aguardandoFirebase();
+            var daddosUsuario = await FirebaseFirestore.instance
+                .collection('usuarios')
+                .doc(uid)
+                .get();
+            Map<String, dynamic> mapUsuario = daddosUsuario.data();
+            double totalCompra = double.parse(_totalCompra).toDouble() * 100;
+
+            String idEmpresa = widget.idEmpresa;
+            var dadosEmpresa = await FirebaseFirestore.instance
+                .collection('usuarios')
+                .doc(idEmpresa)
+                .get();
+
+            Map<String, dynamic> mapEmpresa = dadosEmpresa.data();
+
+            var corpo = json.encode({
+              "api_key": mapEmpresa['chaveApi'],
+              "amount": totalCompra,
+              "card_number": numeroCartao,
+              "card_cvv": codigoSeguranca,
+              "card_expiration_date": vencimento,
+              "card_holder_name": nomeCartao,
+              "customer": {
+                "external_id": uid,
+                "name": nomeCartao,
+                "type": "individual",
+                "country": "br",
+                "email": mapUsuario['email'],
+                "documents": [
+                  {
+                    "type": "cpf",
+                    "number": _mascaraCartao.unmaskText(mapUsuario['cpf']),
+                  }
+                ],
+                "phone_numbers": [
+                  "+55" + _mascaraCartao.unmaskText(mapUsuario['telefone']),
+                  "+55" + _mascaraCartao.unmaskText(mapUsuario['whatsapp'])
+                ],
+              },
+              "billing": {
+                "name": mapEmpresa['razaoSocial'],
+                "address": {
+                  "country": "br",
+                  "state": "mt",
+                  "city": mapEmpresa['cidade'],
+                  "neighborhood": mapEmpresa['bairro'],
+                  "street": mapEmpresa['endereco'],
+                  "street_number": "0000",
+                  "zipcode": _mascaraCartao.unmaskText(mapEmpresa['cep']),
+                }
+              },
+              "items": [
+                {
+                  "id": "r123",
+                  "title": "compra",
+                  "unit_price": totalCompra,
+                  "quantity": 1,
+                  "tangible": true
+                }
+              ]
+            });
+
+            var url = Uri.parse("https://api.pagar.me/1/transactions/");
+
+            http.Response response = await http.post(url,
+                headers: {"content-type": 'application/json'}, body: corpo);
+
+            print("status code: " + response.statusCode.toString());
+            print("status code: " + response.body.toString());
+            Map<String, dynamic> dados = json.decode(response.body);
+            String status = dados["status"];
+            print("Status " + status);
+
+            //paid
+            if (response.statusCode == 200 && status == "paid") {
+              _salvaPedidoPgOnline();
+            } else {
+              Navigator.pop(context);
+              _alertErro(
+                  'Transação não permitida. Entre em contato com o banco emissor do cartão.');
+            }
+          } else {
+            _alertErro('Preencha o código de segurança');
+          }
+        } else {
+          _alertErro('Preencha o vencimento');
+        }
+      } else {
+        _alertErro('Preencha o numero do cartão');
+      }
+    } else {
+      _alertErro('Preencha o nome do titular');
+    }
+  }
+
   _selecionaEndereco() {
     showDialog(
         context: context,
@@ -562,6 +689,77 @@ class _CarrinhoState extends State<Carrinho> {
         });
   }
 
+  _salvaPedidoPgOnline() async {
+    bool verificaCompra = await _verificaEstoque();
+
+    if (verificaCompra) {
+      String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+      Map<String, dynamic> mapUsuario;
+      Map<String, dynamic> mapEmpresa;
+      DocumentSnapshot dadosUsuario = await FirebaseFirestore.instance
+          .collection("usuarios")
+          .doc(uid)
+          .get();
+      mapUsuario = dadosUsuario.data();
+
+      DocumentSnapshot dadosEmpresa = await FirebaseFirestore.instance
+          .collection("usuarios")
+          .doc(_idEmpresa)
+          .get();
+      mapEmpresa = dadosEmpresa.data();
+
+      await FirebaseFirestore.instance.collection("pedidos").doc().set({
+        "status": "Aguardando",
+        "andamento": true,
+        "nomeEntregador": "vazio",
+        "cidade": _cidade,
+        "taxaEntrega": 5,
+        "idEmpresa": _idEmpresa,
+        "nomeEmpresa": mapEmpresa["nomeFantasia"],
+        "idUsuario": uid,
+        "cliente": mapUsuario["nome"],
+        "telefoneUsuario": mapUsuario["telefone"],
+        "whatsappUsuario": mapUsuario["whatsapp"],
+        "enderecoUsuario": mapUsuario["endereco"],
+        "bairroUsuario": mapUsuario["bairro"],
+        "listaPedido": _listaCompras,
+        "totalPedido": _totalCompra,
+        "horaPedido": DateTime.now().toString(),
+        "formaPagamento": 'Cartão crédito - pago pelo app ',
+        "troco": "sem troco",
+      }).then((value) async {
+        String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+        String idEmpresa = widget.idEmpresa;
+        QuerySnapshot cestaCompras = await FirebaseFirestore.instance
+            .collection("cesta")
+            .doc(uid)
+            .collection(uid)
+            .where("idEmpresa", isEqualTo: idEmpresa)
+            .where("idUsuario", isEqualTo: uid)
+            .get();
+        _avisaEmpresa();
+        cestaCompras.docs.forEach((element) {
+          FirebaseFirestore.instance
+              .collection("cesta")
+              .doc(uid)
+              .collection(uid)
+              .doc(element.reference.id)
+              .delete();
+        });
+
+        Navigator.pop(context);
+        _confirmaPedido();
+      }).catchError((erro) {
+        Navigator.pop(context);
+        _alertErro("Erro ao enviar seu pedido");
+      });
+    } else {
+      Navigator.pop(context);
+      _alertErro(
+          'Existe produtos sem estoque na sua compra, por favor verifique seus itens');
+    }
+  }
+
   _salvaPedido(String formaPagamento, {double troco}) async {
     if (_enderecoFinal == "vazio") {
       if (troco < 0) {
@@ -630,7 +828,7 @@ class _CarrinhoState extends State<Carrinho> {
             _alertErro("Erro ao enviar seu pedido");
           });
         } else {
-           Navigator.pop(context);
+          Navigator.pop(context);
           _alertErro(
               'Existe produtos sem estoque na sua compra, por favor verifique seus itens');
         }
@@ -701,7 +899,7 @@ class _CarrinhoState extends State<Carrinho> {
             _alertErro("Erro ao enviar seu pedido");
           });
         } else {
-           Navigator.pop(context);
+          Navigator.pop(context);
           _alertErro(
               'Existe produtos sem estoque na sua compra, por favor verifique seus itens');
         }
@@ -772,7 +970,7 @@ class _CarrinhoState extends State<Carrinho> {
             _alertErro("Erro ao enviar seu pedido");
           });
         } else {
-           Navigator.pop(context);
+          Navigator.pop(context);
           _alertErro(
               'Existe produtos sem estoque na sua compra, por favor verifique seus itens');
         }
@@ -964,6 +1162,12 @@ class _CarrinhoState extends State<Carrinho> {
               TextButton(
                   onPressed: () {
                     Navigator.pop(context);
+                    _alertPagamentoOnline();
+                  },
+                  child: Text("Pagar pelo aplicativo")),
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
                     _confirmaPagamento("Dinheiro");
                   },
                   child: Text("Dinheiro")),
@@ -979,6 +1183,91 @@ class _CarrinhoState extends State<Carrinho> {
                     _confirmaPagamento("Cartão crédito");
                   },
                   child: Text("Cartão crédito"))
+            ],
+          );
+        });
+  }
+
+  _alertPagamentoOnline() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Insira as informações"),
+            content: Container(
+                width: 100,
+                height: 300,
+                child: SingleChildScrollView(
+                  child: Column(children: [
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 8),
+                      child: TextField(
+                        keyboardType: TextInputType.text,
+                        textCapitalization: TextCapitalization.sentences,
+                        style: TextStyle(),
+                        decoration: InputDecoration(
+                          labelText: "Nome do titular",
+                          contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                        controller: _controllerNomeCartao,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 8),
+                      child: TextField(
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [_mascaraCartao],
+                        style: TextStyle(),
+                        decoration: InputDecoration(
+                          labelText: "Cartão de crédito",
+                          contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                        controller: _controllerCartao,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 8),
+                      child: TextField(
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [_mascaraVencimento],
+                        style: TextStyle(),
+                        decoration: InputDecoration(
+                          labelText: "Vencimento do cartão",
+                          contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                        controller: _controllerCartaoVencimento,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 8),
+                      child: TextField(
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [_mascaraCodigo],
+                        style: TextStyle(),
+                        decoration: InputDecoration(
+                          labelText: "Código de segurança",
+                          contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                        controller: _controllerCodigoSeguracao,
+                      ),
+                    ),
+                  ]),
+                )),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _salvaPagamentoOnline();
+                  },
+                  child: Text("Confirmar"))
             ],
           );
         });

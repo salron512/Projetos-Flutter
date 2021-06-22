@@ -16,6 +16,8 @@ class _ListaEntregasRealizadasEmpresaState
     extends State<ListaEntregasRealizadasEmpresa> {
   String dropdownValue = '01';
   String dropdownValueAno = '2021';
+  String dropdownValueStatus = 'Entregue';
+  String _status = 'Entregue';
 
   int _mes = DateTime.now().month.toInt();
   int _ano = DateTime.now().year.toInt();
@@ -44,7 +46,7 @@ class _ListaEntregasRealizadasEmpresaState
     reference
         .orderBy("horaPedido", descending: false)
         .where("idEmpresa", isEqualTo: uid)
-        .where("status", isEqualTo: "Entregue")
+        .where("status", isEqualTo: _status)
         .where("mes", isEqualTo: _mes)
         .where("ano", isEqualTo: _ano)
         .snapshots()
@@ -159,6 +161,35 @@ class _ListaEntregasRealizadasEmpresaState
                     _recuperaEntregas();
                   },
                   items: <String>["2021"]
+                      .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                ),
+                Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Text("Status: ")),
+                DropdownButton<String>(
+                  value: dropdownValueStatus,
+                  icon: const Icon(Icons.arrow_downward),
+                  iconSize: 24,
+                  elevation: 16,
+                  style: const TextStyle(color: Colors.deepPurple),
+                  underline: Container(
+                    height: 2,
+                    color: Colors.grey,
+                  ),
+                  onChanged: (newValue) {
+                    setState(() {
+                      _status = newValue;
+                      dropdownValueStatus = newValue;
+                      print(newValue);
+                    });
+                    _recuperaEntregas();
+                  },
+                  items: <String>["Entregue", 'Cancelada']
                       .map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
