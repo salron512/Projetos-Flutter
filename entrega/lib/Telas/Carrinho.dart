@@ -34,6 +34,7 @@ class _CarrinhoState extends State<Carrinho> {
   String _endereco = "";
   String _bairro = "";
   String _enderecoFinal = "vazio";
+  bool _pagamentoOnline = false;
   List<dynamic> _listaCompras = [];
   var _mascaraCartao = MaskTextInputFormatter(
       mask: '#### #### #### ####', filter: {"#": RegExp(r'[0-9]')});
@@ -526,7 +527,7 @@ class _CarrinhoState extends State<Carrinho> {
             String status = dados["status"];
             print("Status " + status);
 
-            //paid
+            //paid refused
             if (response.statusCode == 200 && status == "paid") {
               _salvaPedidoPgOnline();
             } else {
@@ -1159,12 +1160,14 @@ class _CarrinhoState extends State<Carrinho> {
               ),
             ),
             actions: [
-              TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _alertPagamentoOnline();
-                  },
-                  child: Text("Pagar pelo aplicativo")),
+              Visibility(
+                  visible: _pagamentoOnline,
+                  child: TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _alertPagamentoOnline();
+                      },
+                      child: Text("Pagar pelo aplicativo"))),
               TextButton(
                   onPressed: () {
                     Navigator.pop(context);
@@ -1281,11 +1284,28 @@ class _CarrinhoState extends State<Carrinho> {
     _cidade = dadosUsuario["cidade"];
   }
 
+  _verificaPagamentoOnline() async {
+    String idEmpresa = widget.idEmpresa;
+    var dadosEmpresa = await FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(idEmpresa)
+        .get();
+
+    Map<String, dynamic> mapEmpresa = dadosEmpresa.data();
+    String apiPagamento = mapEmpresa['chaveApi'];
+    if (apiPagamento.isNotEmpty) {
+      setState(() {
+        _pagamentoOnline = true;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _recuperaUsuario();
     _recuperaCesta();
+    _verificaPagamentoOnline();
   }
 
   @override

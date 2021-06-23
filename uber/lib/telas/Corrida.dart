@@ -1,18 +1,21 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:uber/Model/Usuario.dart';
-import 'dart:async';
-
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
+import 'package:uber/model/Usuario.dart';
 import 'package:uber/util/StatusRequisicao.dart';
 import 'package:uber/util/UsuarioFirebase.dart';
 
 class Corrida extends StatefulWidget {
+
   String idRequisicao;
-  Corrida(this.idRequisicao);
+
+  Corrida( this.idRequisicao );
 
   @override
   _CorridaState createState() => _CorridaState();
@@ -61,14 +64,12 @@ class _CorridaState extends State<Corrida> {
           if( _statusRequisicao != StatusRequisicao.AGUARDANDO ){
 
             //Atualiza local do passageiro
-            /*
             UsuarioFirebase.atualizarDadosLocalizacao(
                 _idRequisicao,
                 position.latitude,
-                position.longitude
+                position.longitude,
+                "motorista"
             );
-
-             */
 
           }else{//aguardando
             setState(() {
@@ -145,7 +146,7 @@ class _CorridaState extends State<Corrida> {
     Firestore db = Firestore.instance;
 
     await db.collection("requisicoes")
-        .document( _idRequisicao ).snapshots().listen((snapshot){
+    .document( _idRequisicao ).snapshots().listen((snapshot){
 
       if( snapshot.data != null ){
 
@@ -162,10 +163,13 @@ class _CorridaState extends State<Corrida> {
             _statusACaminho();
             break;
           case StatusRequisicao.VIAGEM :
-
+            _statusEmViagem();
             break;
           case StatusRequisicao.FINALIZADA :
-
+            _statusFinalizada();
+            break;
+          case StatusRequisicao.CONFIRMADA :
+            _statusConfirmada();
             break;
 
         }
@@ -214,7 +218,7 @@ class _CorridaState extends State<Corrida> {
     _alterarBotaoPrincipal(
         "Iniciar corrida",
         Color(0xff1ebbd8),
-            (){
+        (){
           _iniciarCorrida();
         }
     );
@@ -228,8 +232,8 @@ class _CorridaState extends State<Corrida> {
 
     //Exibir dois marcadores
     _exibirDoisMarcadores(
-        LatLng(latitudeMotorista, longitudeMotorista),
-        LatLng(latitudePassageiro, longitudePassageiro)
+      LatLng(latitudeMotorista, longitudeMotorista),
+      LatLng(latitudePassageiro, longitudePassageiro)
     );
 
     //'southwest.latitude <= northeast.latitude': is not true
@@ -252,6 +256,159 @@ class _CorridaState extends State<Corrida> {
     }
     //-23.560925, -46.650623
     _movimentarCameraBounds(
+      LatLngBounds(
+          northeast: LatLng(nLat, nLon), //nordeste
+          southwest: LatLng(sLat, sLon) //sudoeste
+      )
+    );
+
+  }
+
+  _finalizarCorrida(){
+
+    Firestore db = Firestore.instance;
+    db.collection("requisicoes")
+    .document( _idRequisicao )
+    .updateData({
+      "status" : StatusRequisicao.FINALIZADA
+    });
+
+
+    String idPassageiro = _dadosRequisicao["passageiro"]["idUsuario"];
+    db.collection("requisicao_ativa")
+        .document( idPassageiro )
+        .updateData({"status": StatusRequisicao.FINALIZADA });
+
+    String idMotorista = _dadosRequisicao["motorista"]["idUsuario"];
+    db.collection("requisicao_ativa_motorista")
+        .document( idMotorista )
+        .updateData({"status": StatusRequisicao.FINALIZADA });
+
+  }
+
+  _statusFinalizada() async {
+
+    //Calcula valor da corrida
+    double latitudeDestino = _dadosRequisicao["destino"]["latitude"];
+    double longitudeDestino = _dadosRequisicao["destino"]["longitude"];
+
+    double latitudeOrigem = _dadosRequisicao["origem"]["latitude"];
+    double longitudeOrigem = _dadosRequisicao["origem"]["longitude"];
+
+    double distanciaEmMetros = await Geolocator().distanceBetween(
+        latitudeOrigem,
+        longitudeOrigem,
+        latitudeDestino,
+        longitudeDestino
+    );
+
+    //Converte para KM
+    double distanciaKm = distanciaEmMetros / 1000;
+
+    //8 é o valor cobrado por KM
+    double valorViagem = distanciaKm * 8;
+
+    //Formatar valor viagem
+    var f = new NumberFormat("#,##0.00", "pt_BR");
+    var valorViagemFormatado = f.format( valorViagem );
+
+    _mensagemStatus = "Viagem finalizada";
+    _alterarBotaoPrincipal(
+        "Confirmar - R\$ ${valorViagemFormatado}",
+        Color(0xff1ebbd8),
+            (){
+          _confirmarCorrida();
+        }
+    );
+
+    _marcadores = {};
+    Position position = Position(
+        latitude: latitudeDestino, longitude: longitudeDestino
+    );
+    _exibirMarcador(
+        position,
+        "imagens/destino.png",
+        "Destino"
+    );
+
+    CameraPosition cameraPosition = CameraPosition(
+        target: LatLng(position.latitude, position.longitude), zoom: 19);
+
+    _movimentarCamera( cameraPosition );
+
+  }
+
+  _statusConfirmada(){
+
+    Navigator.pushReplacementNamed(context, "/painel-motorista");
+
+  }
+
+  _confirmarCorrida(){
+
+    Firestore db = Firestore.instance;
+    db.collection("requisicoes")
+        .document( _idRequisicao )
+        .updateData({
+      "status" : StatusRequisicao.CONFIRMADA
+    });
+
+    String idPassageiro = _dadosRequisicao["passageiro"]["idUsuario"];
+    db.collection("requisicao_ativa")
+        .document( idPassageiro )
+        .delete();
+
+    String idMotorista = _dadosRequisicao["motorista"]["idUsuario"];
+    db.collection("requisicao_ativa_motorista")
+        .document( idMotorista )
+        .delete();
+
+  }
+
+  _statusEmViagem() {
+
+    _mensagemStatus = "Em viagem";
+    _alterarBotaoPrincipal(
+        "Finalizar corrida",
+        Color(0xff1ebbd8),
+            (){
+          _finalizarCorrida();
+        }
+    );
+
+
+    double latitudeDestino = _dadosRequisicao["destino"]["latitude"];
+    double longitudeDestino = _dadosRequisicao["destino"]["longitude"];
+
+    double latitudeOrigem = _dadosRequisicao["motorista"]["latitude"];
+    double longitudeOrigem = _dadosRequisicao["motorista"]["longitude"];
+
+    //Exibir dois marcadores
+    _exibirDoisMarcadores(
+        LatLng(latitudeOrigem, longitudeOrigem),
+        LatLng(latitudeDestino, longitudeDestino)
+    );
+
+    //'southwest.latitude <= northeast.latitude': is not true
+    var nLat, nLon, sLat, sLon;
+
+    if( latitudeOrigem <=  latitudeDestino ){
+      sLat = latitudeOrigem;
+      nLat = latitudeDestino;
+    }else{
+      sLat = latitudeDestino;
+      nLat = latitudeOrigem;
+    }
+
+    if( longitudeOrigem <=  longitudeDestino ){
+      sLon = longitudeOrigem;
+      nLon = longitudeDestino;
+    }else{
+      sLon = longitudeDestino;
+      nLon = longitudeOrigem;
+    }
+    //-23.560925, -46.650623
+    _movimentarCameraBounds(
         LatLngBounds(
             northeast: LatLng(nLat, nLon), //nordeste
             southwest: LatLng(sLat, sLon) //sudoeste
@@ -264,8 +421,8 @@ class _CorridaState extends State<Corrida> {
 
     Firestore db = Firestore.instance;
     db.collection("requisicoes")
-        .document( _idRequisicao )
-        .updateData({
+    .document( _idRequisicao )
+    .updateData({
       "origem" : {
         "latitude" : _dadosRequisicao["motorista"]["latitude"],
         "longitude" : _dadosRequisicao["motorista"]["longitude"]
@@ -275,8 +432,8 @@ class _CorridaState extends State<Corrida> {
 
     String idPassageiro = _dadosRequisicao["passageiro"]["idUsuario"];
     db.collection("requisicao_ativa")
-        .document( idPassageiro )
-        .updateData({"status": StatusRequisicao.VIAGEM });
+    .document( idPassageiro )
+    .updateData({"status": StatusRequisicao.VIAGEM });
 
     String idMotorista = _dadosRequisicao["motorista"]["idUsuario"];
     db.collection("requisicao_ativa_motorista")
@@ -290,10 +447,10 @@ class _CorridaState extends State<Corrida> {
     GoogleMapController googleMapController = await _controller.future;
     googleMapController
         .animateCamera(
-        CameraUpdate.newLatLngBounds(
-            latLngBounds,
-            100
-        )
+      CameraUpdate.newLatLngBounds(
+          latLngBounds,
+          100
+      )
     );
 
   }
@@ -342,9 +499,9 @@ class _CorridaState extends State<Corrida> {
 
     Firestore db = Firestore.instance;
     String idRequisicao = _dadosRequisicao["id"];
-
+    
     db.collection("requisicoes")
-        .document( idRequisicao ).updateData({
+    .document( idRequisicao ).updateData({
       "motorista" : motorista.toMap(),
       "status" : StatusRequisicao.A_CAMINHO,
     }).then((_){
@@ -353,7 +510,7 @@ class _CorridaState extends State<Corrida> {
       String idPassageiro = _dadosRequisicao["passageiro"]["idUsuario"];
       db.collection("requisicao_ativa")
           .document( idPassageiro ).updateData({
-        "status" : StatusRequisicao.A_CAMINHO,
+          "status" : StatusRequisicao.A_CAMINHO,
       });
 
       //Salvar requisicao ativa para motorista
@@ -367,8 +524,8 @@ class _CorridaState extends State<Corrida> {
       });
 
     });
-
-
+    
+    
 
   }
 
@@ -386,42 +543,42 @@ class _CorridaState extends State<Corrida> {
 
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Painel Corrida - " + _mensagemStatus),
+        title: Text("Painel corrida - " + _mensagemStatus ),
       ),
       body: Container(
         child: Stack(
-          children: [
+          children: <Widget>[
             GoogleMap(
               mapType: MapType.normal,
               initialCameraPosition: _posicaoCamera,
               onMapCreated: _onMapCreated,
-              // myLocationEnabled: false,
-              markers: _marcadores,
+              //myLocationEnabled: true,
               myLocationButtonEnabled: false,
-              zoomControlsEnabled: false,
+              markers: _marcadores,
+              //-23,559200, -46,658878
             ),
             Positioned(
-                right: 0,
-                left: 0,
-                bottom: 0,
-                child: Padding(
-                  padding: Platform.isIOS
-                      ? EdgeInsets.fromLTRB(20, 10, 20, 25)
-                      : EdgeInsets.all(10),
-                  child: RaisedButton(
-                      child: Text(
-                        _textoBotao,
-                        style: TextStyle(fontSize: 25, color: Colors.white),
-                      ),
-                      color: _corBotao,
-                      padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                      onPressed: _funcaoBotao),
-                )),
+              right: 0,
+              left: 0,
+              bottom: 0,
+              child: Padding(
+                padding: Platform.isIOS
+                    ? EdgeInsets.fromLTRB(20, 10, 20, 25)
+                    : EdgeInsets.all(10),
+                child: RaisedButton(
+                    child: Text(
+                      _textoBotao,
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                    color: _corBotao,
+                    padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                    onPressed: _funcaoBotao),
+              ),
+            )
           ],
         ),
       ),

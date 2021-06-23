@@ -562,7 +562,7 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
                 Padding(
                   padding: EdgeInsets.only(bottom: 8),
                   child: TextField(
-                    keyboardType: TextInputType.number,
+                    keyboardType: TextInputType.text,
                     style: TextStyle(
                       fontSize: 20,
                     ),
