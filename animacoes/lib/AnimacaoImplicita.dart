@@ -13,6 +13,7 @@ class _AnimacaoImplicitaState extends State<AnimacaoImplicita> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        
         AnimatedContainer(
           duration: const Duration(seconds: 1),
           curve: Curves.bounceOut,

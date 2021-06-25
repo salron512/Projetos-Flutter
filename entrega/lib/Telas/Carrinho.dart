@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:entrega/util/RecupepraFirebase.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:geocoding/geocoding.dart';
@@ -53,6 +51,7 @@ class _CarrinhoState extends State<Carrinho> {
   TextEditingController _controllerCodigoSeguracao = TextEditingController();
   TextEditingController _controllerNomeCartao = TextEditingController();
   TextEditingController _controllerCartaoVencimento = TextEditingController();
+  TextEditingController _controllerCpf = TextEditingController();
 
   _verificaEstoque() async {
     String idEmpresa = widget.idEmpresa;
@@ -123,7 +122,7 @@ class _CarrinhoState extends State<Carrinho> {
           _totalSoma = _totalSoma + soma;
           print("Empresa ID" + _idEmpresa);
         }
-        if (_totalSoma > _taxa) {
+        if (_totalSoma >= 10) {
           setState(() {
             _mostraTotal = true;
           });
@@ -448,92 +447,97 @@ class _CarrinhoState extends State<Carrinho> {
     String codigoSeguranca =
         _mascaraCartao.unmaskText(_controllerCodigoSeguracao.text);
     String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+    String cpf = _mascaraCpf.unmaskText(_controllerCpf.text);
 
     if (nomeCartao.isNotEmpty) {
       if (nomeCartao.isNotEmpty) {
         if (vencimento.isNotEmpty) {
           if (codigoSeguranca.isNotEmpty) {
-            _aguardandoFirebase();
-            var daddosUsuario = await FirebaseFirestore.instance
-                .collection('usuarios')
-                .doc(uid)
-                .get();
-            Map<String, dynamic> mapUsuario = daddosUsuario.data();
-            double totalCompra = double.parse(_totalCompra).toDouble() * 100;
+            if (cpf.isNotEmpty) {
+              _aguardandoFirebase();
+              var daddosUsuario = await FirebaseFirestore.instance
+                  .collection('usuarios')
+                  .doc(uid)
+                  .get();
+              Map<String, dynamic> mapUsuario = daddosUsuario.data();
+              double totalCompra = double.parse(_totalCompra).toDouble() * 100;
 
-            String idEmpresa = widget.idEmpresa;
-            var dadosEmpresa = await FirebaseFirestore.instance
-                .collection('usuarios')
-                .doc(idEmpresa)
-                .get();
+              String idEmpresa = widget.idEmpresa;
+              var dadosEmpresa = await FirebaseFirestore.instance
+                  .collection('usuarios')
+                  .doc(idEmpresa)
+                  .get();
 
-            Map<String, dynamic> mapEmpresa = dadosEmpresa.data();
+              Map<String, dynamic> mapEmpresa = dadosEmpresa.data();
 
-            var corpo = json.encode({
-              "api_key": mapEmpresa['chaveApi'],
-              "amount": totalCompra,
-              "card_number": numeroCartao,
-              "card_cvv": codigoSeguranca,
-              "card_expiration_date": vencimento,
-              "card_holder_name": nomeCartao,
-              "customer": {
-                "external_id": uid,
-                "name": nomeCartao,
-                "type": "individual",
-                "country": "br",
-                "email": mapUsuario['email'],
-                "documents": [
-                  {
-                    "type": "cpf",
-                    "number": _mascaraCartao.unmaskText(mapUsuario['cpf']),
-                  }
-                ],
-                "phone_numbers": [
-                  "+55" + _mascaraCartao.unmaskText(mapUsuario['telefone']),
-                  "+55" + _mascaraCartao.unmaskText(mapUsuario['whatsapp'])
-                ],
-              },
-              "billing": {
-                "name": mapEmpresa['razaoSocial'],
-                "address": {
+              var corpo = json.encode({
+                "api_key": mapEmpresa['chaveApi'],
+                "amount": totalCompra,
+                "card_number": numeroCartao,
+                "card_cvv": codigoSeguranca,
+                "card_expiration_date": vencimento,
+                "card_holder_name": nomeCartao,
+                "customer": {
+                  "external_id": uid,
+                  "name": nomeCartao,
+                  "type": "individual",
                   "country": "br",
-                  "state": "mt",
-                  "city": mapEmpresa['cidade'],
-                  "neighborhood": mapEmpresa['bairro'],
-                  "street": mapEmpresa['endereco'],
-                  "street_number": "0000",
-                  "zipcode": _mascaraCartao.unmaskText(mapEmpresa['cep']),
-                }
-              },
-              "items": [
-                {
-                  "id": "r123",
-                  "title": "compra",
-                  "unit_price": totalCompra,
-                  "quantity": 1,
-                  "tangible": true
-                }
-              ]
-            });
+                  "email": mapUsuario['email'],
+                  "documents": [
+                    {
+                      "type": "cpf",
+                      "number": cpf,
+                    }
+                  ],
+                  "phone_numbers": [
+                    "+55" + _mascaraCartao.unmaskText(mapUsuario['telefone']),
+                    "+55" + _mascaraCartao.unmaskText(mapUsuario['whatsapp'])
+                  ],
+                },
+                "billing": {
+                  "name": mapEmpresa['razaoSocial'],
+                  "address": {
+                    "country": "br",
+                    "state": "mt",
+                    "city": mapEmpresa['cidade'],
+                    "neighborhood": mapUsuario['bairro'],
+                    "street": mapUsuario['endereco'],
+                    "street_number": "0000",
+                    "zipcode": _mascaraCartao.unmaskText(mapEmpresa['cep']),
+                  }
+                },
+                "items": [
+                  {
+                    "id": "r123",
+                    "title": "compra",
+                    "unit_price": totalCompra,
+                    "quantity": 1,
+                    "tangible": true
+                  }
+                ]
+              });
 
-            var url = Uri.parse("https://api.pagar.me/1/transactions/");
+              var url = Uri.parse("https://api.pagar.me/1/transactions/");
 
-            http.Response response = await http.post(url,
-                headers: {"content-type": 'application/json'}, body: corpo);
+              http.Response response = await http.post(url,
+                  headers: {"content-type": 'application/json'}, body: corpo);
 
-            print("status code: " + response.statusCode.toString());
-            print("status code: " + response.body.toString());
-            Map<String, dynamic> dados = json.decode(response.body);
-            String status = dados["status"];
-            print("Status " + status);
+              print("status code: " + response.statusCode.toString());
+              print("status code: " + response.body.toString());
+              Map<String, dynamic> dados = json.decode(response.body);
+              String status = dados["status"];
+              print("Status " + status);
 
-            //paid refused
-            if (response.statusCode == 200 && status == "paid") {
-              _salvaPedidoPgOnline();
+              //paid refused
+              if (response.statusCode == 200 && status == "paid") {
+                _salvaPedidoPgOnline();
+              } else {
+                Navigator.pop(context);
+                _alertErro(
+                    'Transação não permitida. Entre em contato com o banco emissor do cartão.');
+              }
             } else {
-              Navigator.pop(context);
-              _alertErro(
-                  'Transação não permitida. Entre em contato com o banco emissor do cartão.');
+              _alertErro('Preencha o CPF');
             }
           } else {
             _alertErro('Preencha o código de segurança');
@@ -1210,7 +1214,7 @@ class _CarrinhoState extends State<Carrinho> {
                         style: TextStyle(),
                         decoration: InputDecoration(
                           labelText: "Nome do titular",
-                          contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                          contentPadding: EdgeInsets.fromLTRB(5, 5, 5, 5),
                           filled: true,
                           fillColor: Colors.white,
                         ),
@@ -1225,7 +1229,7 @@ class _CarrinhoState extends State<Carrinho> {
                         style: TextStyle(),
                         decoration: InputDecoration(
                           labelText: "Cartão de crédito",
-                          contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                          contentPadding: EdgeInsets.fromLTRB(5, 5, 5, 5),
                           filled: true,
                           fillColor: Colors.white,
                         ),
@@ -1240,7 +1244,7 @@ class _CarrinhoState extends State<Carrinho> {
                         style: TextStyle(),
                         decoration: InputDecoration(
                           labelText: "Vencimento do cartão",
-                          contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                          contentPadding: EdgeInsets.fromLTRB(5, 5, 5, 5),
                           filled: true,
                           fillColor: Colors.white,
                         ),
@@ -1255,12 +1259,26 @@ class _CarrinhoState extends State<Carrinho> {
                         style: TextStyle(),
                         decoration: InputDecoration(
                           labelText: "Código de segurança",
-                          contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                          contentPadding: EdgeInsets.fromLTRB(5, 5, 5, 5),
                           filled: true,
                           fillColor: Colors.white,
                         ),
                         controller: _controllerCodigoSeguracao,
                       ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 8),
+                      child: TextField(
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [_mascaraCpf],
+                          style: TextStyle(),
+                          decoration: InputDecoration(
+                            labelText: "CPF",
+                            contentPadding: EdgeInsets.fromLTRB(5, 5, 5, 5),
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
+                          controller: _controllerCpf),
                     ),
                   ]),
                 )),
@@ -1268,6 +1286,11 @@ class _CarrinhoState extends State<Carrinho> {
               TextButton(
                   onPressed: () {
                     Navigator.pop(context);
+                  },
+                  child: Text("Cancelar")),
+              TextButton(
+                  onPressed: () {
+                    //Navigator.pop(context);
                     _salvaPagamentoOnline();
                   },
                   child: Text("Confirmar"))
