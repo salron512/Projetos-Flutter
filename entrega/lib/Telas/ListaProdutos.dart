@@ -319,7 +319,9 @@ class _ListaProdutosState extends State<ListaProdutos> {
                                                     estoqueAtivo = value;
                                                   });
                                                 }),
-                                            Text("Estoque ativo")
+                                            Text("Estoque ativo"),
+                                            
+
                                           ],
                                         )
                                       ]),
@@ -334,9 +336,11 @@ class _ListaProdutosState extends State<ListaProdutos> {
                                         ),
                                         onPressed: () {
                                           _excluirProduto(dados.reference.id);
-                                        })
+                                        }),
+                                        
+                                  
                                   ],
-                                )
+                                ),
                               ],
                             ),
                             onLongPress: () {

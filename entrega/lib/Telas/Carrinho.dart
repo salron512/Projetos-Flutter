@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:cielo_ecommerce/cielo_ecommerce.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:entrega/util/RecupepraFirebase.dart';
 import 'package:flutter/material.dart';
@@ -40,7 +41,7 @@ class _CarrinhoState extends State<Carrinho> {
   var _mascaraCodigo =
       new MaskTextInputFormatter(mask: '###', filter: {"#": RegExp(r'[0-9]')});
   var _mascaraVencimento =
-      MaskTextInputFormatter(mask: '##/##', filter: {"#": RegExp(r'[0-9]')});
+      MaskTextInputFormatter(mask: '##/####', filter: {"#": RegExp(r'[0-9]')});
 
   var _mascaraCpf = MaskTextInputFormatter(
       mask: '###.###.###-##', filter: {"#": RegExp(r'[0-9]')});
@@ -438,7 +439,7 @@ class _CarrinhoState extends State<Carrinho> {
         break;
     }
   }
-
+/*
   _salvaPagamentoOnline() async {
     String nomeCartao = _controllerNomeCartao.text;
     String numeroCartao = _mascaraCartao.unmaskText(_controllerCartao.text);
@@ -493,17 +494,18 @@ class _CarrinhoState extends State<Carrinho> {
                     "+55" + _mascaraCartao.unmaskText(mapUsuario['telefone']),
                     "+55" + _mascaraCartao.unmaskText(mapUsuario['whatsapp'])
                   ],
+                  "birthday": "1972-01-08"
                 },
                 "billing": {
-                  "name": mapEmpresa['razaoSocial'],
+                  "name": "André Ricardo Vicensotti",
                   "address": {
                     "country": "br",
                     "state": "mt",
-                    "city": mapEmpresa['cidade'],
-                    "neighborhood": mapUsuario['bairro'],
-                    "street": mapUsuario['endereco'],
+                    "city": "Curvelândia",
+                    "neighborhood": "Zona Rural",
+                    "street": "MT 170 km 33",
                     "street_number": "0000",
-                    "zipcode": _mascaraCartao.unmaskText(mapEmpresa['cep']),
+                    "zipcode": "78237000"
                   }
                 },
                 "items": [
@@ -536,6 +538,106 @@ class _CarrinhoState extends State<Carrinho> {
                 _alertErro(
                     'Transação não permitida. Entre em contato com o banco emissor do cartão.');
               }
+            } else {
+              _alertErro('Preencha o CPF');
+            }
+          } else {
+            _alertErro('Preencha o código de segurança');
+          }
+        } else {
+          _alertErro('Preencha o vencimento');
+        }
+      } else {
+        _alertErro('Preencha o numero do cartão');
+      }
+    } else {
+      _alertErro('Preencha o nome do titular');
+    }
+  }
+*/
+
+  _salvaPagamentoOnline() async {
+    String nomeCartao = _controllerNomeCartao.text;
+    String numeroCartao = _mascaraCartao.unmaskText(_controllerCartao.text);
+    String vencimento = _controllerCartaoVencimento.text;
+    String codigoSeguranca =
+        _mascaraCartao.unmaskText(_controllerCodigoSeguracao.text);
+    String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+    String cpf = _mascaraCpf.unmaskText(_controllerCpf.text);
+
+    if (nomeCartao.isNotEmpty) {
+      if (nomeCartao.isNotEmpty) {
+        if (vencimento.isNotEmpty) {
+          if (codigoSeguranca.isNotEmpty) {
+            if (cpf.isNotEmpty) {
+              _aguardandoFirebase();
+              var daddosUsuario = await FirebaseFirestore.instance
+                  .collection('usuarios')
+                  .doc(uid)
+                  .get();
+              Map<String, dynamic> mapUsuario = daddosUsuario.data();
+              String conversao = _mascaraCartao.unmaskText(_totalCompra) ;
+              print('Conversao ' + conversao);
+
+              int totalCompra = int.parse(conversao).toInt();
+
+              String idEmpresa = widget.idEmpresa;
+              var dadosEmpresa = await FirebaseFirestore.instance
+                  .collection('usuarios')
+                  .doc(idEmpresa)
+                  .get();
+
+              Map<String, dynamic> mapEmpresa = dadosEmpresa.data();
+              //"5d8bfbe3-93ac-431d-8f24-bab44617af5e"
+              final CieloEcommerce cielo = CieloEcommerce(
+                  environment: Environment.sandbox,
+                  merchant: Merchant(
+                    merchantId: "f0d61596-5920-45a6-82e9-1f889dc5a9b3",
+                    merchantKey: "IYLWGMNBQSUDUVUMFWRJYNDGPWQCVDBKSCMBVNIW",
+                  ));
+
+              print("Transação Simples");
+              print("Iniciando pagamento....");
+              //Objeto de venda
+              Sale sale = Sale(
+                merchantOrderId:
+                    "2020032601", // Numero de identificação do Pedido
+                customer: Customer(
+                  name: mapUsuario['nome'] // Nome do Comprador
+                    ),
+                payment: Payment(
+                  type: TypePayment.creditCard, // Tipo do Meio de Pagamento
+                  amount: totalCompra, // Valor do Pedido (ser enviado em centavos)
+                  installments: 1, // Número de Parcelas
+                  softDescriptor:
+                      "Mensagem", // Descrição que aparecerá no extrato do usuário. Apenas 15 caracteres
+                  creditCard: CreditCard(
+                    cardNumber: numeroCartao, // Número do Cartão do Comprador
+                    holder: nomeCartao, // Nome do Comprador impresso no cartão
+                    expirationDate:
+                        vencimento, // Data de validade impresso no cartão
+                    securityCode:
+                        codigoSeguranca, // Código de segurança impresso no verso do cartão
+                    brand: 'Visa', // Bandeira do cartão
+                  ),
+                ),
+              );
+
+              try {
+                var response = await cielo.createSale(sale);
+                  
+                print('paymentId ${response.payment.paymentId}');
+                print('teste cielo ' + response.payment.returnMessage);
+                 _salvaPedidoPgOnline();
+              } on CieloException catch (e) {
+                print(e);
+                print(e.message);
+                print(e.errors[0].message);
+                print(e.errors[0].code);
+              }
+
+              //paid refused
+
             } else {
               _alertErro('Preencha o CPF');
             }
@@ -1243,7 +1345,7 @@ class _CarrinhoState extends State<Carrinho> {
                         inputFormatters: [_mascaraVencimento],
                         style: TextStyle(),
                         decoration: InputDecoration(
-                          labelText: "Vencimento do cartão",
+                          labelText: "Vencimento do cartão Ex: 12/2025",
                           contentPadding: EdgeInsets.fromLTRB(5, 5, 5, 5),
                           filled: true,
                           fillColor: Colors.white,
@@ -1409,7 +1511,7 @@ class _CarrinhoState extends State<Carrinho> {
                                     produto["observacao"] == ""
                                         ? Text("")
                                         : Text('Oberservação ' +
-                                            produto["observacao"])
+                                            produto["observacao"]),
                                   ],
                                 ),
                               ),

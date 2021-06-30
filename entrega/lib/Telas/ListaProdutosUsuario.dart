@@ -288,7 +288,20 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
                                       produtos.estoqueAtivo == true
                                           ? Text("Quantidade disponínel " +
                                               produtos.estoque.toString())
-                                          : Text("")
+                                          : Text(""),
+                                      Padding(
+                                        padding: EdgeInsets.all(5),
+                                        child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                              primary: Theme.of(context)
+                                                  .primaryColor),
+                                          child: Text('Galeria'),
+                                          onPressed: () {
+                                            Navigator.pushNamed(
+                                                context, '/grid', arguments: produtos.id);
+                                          },
+                                        ),
+                                      )
                                     ],
                                   ),
                                 ],

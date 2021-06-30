@@ -23,6 +23,8 @@ class Api {
     );
 
     if( response.statusCode == 200 ){
+      
+      
 
 
       Map<String, dynamic> dadosJson = json.decode( response.body );

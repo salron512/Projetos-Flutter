@@ -8,7 +8,9 @@ import 'package:entrega/Telas/CadastroProdutos.dart';
 import 'package:entrega/Telas/Carrinho.dart';
 import 'package:entrega/Telas/DetalhesEntrega.dart';
 import 'package:entrega/Telas/Financeiro.dart';
+import 'package:entrega/Telas/Grid.dart';
 import 'package:entrega/Telas/Home.dart';
+import 'package:entrega/Telas/Imagem.dart';
 import 'package:entrega/Telas/ListaEmpresaCadastro.dart';
 import 'package:entrega/Telas/ListaEmpresas.dart';
 import 'package:entrega/Telas/ListaEntregadores.dart';
@@ -88,8 +90,12 @@ class Rotas {
         return MaterialPageRoute(builder: (_) => Financeiro());
       case "/reset":
         return MaterialPageRoute(builder: (_) => RecuperaSenha());
-          case "/listaempresacadastro":
+      case "/listaempresacadastro":
         return MaterialPageRoute(builder: (_) => ListaEmpresaCadastro());
+      case "/grid":
+        return MaterialPageRoute(builder: (_) => Grid(args));
+      case "/imagem":
+        return MaterialPageRoute(builder: (_) => Imagem(args));
 
       default:
         _erroRota();

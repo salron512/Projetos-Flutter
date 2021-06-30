@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -182,6 +181,15 @@ class _PerfilProdutoState extends State<PerfilProduto> {
                       icon: Icon(Icons.arrow_forward),
                     ),
                   )),
+              IconButton(
+                iconSize: 40,
+                color: Colors.white,
+                onPressed: () {
+                  String idProduto = widget.id;
+                  Navigator.pushNamed(context, '/grid', arguments: idProduto);
+                },
+                icon: Icon(Icons.photo_album),
+              ),
             ],
           )),
     );
