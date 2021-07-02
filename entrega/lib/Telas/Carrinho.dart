@@ -576,7 +576,7 @@ class _CarrinhoState extends State<Carrinho> {
                   .doc(uid)
                   .get();
               Map<String, dynamic> mapUsuario = daddosUsuario.data();
-              String conversao = _mascaraCartao.unmaskText(_totalCompra) ;
+              String conversao = _mascaraCartao.unmaskText(_totalCompra);
               print('Conversao ' + conversao);
 
               int totalCompra = int.parse(conversao).toInt();
@@ -602,12 +602,12 @@ class _CarrinhoState extends State<Carrinho> {
               Sale sale = Sale(
                 merchantOrderId:
                     "2020032601", // Numero de identificação do Pedido
-                customer: Customer(
-                  name: mapUsuario['nome'] // Nome do Comprador
+                customer: Customer(name: mapUsuario['nome'] // Nome do Comprador
                     ),
                 payment: Payment(
                   type: TypePayment.creditCard, // Tipo do Meio de Pagamento
-                  amount: totalCompra, // Valor do Pedido (ser enviado em centavos)
+                  amount:
+                      totalCompra, // Valor do Pedido (ser enviado em centavos)
                   installments: 1, // Número de Parcelas
                   softDescriptor:
                       "Mensagem", // Descrição que aparecerá no extrato do usuário. Apenas 15 caracteres
@@ -625,10 +625,10 @@ class _CarrinhoState extends State<Carrinho> {
 
               try {
                 var response = await cielo.createSale(sale);
-                  
+
                 print('paymentId ${response.payment.paymentId}');
                 print('teste cielo ' + response.payment.returnMessage);
-                 _salvaPedidoPgOnline();
+                _salvaPedidoPgOnline();
               } on CieloException catch (e) {
                 print(e);
                 print(e.message);
@@ -1510,10 +1510,11 @@ class _CarrinhoState extends State<Carrinho> {
                                     ),
                                     produto["observacao"] == ""
                                         ? Text("")
-                                        : Text('Oberservação ' +
+                                        : Text('Obserservação ' +
                                             produto["observacao"]),
                                   ],
                                 ),
+                                trailing: Icon(Icons.arrow_back_ios),
                               ),
                             ),
                             secondaryActions: [

@@ -16,21 +16,24 @@ class _ImagemState extends State<Imagem> {
     return Scaffold(
       appBar: AppBar(),
       body: Container(
-        decoration: BoxDecoration(
-         // color: Theme.of(context).accentColor
-        ),
-          child: Center(
-        // ignore: missing_required_param
-        child: Padding(
-            padding: EdgeInsets.all(16),
-            child: PhysicalModel(
-              color: Colors.white,
-              elevation: 8,
-              child: Image.network(
-                widget.dados["urlGaleria"],
+          decoration: BoxDecoration(
+              // color: Theme.of(context).accentColor
               ),
-            )),
-      )),
+          child: Center(
+            // ignore: missing_required_param
+            child: Padding(
+                padding: EdgeInsets.all(16),
+                child: PhysicalModel(
+                  color: Colors.white,
+                  elevation: 8,
+                  child: Image.network(
+                    widget.dados["urlGaleria"],
+                    width: 500,
+                    height: 500,
+                    //fit: BoxFit.contain,
+                  ),
+                )),
+          )),
     );
   }
 }

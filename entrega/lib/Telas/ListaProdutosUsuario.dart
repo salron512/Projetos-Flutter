@@ -250,68 +250,75 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
                       itemBuilder: (context, indice) {
                         Produtos produtos = listaProdutos[indice];
                         return Container(
-                            padding: EdgeInsets.all(4),
-                            child: GestureDetector(
-                              child: Row(
+                          padding: EdgeInsets.all(4),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              produtos.urlImagem != null
+                                  ? Container(
+                                      padding: EdgeInsets.only(right: 8),
+                                      child: Image.network(
+                                        produtos.urlImagem,
+                                        fit: BoxFit.cover,
+                                        height: 120,
+                                        width: 120,
+                                      ),
+                                    )
+                                  : Container(
+                                      padding: EdgeInsets.only(right: 8),
+                                      child: Image.asset(
+                                        "images/error.png",
+                                        fit: BoxFit.cover,
+                                        height: 120,
+                                        width: 120,
+                                      )),
+                              Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  produtos.urlImagem != null
-                                      ? Container(
-                                          padding: EdgeInsets.only(right: 8),
-                                          child: Image.network(
-                                            produtos.urlImagem,
-                                            fit: BoxFit.cover,
-                                            height: 120,
-                                            width: 120,
-                                          ),
-                                        )
-                                      : Container(
-                                          padding: EdgeInsets.only(right: 8),
-                                          child: Image.asset(
-                                            "images/error.png",
-                                            fit: BoxFit.cover,
-                                            height: 120,
-                                            width: 120,
-                                          )),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                  Text(
+                                    produtos.nome,
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text("R\$ " + produtos.preco),
+                                  Text(produtos.descricao),
+                                  produtos.estoqueAtivo == true
+                                      ? Text("Quantidade disponínel " +
+                                          produtos.estoque.toString())
+                                      : Text(""),
+                                  Row(
+                                   mainAxisAlignment: MainAxisAlignment.end,
+
                                     children: [
-                                      Text(
-                                        produtos.nome,
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      Text("R\$ " + produtos.preco),
-                                      Text(produtos.descricao),
-                                      produtos.estoqueAtivo == true
-                                          ? Text("Quantidade disponínel " +
-                                              produtos.estoque.toString())
-                                          : Text(""),
                                       Padding(
                                         padding: EdgeInsets.all(5),
                                         child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                              primary: Theme.of(context)
-                                                  .primaryColor),
                                           child: Text('Galeria'),
                                           onPressed: () {
-                                            Navigator.pushNamed(
-                                                context, '/grid', arguments: produtos.id);
+                                            Navigator.pushNamed(context, '/grid',
+                                                arguments: produtos.id);
                                           },
                                         ),
-                                      )
+                                      ),
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                            primary:
+                                            Theme.of(context).primaryColor),
+                                        child: Text('Comprar'),
+                                        onPressed: () {
+                                          if (_tipoUsuario != "empresa") {
+                                            _alerQtd(produtos);
+                                          }
+                                        },
+                                      ),
                                     ],
-                                  ),
+                                  )
                                 ],
                               ),
-                              onTap: () {
-                                if (_tipoUsuario != "empresa") {
-                                  _alerQtd(produtos);
-                                }
-                              },
-                            ));
+                            ],
+                          ),
+                        );
 
                         /*
                          ListTile(
