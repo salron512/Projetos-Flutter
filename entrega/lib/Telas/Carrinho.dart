@@ -1510,7 +1510,7 @@ class _CarrinhoState extends State<Carrinho> {
                                     ),
                                     produto["observacao"] == ""
                                         ? Text("")
-                                        : Text('Obserservação ' +
+                                        : Text('Observação ' +
                                             produto["observacao"]),
                                   ],
                                 ),
