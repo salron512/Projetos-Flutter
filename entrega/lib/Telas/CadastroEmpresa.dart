@@ -119,7 +119,8 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
                                         "diasFunc": diasFuncionamento,
                                         "categoria": _escolhaCategoria,
                                         "urlImagem": null,
-                                        'chaveApi': ''
+                                        'merchantId': '',
+                                        'merchantKey': ''
                                       });
                                     }).catchError((erro) {
                                       setState(() {

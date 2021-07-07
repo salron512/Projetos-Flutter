@@ -25,6 +25,7 @@ class _CarrinhoState extends State<Carrinho> {
   StreamController _streamController = StreamController.broadcast();
   double _taxa = 4;
   double _totalSoma = 0;
+  String _bandeira = '';
   String _totalCompra = "0";
   bool _mostraTotal = false;
   String _cidade = '';
@@ -556,91 +557,133 @@ class _CarrinhoState extends State<Carrinho> {
   }
 */
 
+  _alertBandeira() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          List<String> listaCartoes = ['Visa', 'Elo'];
+          return AlertDialog(
+            title: Text("Selecione a bandeira do cartão de crédito"),
+            content: Container(
+              width: 200,
+              height: 200,
+              child: ListView.builder(
+                  itemCount: listaCartoes.length,
+                  itemBuilder: (context, indice) {
+                    String bandeiraCartao = listaCartoes[indice];
+                    return ListTile(
+                      title: Text(bandeiraCartao),
+                      onTap: () {
+                        Navigator.pop(context);
+                        _bandeira = bandeiraCartao;
+                        _alertPagamentoOnline();
+                      },
+                    );
+                  }),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text("Cancelar"))
+            ],
+          );
+        });
+  }
+
   _salvaPagamentoOnline() async {
     String nomeCartao = _controllerNomeCartao.text;
     String numeroCartao = _mascaraCartao.unmaskText(_controllerCartao.text);
     String vencimento = _controllerCartaoVencimento.text;
     String codigoSeguranca =
         _mascaraCartao.unmaskText(_controllerCodigoSeguracao.text);
-    String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
-    String cpf = _mascaraCpf.unmaskText(_controllerCpf.text);
+    //String cpf = _mascaraCpf.unmaskText(_controllerCpf.text);
 
     if (nomeCartao.isNotEmpty) {
       if (nomeCartao.isNotEmpty) {
         if (vencimento.isNotEmpty) {
           if (codigoSeguranca.isNotEmpty) {
-            if (cpf.isNotEmpty) {
-              _aguardandoFirebase();
-              var daddosUsuario = await FirebaseFirestore.instance
-                  .collection('usuarios')
-                  .doc(uid)
-                  .get();
-              Map<String, dynamic> mapUsuario = daddosUsuario.data();
-              String conversao = _mascaraCartao.unmaskText(_totalCompra);
-              print('Conversao ' + conversao);
+            _aguardandoFirebase();
 
-              int totalCompra = int.parse(conversao).toInt();
+            String conversao = _mascaraCartao.unmaskText(_totalCompra);
+            print('Conversao ' + conversao);
 
-              String idEmpresa = widget.idEmpresa;
-              var dadosEmpresa = await FirebaseFirestore.instance
-                  .collection('usuarios')
-                  .doc(idEmpresa)
-                  .get();
+            int totalCompra = int.parse(conversao).toInt();
 
-              Map<String, dynamic> mapEmpresa = dadosEmpresa.data();
-              //"5d8bfbe3-93ac-431d-8f24-bab44617af5e"
-              final CieloEcommerce cielo = CieloEcommerce(
-                  environment: Environment.sandbox,
-                  merchant: Merchant(
-                    merchantId: "f0d61596-5920-45a6-82e9-1f889dc5a9b3",
-                    merchantKey: "IYLWGMNBQSUDUVUMFWRJYNDGPWQCVDBKSCMBVNIW",
-                  ));
+            String idEmpresa = widget.idEmpresa;
+            var dadosEmpresa = await FirebaseFirestore.instance
+                .collection('usuarios')
+                .doc(idEmpresa)
+                .get();
 
-              print("Transação Simples");
-              print("Iniciando pagamento....");
-              //Objeto de venda
-              Sale sale = Sale(
-                merchantOrderId:
-                    "2020032601", // Numero de identificação do Pedido
-                customer: Customer(name: mapUsuario['nome'] // Nome do Comprador
-                    ),
-                payment: Payment(
-                  type: TypePayment.creditCard, // Tipo do Meio de Pagamento
-                  amount:
-                      totalCompra, // Valor do Pedido (ser enviado em centavos)
-                  installments: 1, // Número de Parcelas
-                  softDescriptor:
-                      "Mensagem", // Descrição que aparecerá no extrato do usuário. Apenas 15 caracteres
-                  creditCard: CreditCard(
-                    cardNumber: numeroCartao, // Número do Cartão do Comprador
-                    holder: nomeCartao, // Nome do Comprador impresso no cartão
-                    expirationDate:
-                        vencimento, // Data de validade impresso no cartão
-                    securityCode:
-                        codigoSeguranca, // Código de segurança impresso no verso do cartão
-                    brand: 'Visa', // Bandeira do cartão
+            Map<String, dynamic> mapEmpresa = dadosEmpresa.data();
+            String merchantId = mapEmpresa['merchantId'];
+            String merchantkey = mapEmpresa['merchantKey'];
+            print("dados pagamentos " + merchantkey + " " + merchantId);
+            //"5d8bfbe3-93ac-431d-8f24-bab44617af5e"
+            final CieloEcommerce cielo = CieloEcommerce(
+                environment: Environment.production,
+                merchant: Merchant(
+                  merchantId: merchantId,
+                  merchantKey: merchantkey,
+                ));
+
+            print("Transação Simples");
+            print("Iniciando pagamento....");
+
+            //Objeto de venda
+            Sale sale = Sale(
+              merchantOrderId: DateTime.now()
+                  .toString(), // Numero de identificação do Pedido
+              customer: Customer(name: nomeCartao // Nome do Comprador
                   ),
+              payment: Payment(
+                type: TypePayment.creditCard, // Tipo do Meio de Pagamento
+                amount:
+                    totalCompra, // Valor do Pedido (ser enviado em centavos)
+                installments: 1, // Número de Parcelas
+                softDescriptor:
+                    "Mensagem", // Descrição que aparecerá no extrato do usuário. Apenas 15 caracteres
+                creditCard: CreditCard(
+                  cardNumber: numeroCartao, // Número do Cartão do Comprador
+                  holder: nomeCartao, // Nome do Comprador impresso no cartão
+                  expirationDate:
+                      vencimento, // Data de validade impresso no cartão
+                  securityCode:
+                      codigoSeguranca, // Código de segurança impresso no verso do cartão
+                  brand: _bandeira,
+                  // Bandeira do cartão
                 ),
-              );
+              ),
+            );
 
-              try {
-                var response = await cielo.createSale(sale);
+            try {
+              var response = await cielo.createSale(sale);
 
-                print('paymentId ${response.payment.paymentId}');
-                print('teste cielo ' + response.payment.returnMessage);
-                _salvaPedidoPgOnline();
-              } on CieloException catch (e) {
-                print(e);
-                print(e.message);
-                print(e.errors[0].message);
-                print(e.errors[0].code);
+              // print('paymentId ${response.payment.paymentId}');
+              // print('teste cielo ' + response.payment.returnMessage);
+              if (response != null) {
+                print("primeiro teste ok");
+                if (response.payment.returnMessage == "Transacao autorizada") {
+                  _salvaPedidoPgOnline();
+                } else {
+                  Navigator.pop(context);
+                  _alertErro(
+                      'Erro na compra, por favor verifique suas informações');
+                }
+              } else {
+                Navigator.pop(context);
+                _alertErro(
+                    'Erro na compra, por favor verifique suas informações');
               }
-
-              //paid refused
-
-            } else {
-              _alertErro('Preencha o CPF');
+            } on CieloException catch (e) {
+              print(e);
+              print(e.message);
+              print(e.errors[0].message);
+              print(e.errors[0].code);
             }
+
+            //paid refused
+
           } else {
             _alertErro('Preencha o código de segurança');
           }
@@ -1271,7 +1314,7 @@ class _CarrinhoState extends State<Carrinho> {
                   child: TextButton(
                       onPressed: () {
                         Navigator.pop(context);
-                        _alertPagamentoOnline();
+                        _alertBandeira();
                       },
                       child: Text("Pagar pelo aplicativo"))),
               TextButton(
@@ -1368,20 +1411,6 @@ class _CarrinhoState extends State<Carrinho> {
                         controller: _controllerCodigoSeguracao,
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(bottom: 8),
-                      child: TextField(
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [_mascaraCpf],
-                          style: TextStyle(),
-                          decoration: InputDecoration(
-                            labelText: "CPF",
-                            contentPadding: EdgeInsets.fromLTRB(5, 5, 5, 5),
-                            filled: true,
-                            fillColor: Colors.white,
-                          ),
-                          controller: _controllerCpf),
-                    ),
                   ]),
                 )),
             actions: [
@@ -1417,8 +1446,9 @@ class _CarrinhoState extends State<Carrinho> {
         .get();
 
     Map<String, dynamic> mapEmpresa = dadosEmpresa.data();
-    String apiPagamento = mapEmpresa['chaveApi'];
-    if (apiPagamento.isNotEmpty) {
+    String merchantId = mapEmpresa['merchantId'];
+    String merchantKey = mapEmpresa['merchantKey'];
+    if (merchantId.isNotEmpty && merchantKey.isNotEmpty) {
       setState(() {
         _pagamentoOnline = true;
       });

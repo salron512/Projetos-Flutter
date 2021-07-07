@@ -45,6 +45,7 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
   TextEditingController _controllerDiasFuncionamento = TextEditingController();
   TextEditingController _controllerApiPamento = TextEditingController();
   TextEditingController _controllerCep = TextEditingController();
+  TextEditingController _controllerMerchantid = TextEditingController();
 
   _verificaCampos() async {
     String idUsurio = RecuperaFirebase.RECUPERAIDUSUARIO();
@@ -58,6 +59,7 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
     String hFechamento = _controllerHoraFechamento.text;
     String diasFuncionamento = _controllerDiasFuncionamento.text;
     String chaveApi = _controllerApiPamento.text;
+    String merchantId = _controllerMerchantid.text;
     String cep = _controllerCep.text;
 
     if (razaoSocial.isNotEmpty) {
@@ -88,8 +90,8 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
                               "diasFunc": diasFuncionamento,
                               "categoria": _escolhaCategoria,
                               "aberto": _aberto,
-                              'chaveApi': chaveApi,
-                              'cep': cep,
+                              'merchantId': merchantId ,
+                              'merchantKey': chaveApi
                             }).catchError((erro) {
                               setState(() {
                                 setState(() {
@@ -262,7 +264,8 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
       _cidade = map["cidade"];
       _escolhaCategoria = map["categoria"];
       _aberto = map["aberto"];
-      _controllerApiPamento.text = map['chaveApi'];
+      _controllerApiPamento.text = map['merchantKey'];
+      _controllerMerchantid.text = map['merchantId'];
       _controllerCep.text = map['cep'];
     });
   }
@@ -557,6 +560,22 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15))),
                     controller: _controllerHoraFechamento,
+                  ),
+                ), Padding(
+                  padding: EdgeInsets.only(bottom: 8),
+                  child: TextField(
+                    keyboardType: TextInputType.text,
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                    decoration: InputDecoration(
+                        contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                        labelText: "Merchant ID",
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15))),
+                    controller: _controllerMerchantid,
                   ),
                 ),
                 Padding(
