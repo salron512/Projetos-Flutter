@@ -14,6 +14,7 @@ class _ListEntregasPendentesState extends State<ListEntregasPendentes> {
   StreamController _streamController = StreamController.broadcast();
   String _nomeEntregador = "";
   String _cidade = "";
+
   _recuperaEntregas() {
     CollectionReference reference =
         FirebaseFirestore.instance.collection("pedidos");

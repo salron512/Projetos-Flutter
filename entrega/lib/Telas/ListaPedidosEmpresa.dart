@@ -20,7 +20,7 @@ class _ListaPedidosEmpresaState extends State<ListaPedidosEmpresa> {
     String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
 
     CollectionReference reference =
-        FirebaseFirestore.instance.collection("pedidos");
+    FirebaseFirestore.instance.collection("pedidos");
 
     reference
         .orderBy("horaPedido")
@@ -67,7 +67,7 @@ class _ListaPedidosEmpresaState extends State<ListaPedidosEmpresa> {
     String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
     List<String> list = [];
     DocumentSnapshot snapshot =
-        await FirebaseFirestore.instance.collection("usuarios").doc(uid).get();
+    await FirebaseFirestore.instance.collection("usuarios").doc(uid).get();
 
     Map<String, dynamic> dadosUsuario = snapshot.data();
     String cidade = dadosUsuario["cidade"];
@@ -116,7 +116,7 @@ class _ListaPedidosEmpresaState extends State<ListaPedidosEmpresa> {
                         .doc(pedido.reference.id)
                         .update({
                       "status": "Recebido",
-                      'andamento': false,
+                      'andamento': true,
                       'mes': DateTime.now().month.toInt(),
                       'ano': DateTime.now().year.toInt(),
                     });
@@ -268,7 +268,7 @@ class _ListaPedidosEmpresaState extends State<ListaPedidosEmpresa> {
                       // ignore: missing_return
                       itemBuilder: (context, indice) {
                         List<QueryDocumentSnapshot> lista =
-                            querySnapshot.docs.toList();
+                        querySnapshot.docs.toList();
                         QueryDocumentSnapshot entrega = lista[indice];
                         return Card(
                           color: entrega["status"] != "Aguardando"
@@ -315,14 +315,14 @@ class _ListaPedidosEmpresaState extends State<ListaPedidosEmpresa> {
                                 ),
                                 entrega["nomeEntregador"] == "vazio"
                                     ? Text(
-                                        "Aguardando entregador",
-                                        style: TextStyle(color: Colors.white),
-                                      )
+                                  "Aguardando entregador",
+                                  style: TextStyle(color: Colors.white),
+                                )
                                     : Text(
-                                        "Nome entregador " +
-                                            entrega["nomeEntregador"],
-                                        style: TextStyle(color: Colors.white),
-                                      ),
+                                  "Nome entregador " +
+                                      entrega["nomeEntregador"],
+                                  style: TextStyle(color: Colors.white),
+                                ),
                                 Text(
                                   "Status " + entrega["status"],
                                   style: TextStyle(color: Colors.white),

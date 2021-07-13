@@ -25,6 +25,9 @@ class _ListaEntregasRealizadasEmpresaState
   double _vlrEntrega = 0;
   double _totalReceber = 0;
   double _totalPagar = 0;
+  double _taxaEntrega = 4;
+  double _totalEntrega = 0;
+  double _totalFinal = 0;
   double _taxa = 0.05;
   int _qtd = 0;
   StreamController _streamController = StreamController.broadcast();
@@ -65,12 +68,17 @@ class _ListaEntregasRealizadasEmpresaState
         Map<String, dynamic> dados = element.data();
         _vlrEntrega = double.tryParse(dados["totalPedido"]).toDouble();
         print("valor " + _vlrEntrega.toString());
-        _resultado = _resultado + _vlrEntrega;
+        _vlrEntrega -= _taxaEntrega;
+        _resultado += _vlrEntrega;
       });
       setState(() {
         _qtd = event.docs.length;
         _totalReceber = _resultado;
+
+
         _totalPagar = _resultado * _taxa;
+        _totalEntrega = _taxaEntrega * _qtd;
+        _totalFinal = _totalPagar + _totalEntrega;
       });
     });
   }
@@ -300,12 +308,16 @@ class _ListaEntregasRealizadasEmpresaState
                         style: TextStyle(color: Colors.white),
                       ),
                       Text(
-                        "Valor total á pagar R\$ " +
-                            _totalPagar.toStringAsFixed(2),
+                        "Quantidade total de entregas " + _qtd.toString(),
                         style: TextStyle(color: Colors.white),
                       ),
                       Text(
-                        "Quantidade total de entregas " + _qtd.toString(),
+                        "Total á pagar entregas R\$ " + _totalEntrega.toStringAsFixed(2),
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      Text(
+                        "Valor total á pagar R\$ " +
+                            _totalFinal.toStringAsFixed(2),
                         style: TextStyle(color: Colors.white),
                       ),
                     ],

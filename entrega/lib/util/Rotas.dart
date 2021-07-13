@@ -9,6 +9,7 @@ import 'package:entrega/Telas/Carrinho.dart';
 import 'package:entrega/Telas/DetalhesEntrega.dart';
 import 'package:entrega/Telas/Financeiro.dart';
 import 'package:entrega/Telas/Grid.dart';
+import 'package:entrega/Telas/GrupoDeProduto.dart';
 import 'package:entrega/Telas/Home.dart';
 import 'package:entrega/Telas/Imagem.dart';
 import 'package:entrega/Telas/ListaEmpresaCadastro.dart';
@@ -53,6 +54,8 @@ class Rotas {
             builder: (_) => CadastraImagemPerfilEmpresa(args));
       case "/listaempresas":
         return MaterialPageRoute(builder: (_) => ListaEmpressas(args));
+      case "/grupo":
+        return MaterialPageRoute(builder: (_) => GrupoDeProduto());
       case "/alteracadastroempresa":
         return MaterialPageRoute(builder: (_) => AlteraCadastroEmpresa());
       case "/listaprodutos":

@@ -54,7 +54,7 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
   }
 
   _verificaCampos() async {
-    String idUsurio;
+    String idUsuario;
     String razaoSocial = _controllerRazaoSocial.text;
     String nomeFantasia = _controllerNomeFantasia.text;
     String email = _controllerEmail.text;
@@ -95,15 +95,15 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
                                       String playerId =
                                           status.subscriptionStatus.userId;
 
-                                      idUsurio = value.user.uid;
+                                      idUsuario = value.user.uid;
                                       await FirebaseFirestore.instance
                                           .collection("usuarios")
-                                          .doc(idUsurio)
+                                          .doc(idUsuario)
                                           .set({
                                         "cep": _mascaraCep.unmaskText(cep),
                                         'chaveApi': apiPagamento,
                                         "playerId": playerId,
-                                        "idEmpresa": idUsurio,
+                                        "idEmpresa": idUsuario,
                                         "aberto": false,
                                         "tipoUsuario": "empresa",
                                         "razaoSocial": razaoSocial,
@@ -122,16 +122,16 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
                                         'merchantId': '',
                                         'merchantKey': ''
                                       });
+                                      Navigator.pushNamed(
+                                          context, "/cadastroperfil",
+                                          arguments: idUsuario);
                                     }).catchError((erro) {
                                       setState(() {
                                         _msgErro =
-                                            "Falha ao salvar o cadastro por"
-                                            "favor verifique sua conexão";
+                                            "Falha ao salvar o cadastro por "
+                                            "favor verifique seus dados";
                                       });
                                     });
-                                    Navigator.pushNamed(
-                                        context, "/cadastroperfil",
-                                        arguments: idUsurio);
                                   } else {
                                     setState(() {
                                       _msgErro = 'Por favor informe o CEP';

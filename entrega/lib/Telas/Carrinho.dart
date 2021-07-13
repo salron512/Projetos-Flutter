@@ -561,7 +561,7 @@ class _CarrinhoState extends State<Carrinho> {
     showDialog(
         context: context,
         builder: (context) {
-          List<String> listaCartoes = ['Visa', 'Elo'];
+          List<String> listaCartoes = ['Visa','Elo','Mastercard'];
           return AlertDialog(
             title: Text("Selecione a bandeira do cartão de crédito"),
             content: Container(

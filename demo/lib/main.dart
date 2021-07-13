@@ -112,7 +112,7 @@ class _HomeState extends State<Home> {
         title: Text("teste ok"),
       ),
       body: Center(
-        child: Text("teste Winddows"),
+        child: Text("teste Web"),
       ),
     );
   }

@@ -320,8 +320,6 @@ class _ListaProdutosState extends State<ListaProdutos> {
                                                   });
                                                 }),
                                             Text("Estoque ativo"),
-                                            
-
                                           ],
                                         )
                                       ]),
@@ -337,8 +335,6 @@ class _ListaProdutosState extends State<ListaProdutos> {
                                         onPressed: () {
                                           _excluirProduto(dados.reference.id);
                                         }),
-                                        
-                                  
                                   ],
                                 ),
                               ],
@@ -372,6 +368,23 @@ class _ListaProdutosState extends State<ListaProdutos> {
           Navigator.pushNamed(context, "/cadastroproduto");
         },
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+      bottomNavigationBar: BottomAppBar(
+          color: Theme.of(context).primaryColor,
+          shape: CircularNotchedRectangle(),
+          child: Row(
+            children: [
+              Padding(
+                padding: EdgeInsets.all(8),
+                child: ElevatedButton(
+
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/grupo');
+                    },
+                    child: Text("Cadastrar Grupo de produtos")),
+              )
+            ],
+          )),
     );
   }
 }
