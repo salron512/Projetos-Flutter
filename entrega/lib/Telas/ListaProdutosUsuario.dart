@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:entrega/util/GrupoProdutos.dart';
 import 'package:entrega/util/Produtos.dart';
 import 'package:entrega/util/RecupepraFirebase.dart';
 import 'package:flutter/material.dart';
@@ -6,8 +7,8 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 // ignore: must_be_immutable
 class ListaProdutosUsuario extends StatefulWidget {
-  String id;
-  ListaProdutosUsuario(this.id);
+  GrupoProduto dados;
+  ListaProdutosUsuario(this.dados);
   @override
   _ListaProdutosUsuarioState createState() => _ListaProdutosUsuarioState();
 }
@@ -21,14 +22,16 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
 
   Future _recuperaProdutos() async {
     List<Produtos> listaProdutos = [];
-    String idEmpresa = widget.id;
+    String idEmpresa = widget.dados.idEmpresa;
+    String grupo = widget.dados.nome;
 
     CollectionReference reference =
         FirebaseFirestore.instance.collection("produtos");
 
     QuerySnapshot snapshot = await reference
-        .orderBy("nome", descending: false)
+        //.orderBy("nome", descending: false)
         .where("idEmpresa", isEqualTo: idEmpresa)
+        .where("grupo", isEqualTo: grupo)
         .get();
 
     for (var item in snapshot.docs) {
@@ -181,7 +184,7 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
                   if (controllerQtd.text.isNotEmpty) {
                     qtd = int.parse(controllerQtd.text).toInt();
                     if (produto.estoqueAtivo && produto.estoque < qtd) {
-                      return _alertErro("Quantidade não permitidacle");
+                      return _alertErro("Quantidade não permitida");
                     } else {
                       _addCesta(produto, qtd);
                     }

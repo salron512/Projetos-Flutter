@@ -11,6 +11,8 @@ class ListaProdutos extends StatefulWidget {
 }
 
 class _ListaProdutosState extends State<ListaProdutos> {
+  String _escolhaGrupo = '';
+  List<String> _listaGrupo = [];
   StreamController _streamController = StreamController.broadcast();
 
   var _mascaraQtd = MaskTextInputFormatter(
@@ -211,9 +213,61 @@ class _ListaProdutosState extends State<ListaProdutos> {
     });
   }
 
+  _recuperaGruposProdutos() async {
+    if (_listaGrupo.length > 0) {
+      _listaGrupo.clear();
+    }
+    String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection("grupoProduto")
+        .where("idEmpresa", isEqualTo: uid)
+        .get();
+    for (var item in snapshot.docs) {
+      Map dados = item.data();
+      String grupoNome = dados['nome'];
+      _listaGrupo.add(grupoNome);
+    }
+  }
+
+  _alertGrupo(String idProduto) {
+    showDialog(
+        context: context,
+        builder: (contex) {
+          return AlertDialog(
+            title: Text('Grupos de produto'),
+            content: Container(
+              width: 250,
+              height: 250,
+              child: ListView.separated(
+                itemCount: _listaGrupo.length,
+                separatorBuilder: (context, indice) => Divider(
+                  height: 4,
+                  color: Colors.grey,
+                ),
+                itemBuilder: (context, indice) {
+                  String grupo = _listaGrupo[indice];
+                  return ListTile(
+                    title: Text(grupo),
+                    onTap: () {
+                      FirebaseFirestore.instance
+                          .collection("produtos")
+                          .doc(idProduto)
+                          .update({
+                        "grupo": grupo,
+                      }).then((value) => Navigator.pop(context));
+                    },
+                  );
+                },
+              ),
+            ),
+          );
+        });
+  }
+
   @override
   void initState() {
     super.initState();
+    //_recuperaGruposProdutos();
     _recuperaListaProdutos();
   }
 
@@ -303,9 +357,6 @@ class _ListaProdutosState extends State<ListaProdutos> {
                                             ? Text("Estoque " +
                                                 dados['estoque'].toString())
                                             : Text(''),
-                                        ElevatedButton(
-                                            onPressed: () {},
-                                            child: Text("Grupo do produto")),
                                         Row(
                                           children: [
                                             Checkbox(
@@ -325,7 +376,13 @@ class _ListaProdutosState extends State<ListaProdutos> {
                                                 }),
                                             Text("Estoque ativo"),
                                           ],
-                                        )
+                                        ),
+                                        ElevatedButton(
+                                            onPressed: () {
+                                              _recuperaGruposProdutos();
+                                              _alertGrupo(dados.reference.id);
+                                            },
+                                            child: Text("Alterar grupo")),
                                       ]),
                                 ),
                                 Row(

@@ -138,7 +138,7 @@ class _ListaEmpressasState extends State<ListaEmpressas> {
                           onTap: () {
                             if (dadosEmpresa.estado) {
                               Navigator.pushNamed(
-                                  context, "/listaprodutosusuario",
+                                  context, "/listagrupoprodutosusuario",
                                   arguments: dadosEmpresa.idEmpresa);
                             }
                           },

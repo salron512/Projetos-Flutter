@@ -18,6 +18,7 @@ import 'package:entrega/Telas/ListaEntregadores.dart';
 import 'package:entrega/Telas/ListaEntregasPendentes.dart';
 import 'package:entrega/Telas/ListaEntregasRealizadas.dart';
 import 'package:entrega/Telas/ListaEntregasRealizadasEmpresa.dart';
+import 'package:entrega/Telas/ListaGruposProdutosUsuario.dart';
 import 'package:entrega/Telas/ListaPedidosEmpresa.dart';
 import 'package:entrega/Telas/ListaPedidosUsuario.dart';
 import 'package:entrega/Telas/ListaProdutos.dart';
@@ -42,6 +43,10 @@ class Rotas {
 
       case "/cadastro":
         return MaterialPageRoute(builder: (_) => Cadastro());
+
+      case "/listagrupoprodutosusuario":
+        return MaterialPageRoute(
+            builder: (_) => ListaGruposProdutosUsuario(args));
 
       case "/home":
         return MaterialPageRoute(builder: (_) => Home());
