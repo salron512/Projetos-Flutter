@@ -60,7 +60,6 @@ class _FinanceiroState extends State<Financeiro> {
         }
       });
     } else {
-      
       reference
           .where("nomeEmpresa", isEqualTo: _empresa)
           .where("status", isEqualTo: "Entregue")
@@ -151,7 +150,7 @@ class _FinanceiroState extends State<Financeiro> {
                     setState(() {
                       _empresa = "";
                     });
-                     _recuperaEntregas();
+                    _recuperaEntregas();
                     Navigator.pop(context);
                   },
                   child: Text("Limpar"))

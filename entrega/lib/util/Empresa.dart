@@ -11,10 +11,10 @@ class Empresa {
   bool _estado;
   bool _ativo;
   String _telefone;
-  
- String get telefone => this._telefone;
 
- set telefone(String value) => this._telefone = value;
+  String get telefone => this._telefone;
+
+  set telefone(String value) => this._telefone = value;
 
   bool get ativo => this._ativo;
 

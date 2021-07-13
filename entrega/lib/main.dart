@@ -40,6 +40,5 @@ void main() async {
       GlobalCupertinoLocalizations.delegate,
     ],
     supportedLocales: [const Locale('pt', 'BR')],
-  )
-  );
+  ));
 }

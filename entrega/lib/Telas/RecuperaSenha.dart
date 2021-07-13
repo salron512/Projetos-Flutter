@@ -9,9 +9,7 @@ class RecuperaSenha extends StatefulWidget {
 class _RecuperaSenhaState extends State<RecuperaSenha> {
   TextEditingController _controllerEmail = TextEditingController();
   String _mensagenError = "";
-  
 
- 
   _recuperaSenha() async {
     String email = _controllerEmail.text;
     if (email.isNotEmpty) {

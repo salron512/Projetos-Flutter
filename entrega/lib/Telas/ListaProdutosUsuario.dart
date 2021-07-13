@@ -288,15 +288,15 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
                                           produtos.estoque.toString())
                                       : Text(""),
                                   Row(
-                                   mainAxisAlignment: MainAxisAlignment.end,
-
+                                    mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       Padding(
                                         padding: EdgeInsets.all(5),
                                         child: ElevatedButton(
                                           child: Text('Galeria'),
                                           onPressed: () {
-                                            Navigator.pushNamed(context, '/grid',
+                                            Navigator.pushNamed(
+                                                context, '/grid',
                                                 arguments: produtos.id);
                                           },
                                         ),
@@ -304,7 +304,7 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
                                       ElevatedButton(
                                         style: ElevatedButton.styleFrom(
                                             primary:
-                                            Theme.of(context).primaryColor),
+                                                Theme.of(context).primaryColor),
                                         child: Text('Comprar'),
                                         onPressed: () {
                                           if (_tipoUsuario != "empresa") {

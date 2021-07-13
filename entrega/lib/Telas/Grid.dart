@@ -302,7 +302,6 @@ class _GridState extends State<Grid> {
                         _recuperaImagem(false);
                       },
                       icon: Icon(Icons.photo_rounded)),
-                
                 ],
               )),
         ));

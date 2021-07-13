@@ -75,7 +75,6 @@ class _ListaEntregasRealizadasEmpresaState
         _qtd = event.docs.length;
         _totalReceber = _resultado;
 
-
         _totalPagar = _resultado * _taxa;
         _totalEntrega = _taxaEntrega * _qtd;
         _totalFinal = _totalPagar + _totalEntrega;
@@ -312,7 +311,8 @@ class _ListaEntregasRealizadasEmpresaState
                         style: TextStyle(color: Colors.white),
                       ),
                       Text(
-                        "Total á pagar entregas R\$ " + _totalEntrega.toStringAsFixed(2),
+                        "Total á pagar entregas R\$ " +
+                            _totalEntrega.toStringAsFixed(2),
                         style: TextStyle(color: Colors.white),
                       ),
                       Text(

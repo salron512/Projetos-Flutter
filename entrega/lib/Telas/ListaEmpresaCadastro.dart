@@ -36,7 +36,8 @@ class _ListaEmpresaCadastroState extends State<ListaEmpresaCadastro> {
     }
     return listaRecuperada;
   }
-   _abrirTelefone(String telefone) async {
+
+  _abrirTelefone(String telefone) async {
     var telefoneUrl = "tel:$telefone";
 
     if (await canLaunch(telefoneUrl)) {

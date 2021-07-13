@@ -66,7 +66,8 @@ class _ListaPedidosUsuarioState extends State<ListaPedidosUsuario> {
             switch (snapshot.connectionState) {
               case ConnectionState.none:
               case ConnectionState.waiting:
-                return Center(child: CircularProgressIndicator(
+                return Center(
+                    child: CircularProgressIndicator(
                   color: Theme.of(context).primaryColor,
                 ));
                 break;
@@ -116,18 +117,15 @@ class _ListaPedidosUsuarioState extends State<ListaPedidosUsuario> {
                               ),
                               pedido["status"] == "À caminho"
                                   ? TextButton(
-                                    
                                       onPressed: () {
                                         Navigator.pushNamed(context, "/mapa",
                                             arguments: pedido.reference.id);
                                       },
-                                      child: Text("Acompanhe seu pedido",
-                                      style: TextStyle(
-                                        color: Colors.white
+                                      child: Text(
+                                        "Acompanhe seu pedido",
+                                        style: TextStyle(color: Colors.white),
                                       ),
-                                      ),
-                                      
-                                      )
+                                    )
                                   : Text("")
                             ],
                           ),

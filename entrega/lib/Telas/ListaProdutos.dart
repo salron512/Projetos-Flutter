@@ -298,10 +298,14 @@ class _ListaProdutosState extends State<ListaProdutos> {
                                         Text(dados["nome"]),
                                         Text("Preço: R\$ " + dados["preco"]),
                                         Text(dados["descricao"]),
+                                        Text("Grupo: " + dados["grupo"]),
                                         dados['estoqueAtivo'] == true
                                             ? Text("Estoque " +
                                                 dados['estoque'].toString())
                                             : Text(''),
+                                        ElevatedButton(
+                                            onPressed: () {},
+                                            child: Text("Grupo do produto")),
                                         Row(
                                           children: [
                                             Checkbox(
@@ -377,7 +381,6 @@ class _ListaProdutosState extends State<ListaProdutos> {
               Padding(
                 padding: EdgeInsets.all(8),
                 child: ElevatedButton(
-
                     onPressed: () {
                       Navigator.pushNamed(context, '/grupo');
                     },

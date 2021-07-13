@@ -7,10 +7,10 @@ class Entegadores {
   String _email;
   bool _ativo;
   String _uid;
-  
- String get uid => this._uid;
 
- set uid(String value) => this._uid = value;
+  String get uid => this._uid;
+
+  set uid(String value) => this._uid = value;
 
   get nome => this._nome;
 

@@ -9,6 +9,8 @@ class CadastraProdutos extends StatefulWidget {
 }
 
 class _CadastraProdutosState extends State<CadastraProdutos> {
+  String _escolhaGrupo = '';
+  List<String> _listaGrupo = [];
   TextEditingController _controllerNome = TextEditingController();
   TextEditingController _controllerPreco = TextEditingController();
   TextEditingController _controllerDescicao = TextEditingController();
@@ -37,41 +39,49 @@ class _CadastraProdutosState extends State<CadastraProdutos> {
                 _controllerQtdEstoque.text = '0';
               });
             }
-
-            String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
-            int qtdEstoque = int.parse(_controllerQtdEstoque.text).toInt();
-            double precoFirebase = double.tryParse(preco).toDouble();
-            String idDoc = DateTime.now().microsecondsSinceEpoch.toString();
-            await FirebaseFirestore.instance.collection("produtos").doc().set({
-              'status': true,
-              'estoqueAtivo': _estoque,
-              'estoque': qtdEstoque,
-              "id": idDoc,
-              "idEmpresa": uid,
-              "nome": nome,
-              "descricao": descricao,
-              "preco": precoFirebase.toStringAsFixed(2),
-              "urlImagem": null,
-            }).catchError((erro) {
-              
-              setState(() {
-                _msgErro =
-                    "Falha ao salvar os dados por favor verifique sua conexão";
+            if (_escolhaGrupo.isNotEmpty) {
+              String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+              int qtdEstoque = int.parse(_controllerQtdEstoque.text).toInt();
+              double precoFirebase = double.tryParse(preco).toDouble();
+              String idDoc = DateTime.now().microsecondsSinceEpoch.toString();
+              await FirebaseFirestore.instance
+                  .collection("produtos")
+                  .doc()
+                  .set({
+                'status': true,
+                'grupo': _escolhaGrupo,
+                'estoqueAtivo': _estoque,
+                'estoque': qtdEstoque,
+                "id": idDoc,
+                "idEmpresa": uid,
+                "nome": nome,
+                "descricao": descricao,
+                "preco": precoFirebase.toStringAsFixed(2),
+                "urlImagem": null,
+              }).catchError((erro) {
+                setState(() {
+                  _msgErro =
+                      "Falha ao salvar os dados por favor verifique sua conexão";
+                });
               });
-            });
-            String idDocumento;
-            CollectionReference query =
-                FirebaseFirestore.instance.collection("produtos");
-            QuerySnapshot snap = await query
-                .where("idEmpresa", isEqualTo: uid)
-                .where("id", isEqualTo: idDoc)
-                .get();
-            for (var item in snap.docs) {
-              idDocumento = item.reference.id;
+              String idDocumento;
+              CollectionReference query =
+                  FirebaseFirestore.instance.collection("produtos");
+              QuerySnapshot snap = await query
+                  .where("idEmpresa", isEqualTo: uid)
+                  .where("id", isEqualTo: idDoc)
+                  .get();
+              for (var item in snap.docs) {
+                idDocumento = item.reference.id;
+              }
+              print("idDoc " + idDocumento);
+              Navigator.pushNamed(context, "/perfilproduto",
+                  arguments: idDocumento);
+            } else {
+              setState(() {
+                _msgErro = "Por favor escolha um grupo de produtos";
+              });
             }
-            print("idDoc " + idDocumento);
-            Navigator.pushNamed(context, "/perfilproduto",
-                arguments: idDocumento);
           } else {
             setState(() {
               _msgErro = "Por favor preencha a descrição do produto";
@@ -88,6 +98,59 @@ class _CadastraProdutosState extends State<CadastraProdutos> {
         _msgErro = "Por favor preencha o nome do produto";
       });
     }
+  }
+
+  _recuperaGruposProdutos() async {
+    String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection("grupoProduto")
+        .where("idEmpresa", isEqualTo: uid)
+        .get();
+    for (var item in snapshot.docs) {
+      Map dados = item.data();
+      String grupoNome = dados['nome'];
+      _listaGrupo.add(grupoNome);
+    }
+  }
+
+  _alertGrupo() {
+    showDialog(
+        context: context,
+        builder: (contex) {
+          return AlertDialog(
+            title: Text('Grupos de produto'),
+            content: Container(
+              width: 250,
+              height: 250,
+              child: ListView.separated(
+                itemCount: _listaGrupo.length,
+                separatorBuilder: (context, indice) => Divider(
+                  height: 4,
+                  color: Colors.grey,
+                ),
+                itemBuilder: (context, indice) {
+                  String grupo = _listaGrupo[indice];
+                  return ListTile(
+                    title: Text(grupo),
+                    onTap: () {
+                      setState(() {
+                        _escolhaGrupo = grupo;
+                      });
+                      Navigator.pop(context);
+                    },
+                  );
+                },
+              ),
+            ),
+          );
+        });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _recuperaGruposProdutos();
   }
 
   @override
@@ -197,6 +260,15 @@ class _CadastraProdutosState extends State<CadastraProdutos> {
                             borderRadius: BorderRadius.circular(15))),
                     controller: _controllerQtdEstoque,
                   ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(5),
+                child: GestureDetector(
+                  child: Text("Grupo escolhido " + _escolhaGrupo),
+                  onTap: () {
+                    _alertGrupo();
+                  },
                 ),
               ),
               Text(

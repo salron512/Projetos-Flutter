@@ -21,7 +21,6 @@ class _AlteraCadastroState extends State<AlteraCadastro> {
   TextEditingController _controllerEndereco = TextEditingController();
   TextEditingController _controllerBairro = TextEditingController();
   TextEditingController _controllerCpf = TextEditingController();
-  
 
   _recuperaDadosUsuaurio() async {
     String uid = RecuperaFirebase.RECUPERAIDUSUARIO();

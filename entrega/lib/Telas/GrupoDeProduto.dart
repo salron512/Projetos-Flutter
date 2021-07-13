@@ -39,7 +39,7 @@ class _GrupoDeProdutoState extends State<GrupoDeProduto> {
     _streamController.close();
   }
 
-  _excluirGrupo(String idDoc){
+  _excluirGrupo(String idDoc) {
     showDialog(
         context: context,
         builder: (_) {
@@ -49,7 +49,6 @@ class _GrupoDeProdutoState extends State<GrupoDeProduto> {
               height: 150,
               width: 150,
               child: Column(
-
                 children: [
                   Container(
                     width: 50,
@@ -57,7 +56,6 @@ class _GrupoDeProdutoState extends State<GrupoDeProduto> {
                     child: Image.asset("images/excluir.png"),
                   ),
                   Text("Confirmar exclusão ?"),
-
                 ],
               ),
             ),
@@ -69,16 +67,16 @@ class _GrupoDeProdutoState extends State<GrupoDeProduto> {
                   child: Text('Cancelar')),
               TextButton(
                   onPressed: () {
-                    FirebaseFirestore.instance.collection('grupoProduto')
+                    FirebaseFirestore.instance
+                        .collection('grupoProduto')
                         .doc(idDoc)
-                        .delete().then((value) => Navigator.pop(context));
-
+                        .delete()
+                        .then((value) => Navigator.pop(context));
                   },
                   child: Text('Confirmar'))
             ],
           );
         });
-
   }
 
   _alertEditar(DocumentSnapshot grupo) {
@@ -178,7 +176,7 @@ class _GrupoDeProdutoState extends State<GrupoDeProduto> {
                           .set({
                         'nome': _controllerGrupo.text,
                         'idEmpresa': uid,
-                      }).then((value){
+                      }).then((value) {
                         Navigator.pop(context);
                         _controllerGrupo.clear();
                       });
@@ -231,7 +229,7 @@ class _GrupoDeProdutoState extends State<GrupoDeProduto> {
                       return ListTile(
                         title: Text(grupoProduto['nome']),
                         trailing: Column(
-                       crossAxisAlignment: CrossAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             IconButton(
                                 icon: Icon(
@@ -240,7 +238,6 @@ class _GrupoDeProdutoState extends State<GrupoDeProduto> {
                                 ),
                                 onPressed: () {
                                   _excluirGrupo(grupoProduto.reference.id);
-
                                 }),
                           ],
                         ),

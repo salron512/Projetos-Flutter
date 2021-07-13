@@ -37,12 +37,9 @@ class _DetalhesEntregaState extends State<DetalhesEntrega> {
                   Text(
                     "quantidade: " + dados["qtd"].toString(),
                   ),
-                  Text(
-                    "Preço unitário: R\$: " + precoUnitario.toStringAsFixed(2)
-                  ),
-                  Text(
-                    "Preço total: R\$: " + precoTotal.toStringAsFixed(2)
-                  ),
+                  Text("Preço unitário: R\$: " +
+                      precoUnitario.toStringAsFixed(2)),
+                  Text("Preço total: R\$: " + precoTotal.toStringAsFixed(2)),
                   dados["observacao"] == ""
                       ? Text("")
                       : Text('Oberservação ' + dados["observacao"])

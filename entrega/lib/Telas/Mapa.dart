@@ -63,8 +63,6 @@ class _MapaState extends State<Mapa> {
     }
   }
 
-  
-
   @override
   void initState() {
     super.initState();

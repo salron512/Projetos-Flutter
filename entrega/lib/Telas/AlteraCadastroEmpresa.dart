@@ -90,7 +90,7 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
                               "diasFunc": diasFuncionamento,
                               "categoria": _escolhaCategoria,
                               "aberto": _aberto,
-                              'merchantId': merchantId ,
+                              'merchantId': merchantId,
                               'merchantKey': chaveApi
                             }).catchError((erro) {
                               setState(() {
@@ -561,7 +561,8 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
                             borderRadius: BorderRadius.circular(15))),
                     controller: _controllerHoraFechamento,
                   ),
-                ), Padding(
+                ),
+                Padding(
                   padding: EdgeInsets.only(bottom: 8),
                   child: TextField(
                     keyboardType: TextInputType.text,

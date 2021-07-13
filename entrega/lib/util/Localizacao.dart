@@ -18,12 +18,12 @@ class Localizacao {
   static recuperaLocalizacao() async {
     Position position = await Geolocator.getCurrentPosition();
     //Position testePosition =
-        // ignore: missing_required_param
-      //  Position(latitude: -15.678107839468899, longitude: -58.09578097051735);
+    // ignore: missing_required_param
+    //  Position(latitude: -15.678107839468899, longitude: -58.09578097051735);
     // -15.678107839468899, -58.09578097051735
 
-    List<Placemark> listaendereco = await placemarkFromCoordinates(
-        position.latitude, position.longitude);
+    List<Placemark> listaendereco =
+        await placemarkFromCoordinates(position.latitude, position.longitude);
     var endereco = listaendereco[0];
     String cidade = endereco.subAdministrativeArea;
     print("cidade recuperada " + cidade);

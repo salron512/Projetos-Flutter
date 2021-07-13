@@ -221,10 +221,10 @@ class _MinhasEntregasEntregadorState extends State<MinhasEntregasEntregador> {
 
     if (list.isNotEmpty) {
       OneSignal.shared.postNotification(OSCreateNotification(
-      playerIds: list,
-      heading: "Entrega á caminho",
-      content: "Acompanhe sua entrega em tempo real!",
-    ));
+        playerIds: list,
+        heading: "Entrega á caminho",
+        content: "Acompanhe sua entrega em tempo real!",
+      ));
     }
     print("ENVIADO!!!");
   }
