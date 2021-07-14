@@ -15,7 +15,8 @@ class _ListaGruposProdutosUsuarioState
     extends State<ListaGruposProdutosUsuario> {
   String _tipoUsuario = '';
   String _idEmpresa;
-  _recuperaGrupos() async {
+
+ Future _recuperaGrupos() async {
     _idEmpresa = widget.idEmpresa;
     String idEmpresa = widget.idEmpresa;
     List listaGrupo = [];
@@ -24,7 +25,7 @@ class _ListaGruposProdutosUsuarioState
         FirebaseFirestore.instance.collection("grupoProduto");
 
     QuerySnapshot querySnapshot = await reference
-        //.orderBy('nome', descending: false)
+       //.orderBy('nome', descending: false)
         .where("idEmpresa", isEqualTo: idEmpresa)
         .get();
     for (var item in querySnapshot.docs) {
@@ -84,6 +85,7 @@ class _ListaGruposProdutosUsuarioState
                       itemBuilder: (context, indice) {
                         GrupoProduto grupo = listaSnap[indice];
                         return Card(
+                          elevation: 8,
                           color: Theme.of(context).primaryColor,
                           child: ListTile(
                             title: Text(

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
@@ -13,6 +14,8 @@ class _FinanceiroState extends State<Financeiro> {
   StreamController _streamController = StreamController.broadcast();
   String dropdownValue = '01';
   String dropdownValueAno = '2021';
+  String dropdownValueDiaIncial = '01';
+  String dropdownDiaFinal = '30';
 
   int _mes = DateTime.now().month.toInt();
   int _ano = DateTime.now().year.toInt();
@@ -20,8 +23,12 @@ class _FinanceiroState extends State<Financeiro> {
   double _vlrEntrega = 0;
   double _totalReceber = 0;
   double _totalPagar = 0;
+  double _totalEntregas = 0;
+  double _totalFinal = 0;
   double _taxa = 0.05;
   int _qtd = 0;
+  int _diaInicial;
+  int _diaFinal;
   String _empresa = "";
   List<String> _listaEmpresas = [];
 
@@ -54,8 +61,11 @@ class _FinanceiroState extends State<Financeiro> {
           });
           setState(() {
             _qtd = event.docs.length;
+            String qtd = _qtd.toString();
+            _totalEntregas = 4 * double.tryParse(qtd).toDouble();
             _totalReceber = _resultado;
             _totalPagar = _resultado * _taxa;
+            _totalFinal = _totalEntregas + _totalPagar;
           });
         }
       });
@@ -178,6 +188,128 @@ class _FinanceiroState extends State<Financeiro> {
           children: [
             Row(
               children: [
+                Text("Dia inicial: "),
+                Padding(
+                  padding: EdgeInsets.only(left: 5, right: 5),
+                  child: DropdownButton<String>(
+                    value: dropdownValueDiaIncial,
+                    icon: const Icon(Icons.arrow_downward),
+                    iconSize: 24,
+                    elevation: 16,
+                    style: const TextStyle(color: Colors.deepPurple),
+                    underline: Container(
+                      height: 2,
+                      color: Colors.grey,
+                    ),
+                    onChanged: (newValue) {
+                      setState(() {
+                        dropdownValueDiaIncial = newValue;
+                        _diaInicial = int.parse(dropdownValueDiaIncial).toInt();
+                        print(_mes.toString());
+                        _recuperaEntregas();
+                      });
+                    },
+                    items: <String>[
+                      '01',
+                      '02',
+                      '03',
+                      '04',
+                      '05',
+                      '06',
+                      '07',
+                      '08',
+                      '09',
+                      '10',
+                      '11',
+                      '12',
+                      '13',
+                      '14',
+                      '15',
+                      '16',
+                      '17',
+                      '18',
+                      '19',
+                      '20',
+                      '21',
+                      '22',
+                      '23',
+                      '24',
+                      '25',
+                      '26',
+                      '27',
+                      '28',
+                      '29',
+                      '30',
+                      '31',
+                    ].map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                ),
+                Text("Dia Final: "),
+                Padding(
+                  padding: EdgeInsets.only(right: 5, left: 5),
+                  child: DropdownButton<String>(
+                    value: dropdownDiaFinal,
+                    icon: const Icon(Icons.arrow_downward),
+                    iconSize: 24,
+                    elevation: 16,
+                    style: const TextStyle(color: Colors.deepPurple),
+                    underline: Container(
+                      height: 2,
+                      color: Colors.grey,
+                    ),
+                    onChanged: (newValue) {
+                      setState(() {
+                        dropdownDiaFinal = newValue;
+                        _diaInicial = int.parse(dropdownDiaFinal).toInt();
+                        print(_mes.toString());
+                        _recuperaEntregas();
+                      });
+                    },
+                    items: <String>[
+                      '01',
+                      '02',
+                      '03',
+                      '04',
+                      '05',
+                      '06',
+                      '07',
+                      '08',
+                      '09',
+                      '10',
+                      '11',
+                      '12',
+                      '13',
+                      '14',
+                      '15',
+                      '16',
+                      '17',
+                      '18',
+                      '19',
+                      '20',
+                      '21',
+                      '22',
+                      '23',
+                      '24',
+                      '25',
+                      '26',
+                      '27',
+                      '28',
+                      '29',
+                      '30',
+                      '31',
+                    ].map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                ),
                 Text("Mês: "),
                 DropdownButton<String>(
                   value: dropdownValue,
@@ -217,33 +349,42 @@ class _FinanceiroState extends State<Financeiro> {
                     );
                   }).toList(),
                 ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              //crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Padding(
-                    padding: EdgeInsets.only(left: 10), child: Text("Ano: ")),
-                DropdownButton<String>(
-                  value: dropdownValueAno,
-                  icon: const Icon(Icons.arrow_downward),
-                  iconSize: 24,
-                  elevation: 16,
-                  style: const TextStyle(color: Colors.deepPurple),
-                  underline: Container(
-                    height: 2,
-                    color: Colors.grey,
+                    padding: EdgeInsets.only(left: 0), child: Text("Ano: ")),
+                Padding(
+                  padding: EdgeInsets.only(left: 5, right: 5),
+                  child: DropdownButton<String>(
+                    value: dropdownValueAno,
+                    icon: const Icon(Icons.arrow_downward),
+                    iconSize: 24,
+                    elevation: 16,
+                    style: const TextStyle(color: Colors.deepPurple),
+                    underline: Container(
+                      height: 2,
+                      color: Colors.grey,
+                    ),
+                    onChanged: (newValue) {
+                      setState(() {
+                        dropdownValueAno = newValue;
+                        _ano = int.parse(dropdownValue).toInt();
+                      });
+                      print(dropdownValueAno);
+                      _recuperaEntregas();
+                    },
+                    items: <String>["2021"]
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
                   ),
-                  onChanged: (newValue) {
-                    setState(() {
-                      dropdownValueAno = newValue;
-                      _ano = int.parse(dropdownValue).toInt();
-                    });
-                    print(dropdownValueAno);
-                    _recuperaEntregas();
-                  },
-                  items: <String>["2021"]
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
                 ),
                 IconButton(
                     onPressed: () {
@@ -297,7 +438,6 @@ class _FinanceiroState extends State<Financeiro> {
                                     Text(
                                       "Estabelecimento " +
                                           entrega["nomeEmpresa"],
-                                      style: TextStyle(color: Colors.white),
                                     ),
                                     Text(
                                       "Forma de pagamento " +
@@ -349,12 +489,22 @@ class _FinanceiroState extends State<Financeiro> {
                           style: TextStyle(color: Colors.white),
                         ),
                         Text(
-                          "Valor total á pagar R\$ " +
+                          "Valor total á pagar comissão R\$ " +
                               _totalPagar.toStringAsFixed(2),
                           style: TextStyle(color: Colors.white),
                         ),
                         Text(
                           "Quantidade total de entregas " + _qtd.toString(),
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        Text(
+                          "Total valor entregas R\$ " +
+                              _totalEntregas.toStringAsFixed(0),
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        Text(
+                          "Valor total á pagar R\$ " +
+                              _totalFinal.toStringAsFixed(2),
                           style: TextStyle(color: Colors.white),
                         ),
                       ],

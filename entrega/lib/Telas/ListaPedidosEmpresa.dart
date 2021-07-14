@@ -220,6 +220,7 @@ class _ListaPedidosEmpresaState extends State<ListaPedidosEmpresa> {
       'andamento': false,
       'mes': DateTime.now().month.toInt(),
       'ano': DateTime.now().year.toInt(),
+      'dia': DateTime.now().day.toInt(),
     });
   }
 
