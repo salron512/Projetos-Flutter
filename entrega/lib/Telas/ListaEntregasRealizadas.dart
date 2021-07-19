@@ -196,6 +196,7 @@ class _ListaEntregasRealizadasState extends State<ListaEntregasRealizadas> {
                                     Text(
                                       "Troco R\$ " + entrega["troco"],
                                     ),
+                                    
                                     Text(
                                       "Valor total R\$ " +
                                           entrega["totalPedido"],

@@ -297,6 +297,7 @@ class _ListaPedidosEmpresaState extends State<ListaPedidosEmpresa> {
                                   "Troco R\$ " + entrega["troco"],
                                   style: TextStyle(color: Colors.white),
                                 ),
+                                
                                 Text(
                                   "Valor total R\$ " + entrega["totalPedido"],
                                   style: TextStyle(color: Colors.white),

@@ -259,6 +259,10 @@ class _ListaEntregasRealizadasEmpresaState
                                       "Entregue por " +
                                           entrega["nomeEntregador"],
                                     ),
+                                     Text(
+                                          "Valor total sem taxa R\$ " +
+                                              entrega["totalSemTaxa"],
+                                        ),
                                     Text(
                                       "Valor total R\$ " +
                                           entrega["totalPedido"],

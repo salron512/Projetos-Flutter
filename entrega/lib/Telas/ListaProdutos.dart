@@ -225,7 +225,11 @@ class _ListaProdutosState extends State<ListaProdutos> {
     for (var item in snapshot.docs) {
       Map dados = item.data();
       String grupoNome = dados['nome'];
-      _listaGrupo.add(grupoNome);
+
+      setState(() {
+        _listaGrupo.add(grupoNome);
+      });
+      print("lista Grupo " + grupoNome);
     }
   }
 
@@ -267,7 +271,7 @@ class _ListaProdutosState extends State<ListaProdutos> {
   @override
   void initState() {
     super.initState();
-    //_recuperaGruposProdutos();
+    _recuperaGruposProdutos();
     _recuperaListaProdutos();
   }
 
@@ -379,7 +383,7 @@ class _ListaProdutosState extends State<ListaProdutos> {
                                         ),
                                         ElevatedButton(
                                             onPressed: () {
-                                              _recuperaGruposProdutos();
+                                             
                                               _alertGrupo(dados.reference.id);
                                             },
                                             child: Text("Alterar grupo")),

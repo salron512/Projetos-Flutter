@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:cielo_ecommerce/cielo_ecommerce.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:entrega/util/RecupepraFirebase.dart';
@@ -9,7 +8,6 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
-import 'package:http/http.dart' as http;
 
 // ignore: must_be_immutable
 class Carrinho extends StatefulWidget {
@@ -25,6 +23,7 @@ class _CarrinhoState extends State<Carrinho> {
   StreamController _streamController = StreamController.broadcast();
   double _taxa = 4;
   double _totalSoma = 0;
+  double _totalSomaSemTaxa = 0;
   String _bandeira = '';
   String _totalCompra = "0";
   bool _mostraTotal = false;
@@ -122,7 +121,10 @@ class _CarrinhoState extends State<Carrinho> {
           _idEmpresa = dados["idEmpresa"];
           _listaCompras.add(dados);
           _totalSoma = _totalSoma + soma;
+          _totalSomaSemTaxa = _totalSoma - soma;
           print("Empresa ID" + _idEmpresa);
+          print("valor sem taxa " + _totalSomaSemTaxa.toStringAsFixed(2));
+          print("valor com taxa " + _totalSoma.toStringAsFixed(2));
         }
         if (_totalSoma >= 10) {
           setState(() {
@@ -136,6 +138,7 @@ class _CarrinhoState extends State<Carrinho> {
           });
         }
         _totalSoma = _totalSoma + _taxa;
+        _totalSomaSemTaxa = _totalSoma - _taxa;
         setState(() {
           _totalCompra = _totalSoma.toStringAsFixed(2);
         });
@@ -731,7 +734,8 @@ class _CarrinhoState extends State<Carrinho> {
               TextButton(
                   onPressed: () {
                     Navigator.pop(context);
-                    _selecionaPagamentoAlert();
+                    _selecionaPagarPeloApp();
+                    // _selecionaPagamentoAlert();
                   },
                   child: Text('Endereço cadastro'))
             ],
@@ -825,7 +829,8 @@ class _CarrinhoState extends State<Carrinho> {
                     if (_controllerEndereco.text.isNotEmpty) {
                       if (_controllerBairro.text.isNotEmpty) {
                         Navigator.pop(context);
-                        _selecionaPagamentoAlert();
+                        _selecionaPagarPeloApp();
+                        // _selecionaPagamentoAlert();
                       } else {
                         _alertErro("Por favor preencha o bairro");
                       }
@@ -860,6 +865,7 @@ class _CarrinhoState extends State<Carrinho> {
 
       await FirebaseFirestore.instance.collection("pedidos").doc().set({
         "status": "Aguardando",
+        "totalSemTaxa": _totalSomaSemTaxa.toStringAsFixed(2),
         "andamento": true,
         "nomeEntregador": "vazio",
         "cidade": _cidade,
@@ -934,6 +940,7 @@ class _CarrinhoState extends State<Carrinho> {
 
           await FirebaseFirestore.instance.collection("pedidos").doc().set({
             "status": "Aguardando",
+            "totalSemTaxa": _totalSomaSemTaxa.toStringAsFixed(2),
             "andamento": true,
             "nomeEntregador": "vazio",
             "cidade": _cidade,
@@ -1005,6 +1012,7 @@ class _CarrinhoState extends State<Carrinho> {
 
           await FirebaseFirestore.instance.collection("pedidos").doc().set({
             "status": "Aguardando",
+            "totalSemTaxa": _totalSomaSemTaxa.toStringAsFixed(2),
             "idEmpresa": _idEmpresa,
             "cidade": _cidade,
             "taxaEntrega": 5,
@@ -1076,6 +1084,7 @@ class _CarrinhoState extends State<Carrinho> {
 
           await FirebaseFirestore.instance.collection("pedidos").doc().set({
             "status": "Aguardando",
+            "totalSemTaxa": _totalSomaSemTaxa.toStringAsFixed(2),
             "andamento": true,
             "nomeEntregador": "vazio",
             "cidade": _cidade,
@@ -1147,6 +1156,7 @@ class _CarrinhoState extends State<Carrinho> {
 
           await FirebaseFirestore.instance.collection("pedidos").doc().set({
             "status": "Aguardando",
+            "totalSemTaxa": _totalSomaSemTaxa.toStringAsFixed(2),
             "nomeEntregador": "vazio",
             "cidade": _cidade,
             "taxaEntrega": 5,
@@ -1309,6 +1319,7 @@ class _CarrinhoState extends State<Carrinho> {
               ),
             ),
             actions: [
+              /*
               Visibility(
                   visible: _pagamentoOnline,
                   child: TextButton(
@@ -1316,7 +1327,9 @@ class _CarrinhoState extends State<Carrinho> {
                         Navigator.pop(context);
                         _alertBandeira();
                       },
-                      child: Text("Pagar pelo aplicativo"))),
+                      child: Text("Pagar pelo aplicativo")))
+                      ,
+               */
               TextButton(
                   onPressed: () {
                     Navigator.pop(context);
@@ -1452,6 +1465,54 @@ class _CarrinhoState extends State<Carrinho> {
       setState(() {
         _pagamentoOnline = true;
       });
+      print("chave cadastrada " + _pagamentoOnline.toString());
+    }
+  }
+
+  _selecionaPagarPeloApp() {
+    if (_pagamentoOnline) {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text("Selecione a forma de pagamento"),
+              content: Container(
+                width: 150,
+                height: 150,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(5),
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        child: Image.asset('images/scart.png'),
+                      ),
+                    ),
+                    Text("Como deseja realizar seu pagamento ?")
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  child: Text("Pelo app (Crédito)"),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    return _alertBandeira();
+                  },
+                ),
+                TextButton(
+                  child: Text("Pagamento presencial"),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    return _selecionaPagamentoAlert();
+                  },
+                )
+              ],
+            );
+          });
+    } else {
+      return _selecionaPagamentoAlert();
     }
   }
 

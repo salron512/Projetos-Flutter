@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:entrega/util/GrupoProdutos.dart';
+
 import 'package:entrega/util/Produtos.dart';
 import 'package:entrega/util/RecupepraFirebase.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +7,7 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 // ignore: must_be_immutable
 class ListaProdutosUsuario extends StatefulWidget {
-  GrupoProduto dados;
+  QueryDocumentSnapshot dados;
   ListaProdutosUsuario(this.dados);
   @override
   _ListaProdutosUsuarioState createState() => _ListaProdutosUsuarioState();
@@ -22,8 +22,12 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
 
   Future _recuperaProdutos() async {
     List<Produtos> listaProdutos = [];
-    String idEmpresa = widget.dados.idEmpresa;
-    String grupo = widget.dados.nome;
+    Map<String, dynamic> map = widget.dados.data();
+
+    String idEmpresa = map["idEmpresa"];
+    String grupo = map["nome"];
+    print("grupo " + grupo);
+    print("idEmpresa " + idEmpresa);
 
     CollectionReference reference =
         FirebaseFirestore.instance.collection("produtos");
@@ -36,8 +40,8 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
 
     for (var item in snapshot.docs) {
       Map<String, dynamic> dados = item.data();
-      Produtos produtos = Produtos();
       if (dados["estoque"] < 1 && dados["estoqueAtivo"]) continue;
+      Produtos produtos = Produtos();
       produtos.nome = dados["nome"];
       produtos.estoque = dados["estoque"];
       produtos.estoqueAtivo = dados["estoqueAtivo"];
@@ -237,8 +241,8 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
                   );
                 case ConnectionState.active:
                 case ConnectionState.done:
-                  List listaProdutos = snapshot.data;
-                  if (listaProdutos.isEmpty) {
+                  List listaProduto = snapshot.data;
+                  if (listaProduto.length == 0) {
                     return Center(
                       child: Text("Sem produtos cadastrados"),
                     );
@@ -248,10 +252,10 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
                         height: 4,
                         color: Theme.of(context).primaryColor,
                       ),
-                      itemCount: listaProdutos.length,
+                      itemCount: listaProduto.length,
                       // ignore: missing_return
                       itemBuilder: (context, indice) {
-                        Produtos produtos = listaProdutos[indice];
+                        Produtos produtos = listaProduto[indice];
                         return Container(
                           padding: EdgeInsets.all(4),
                           child: Row(
