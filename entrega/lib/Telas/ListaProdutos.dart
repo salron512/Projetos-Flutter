@@ -11,7 +11,6 @@ class ListaProdutos extends StatefulWidget {
 }
 
 class _ListaProdutosState extends State<ListaProdutos> {
-  String _escolhaGrupo = '';
   List<String> _listaGrupo = [];
   StreamController _streamController = StreamController.broadcast();
 

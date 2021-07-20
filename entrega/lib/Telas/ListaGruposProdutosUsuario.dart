@@ -6,6 +6,7 @@ import 'package:entrega/util/RecupepraFirebase.dart';
 
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class ListaGruposProdutosUsuario extends StatefulWidget {
   var idEmpresa;
   ListaGruposProdutosUsuario(this.idEmpresa);
@@ -27,7 +28,7 @@ class _ListaGruposProdutosUsuarioState
         FirebaseFirestore.instance.collection("grupoProduto");
 
     reference
-        //.orderBy("nome", descending: true)
+       // .orderBy("nome", descending: true)
         .where("idEmpresa", isEqualTo: _idEmpresa)
         .snapshots()
         .listen((event) {

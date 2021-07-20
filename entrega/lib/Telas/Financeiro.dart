@@ -27,7 +27,6 @@ class _FinanceiroState extends State<Financeiro> {
   double _totalReceber = 0;
   double _totalPagar = 0;
   double _totalEntregas = 0;
-  double _totalSemTaxa = 0;
   double _totalFinal = 0;
   double _taxa = 0.05;
   String _empresa = "Selecione um empresa";
@@ -189,7 +188,7 @@ class _FinanceiroState extends State<Financeiro> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
+
     super.dispose();
     _streamController.close();
   }

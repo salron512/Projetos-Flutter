@@ -27,14 +27,14 @@ class _GrupoDeProdutoState extends State<GrupoDeProduto> {
 
   @override
   void initState() {
-    // TODO: implement initState
+  
     super.initState();
     _recuperaListaGrupoProdutos();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
+
     super.dispose();
     _streamController.close();
   }
@@ -117,7 +117,7 @@ class _GrupoDeProdutoState extends State<GrupoDeProduto> {
               TextButton(
                   onPressed: () {
                     if (controllerGrupoEditar.text.isNotEmpty) {
-                      String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
+                     
                       String idDoc = grupo.reference.id;
                       FirebaseFirestore.instance
                           .collection("grupoProduto")

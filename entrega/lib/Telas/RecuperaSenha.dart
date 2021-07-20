@@ -37,7 +37,7 @@ class _RecuperaSenhaState extends State<RecuperaSenha> {
         title: Text("Recuperar senha"),
       ),
       body: Container(
-        decoration: BoxDecoration(color: Theme.of(context).accentColor),
+        decoration: BoxDecoration(color: Theme.of(context).colorScheme.secondary ),
         padding: EdgeInsets.all(16),
         child: Center(
           child: SingleChildScrollView(

@@ -71,7 +71,7 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: Container(
-      decoration: BoxDecoration(color: Theme.of(context).accentColor),
+      decoration: BoxDecoration(color: Theme.of(context).colorScheme.secondary),
       child: SafeArea(
         child: Center(
           child: SingleChildScrollView(

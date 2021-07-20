@@ -43,8 +43,8 @@ class _CarrinhoState extends State<Carrinho> {
   var _mascaraVencimento =
       MaskTextInputFormatter(mask: '##/####', filter: {"#": RegExp(r'[0-9]')});
 
-  var _mascaraCpf = MaskTextInputFormatter(
-      mask: '###.###.###-##', filter: {"#": RegExp(r'[0-9]')});
+  //var _mascaraCpf = MaskTextInputFormatter(
+    //  mask: '###.###.###-##', filter: {"#": RegExp(r'[0-9]')});
   TextEditingController _controllerEndereco = TextEditingController();
   TextEditingController _controllerBairro = TextEditingController();
   TextEditingController _controllerCartao = TextEditingController();
@@ -52,7 +52,7 @@ class _CarrinhoState extends State<Carrinho> {
   TextEditingController _controllerCodigoSeguracao = TextEditingController();
   TextEditingController _controllerNomeCartao = TextEditingController();
   TextEditingController _controllerCartaoVencimento = TextEditingController();
-  TextEditingController _controllerCpf = TextEditingController();
+ // TextEditingController _controllerCpf = TextEditingController();
 
   _verificaEstoque() async {
     String idEmpresa = widget.idEmpresa;

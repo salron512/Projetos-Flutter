@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -252,7 +254,7 @@ class _GridState extends State<Grid> {
                           child: dados["urlGaleria"] == null
                               ? Container(
                                   decoration: BoxDecoration(
-                                      color: Theme.of(context).accentColor),
+                                      color: Theme.of(context).colorScheme.secondary),
                                   child: CircularProgressIndicator(
                                     backgroundColor:
                                         Theme.of(context).primaryColor,

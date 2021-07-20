@@ -148,7 +148,7 @@ class _CadastraProdutosState extends State<CadastraProdutos> {
 
   @override
   void initState() {
-    // TODO: implement initState
+   
     super.initState();
     _recuperaGruposProdutos();
   }
