@@ -1391,7 +1391,7 @@ class _CarrinhoState extends State<Carrinho> {
                         keyboardType: TextInputType.number,
                         inputFormatters: [_mascaraCartao],
                         decoration: InputDecoration(
-                          labelText: "Cartão de crédito ",
+                          labelText: "Cartão de crédito",
                           contentPadding: EdgeInsets.fromLTRB(5, 5, 5, 5),
                           filled: true,
                           fillColor: Colors.white,
