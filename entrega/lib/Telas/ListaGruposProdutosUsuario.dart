@@ -28,7 +28,7 @@ class _ListaGruposProdutosUsuarioState
         FirebaseFirestore.instance.collection("grupoProduto");
 
     reference
-       // .orderBy("nome", descending: true)
+        .orderBy("nome", descending: false)
         .where("idEmpresa", isEqualTo: _idEmpresa)
         .snapshots()
         .listen((event) {

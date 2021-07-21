@@ -188,6 +188,7 @@ class _HomeState extends State<Home> {
                               if (permission == LocationPermission.denied ||
                                   permission ==
                                       LocationPermission.deniedForever) {
+                                Localizacao.verificaLocalizacao();
                               } else {
                                 Navigator.pushNamed(context, "/listaempresas",
                                     arguments: dados.categoria);

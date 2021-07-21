@@ -44,15 +44,15 @@ class _CarrinhoState extends State<Carrinho> {
       MaskTextInputFormatter(mask: '##/####', filter: {"#": RegExp(r'[0-9]')});
 
   //var _mascaraCpf = MaskTextInputFormatter(
-    //  mask: '###.###.###-##', filter: {"#": RegExp(r'[0-9]')});
+  //  mask: '###.###.###-##', filter: {"#": RegExp(r'[0-9]')});
+  // TextEditingController _controllerCpf = TextEditingController();
   TextEditingController _controllerEndereco = TextEditingController();
   TextEditingController _controllerBairro = TextEditingController();
   TextEditingController _controllerCartao = TextEditingController();
-
   TextEditingController _controllerCodigoSeguracao = TextEditingController();
   TextEditingController _controllerNomeCartao = TextEditingController();
   TextEditingController _controllerCartaoVencimento = TextEditingController();
- // TextEditingController _controllerCpf = TextEditingController();
+  
 
   _verificaEstoque() async {
     String idEmpresa = widget.idEmpresa;
@@ -578,7 +578,9 @@ class _CarrinhoState extends State<Carrinho> {
                       title: Text(bandeiraCartao),
                       onTap: () {
                         Navigator.pop(context);
-                        _bandeira = bandeiraCartao;
+                      setState(() {
+                          _bandeira = bandeiraCartao;
+                      });
                         _alertPagamentoOnline();
                       },
                     );
@@ -631,6 +633,8 @@ class _CarrinhoState extends State<Carrinho> {
                 ));
 
             print("Transação Simples");
+            print("merchantId " + merchantId);
+            print("merchantkey " + merchantkey);
             print("Iniciando pagamento....");
 
             //Objeto de venda
@@ -666,6 +670,7 @@ class _CarrinhoState extends State<Carrinho> {
               // print('teste cielo ' + response.payment.returnMessage);
               if (response != null) {
                 print("primeiro teste ok");
+                print("mensagem pagamento: " + response.payment.returnMessage);
                 if (response.payment.returnMessage == "Transacao autorizada") {
                   _salvaPedidoPgOnline();
                 } else {
@@ -1363,7 +1368,8 @@ class _CarrinhoState extends State<Carrinho> {
                 width: 100,
                 height: 300,
                 child: SingleChildScrollView(
-                  child: Column(children: [
+                  child: Column(
+                    children: [
                     Padding(
                       padding: EdgeInsets.only(bottom: 8),
                       child: TextField(
@@ -1384,7 +1390,6 @@ class _CarrinhoState extends State<Carrinho> {
                       child: TextField(
                         keyboardType: TextInputType.number,
                         inputFormatters: [_mascaraCartao],
-                        style: TextStyle(),
                         decoration: InputDecoration(
                           labelText: "Cartão de crédito",
                           contentPadding: EdgeInsets.fromLTRB(5, 5, 5, 5),

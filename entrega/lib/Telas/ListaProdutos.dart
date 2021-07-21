@@ -22,7 +22,7 @@ class _ListaProdutosState extends State<ListaProdutos> {
     var stream = FirebaseFirestore.instance.collection("produtos");
 
     stream
-        .orderBy("nome", descending: false)
+        //.orderBy("nome", descending: false)
         .where("idEmpresa", isEqualTo: uid)
         .snapshots()
         .listen((event) {
