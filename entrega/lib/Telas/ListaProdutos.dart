@@ -22,7 +22,7 @@ class _ListaProdutosState extends State<ListaProdutos> {
     var stream = FirebaseFirestore.instance.collection("produtos");
 
     stream
-        //.orderBy("nome", descending: false)
+        .orderBy("nome", descending: false)
         .where("idEmpresa", isEqualTo: uid)
         .snapshots()
         .listen((event) {
@@ -232,7 +232,8 @@ class _ListaProdutosState extends State<ListaProdutos> {
     }
   }
 
-  _alertGrupo(String idProduto) {
+  _alertGrupo(String idProduto) async {
+    await _recuperaGruposProdutos();
     showDialog(
         context: context,
         builder: (contex) {
@@ -263,6 +264,10 @@ class _ListaProdutosState extends State<ListaProdutos> {
                 },
               ),
             ),
+            actions: [
+              TextButton(onPressed: ()=> Navigator.pop(context),
+               child: Text("Cancelar"))
+            ],
           );
         });
   }
@@ -270,7 +275,7 @@ class _ListaProdutosState extends State<ListaProdutos> {
   @override
   void initState() {
     super.initState();
-    _recuperaGruposProdutos();
+    //_recuperaGruposProdutos();
     _recuperaListaProdutos();
   }
 
@@ -382,7 +387,6 @@ class _ListaProdutosState extends State<ListaProdutos> {
                                         ),
                                         ElevatedButton(
                                             onPressed: () {
-                                             
                                               _alertGrupo(dados.reference.id);
                                             },
                                             child: Text("Alterar grupo")),

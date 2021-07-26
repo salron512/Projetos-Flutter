@@ -7,8 +7,6 @@ import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 final ThemeData temaPatrao = ThemeData(
   primaryColor: Color(0xffFF0000),
-
-  // ignore: deprecated_member_use
   accentColor: Color(0xff8B0000),
   backgroundColor: Colors.grey,
 );

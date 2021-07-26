@@ -33,7 +33,7 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
         FirebaseFirestore.instance.collection("produtos");
 
     QuerySnapshot snapshot = await reference
-        //.orderBy("nome", descending: false)
+        .orderBy("nome", descending: false)
         .where("idEmpresa", isEqualTo: idEmpresa)
         .where("grupo", isEqualTo: grupo)
         .get();
