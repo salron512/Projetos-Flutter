@@ -144,6 +144,7 @@ class _CarrinhoState extends State<Carrinho> {
         });
       }
     });
+    print("stream " + _streamController.hasListener.toString() );
   }
 
   _editaProduto(

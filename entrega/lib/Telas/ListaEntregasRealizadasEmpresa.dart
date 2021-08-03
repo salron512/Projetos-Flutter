@@ -224,7 +224,7 @@ class _ListaEntregasRealizadasEmpresaState
                       QuerySnapshot query = snapshot.data;
                       if (query.docs.isEmpty) {
                         return Center(
-                          child: Text("Sem entregas Realizadas"),
+                          child: Text("Sem entregas realizadas"),
                         );
                       } else {
                         return ListView.separated(

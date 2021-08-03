@@ -20,9 +20,10 @@ class _HomeState extends State<Home> {
   List<String> itensMenu = [
     "Cadastrar empresa",
     "Cadastrar entregador",
+    "Indicações",
     "Lista entregador",
     "Lista empresas",
-    "Financeiro"
+    "Financeiro",
   ];
 
   _deslogar() async {
@@ -46,6 +47,9 @@ class _HomeState extends State<Home> {
         break;
       case "Lista empresas":
         Navigator.pushNamed(context, "/listaempresacadastro");
+        break;
+         case "Indicações":
+        Navigator.pushNamed(context, "/indicacoes");
         break;
     }
   }

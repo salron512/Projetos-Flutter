@@ -73,7 +73,31 @@ class _ListaEmpressasState extends State<ListaEmpressas> {
               case ConnectionState.done:
                 List listaSnap = snapshot.data;
                 if (listaSnap.isEmpty) {
-                  return Center(child: Text("Sem opções para essa categoria"));
+                  return Center(
+                      child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Sem opções para essa categoria"),
+                      Padding(
+                        padding: EdgeInsets.only(top: 15),
+                        child: ElevatedButton(
+                          child: Text(
+                            "Indique uma empresa",
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            primary: Theme.of(context).primaryColor,
+                            padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15)),
+                          ),
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/indicacaoEmpresa');
+                          },
+                        ),
+                      )
+                    ],
+                  ));
                 } else {
                   return ListView.builder(
                     itemCount: listaSnap.length,

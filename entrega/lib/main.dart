@@ -7,13 +7,17 @@ import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 final ThemeData temaPatrao = ThemeData(
   primaryColor: Color(0xffFF0000),
-  accentColor: Color(0xff8B0000),
+  
   backgroundColor: Colors.grey,
+  colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Color(0xff8B0000),
+  primary: Color(0xffFF0000),
+  ),
 );
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
+  
 
   OneSignal.shared.init("b376574d-1c7d-4e81-ac36-47c68468ae6e", iOSSettings: {
     OSiOSSettings.autoPrompt: false,

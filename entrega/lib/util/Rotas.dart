@@ -12,6 +12,7 @@ import 'package:entrega/Telas/Grid.dart';
 import 'package:entrega/Telas/GrupoDeProduto.dart';
 import 'package:entrega/Telas/Home.dart';
 import 'package:entrega/Telas/Imagem.dart';
+import 'package:entrega/Telas/IndicacaoEmpresa.dart';
 import 'package:entrega/Telas/ListaEmpresaCadastro.dart';
 import 'package:entrega/Telas/ListaEmpresas.dart';
 import 'package:entrega/Telas/ListaEntregadores.dart';
@@ -19,6 +20,7 @@ import 'package:entrega/Telas/ListaEntregasPendentes.dart';
 import 'package:entrega/Telas/ListaEntregasRealizadas.dart';
 import 'package:entrega/Telas/ListaEntregasRealizadasEmpresa.dart';
 import 'package:entrega/Telas/ListaGruposProdutosUsuario.dart';
+import 'package:entrega/Telas/ListaIndicacoes.dart';
 import 'package:entrega/Telas/ListaPedidosEmpresa.dart';
 import 'package:entrega/Telas/ListaPedidosUsuario.dart';
 import 'package:entrega/Telas/ListaProdutos.dart';
@@ -104,6 +106,10 @@ class Rotas {
         return MaterialPageRoute(builder: (_) => Grid(args));
       case "/imagem":
         return MaterialPageRoute(builder: (_) => Imagem(args));
+         case "/indicacaoEmpresa":
+        return MaterialPageRoute(builder: (_) => IndicacaoEmpresa());
+          case "/indicacoes":
+        return MaterialPageRoute(builder: (_) => ListaIndicacoes());
 
       default:
         _erroRota();
