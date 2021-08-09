@@ -22,6 +22,14 @@ class _ListaIndicacoesState extends State<ListaIndicacoes> {
     });
   }
 
+  _deletaIndicacao(QueryDocumentSnapshot queryDocumentSnapshot) async {
+    String idDoc = queryDocumentSnapshot.reference.id;
+    await FirebaseFirestore.instance
+        .collection("indicacoes")
+        .doc(idDoc)
+        .delete();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -37,49 +45,57 @@ class _ListaIndicacoesState extends State<ListaIndicacoes> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Lista indicações"),
-        ),
-        body: Container(
-          child: StreamBuilder(
-            stream: _streamController.stream,
-            // ignore: missing_return
-            builder: (context, snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.none:
-                  break;
-                case ConnectionState.waiting:
-                  return Center(
-                    child: CircularProgressIndicator(
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  );
-                  break;
-                case ConnectionState.active:
-                  break;
-                case ConnectionState.done:
-                  QuerySnapshot querySnapshot = snapshot.data;
-                  if (querySnapshot.docs.length == 0) {
-                    return Center(
-                      child: Text('Sem indicações no momento!'),
-                    );
-                  } else {
-                    return ListView.builder(
-                      itemCount: querySnapshot.docs.length,
-                      itemBuilder: (context, indice) {
-                        List<QueryDocumentSnapshot> list =
-                            querySnapshot.docs.toList();
-                        QueryDocumentSnapshot indicacao = list[indice];
-                        return ListTile(
-                          title: Text("Empresa: " + indicacao["nomeFantasia"]),
-                        );
-                      },
-                    );
-                  }
-                  break;
+      appBar: AppBar(
+        title: Text("Lista indicações"),
+      ),
+      body: Container(
+        child: StreamBuilder(
+          stream: _streamController.stream,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              QuerySnapshot querySnapshot = snapshot.data;
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else {
+                return ListView.builder(
+                  itemCount: querySnapshot.docs.length,
+                  itemBuilder: (context, indice) {
+                    List<QueryDocumentSnapshot> list =
+                        querySnapshot.docs.toList();
+                    QueryDocumentSnapshot indicacao = list[indice];
+                    return ListTile(
+                        title: Text("Empresa: " + indicacao["nomeFantasia"]),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Telefone: " + indicacao["telefone"])
+                          ],
+                        ),
+                        trailing: IconButton(
+                          onPressed: () {
+                            _deletaIndicacao(indicacao);
+                          },
+                          icon: Icon(
+                            Icons.delete,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ));
+                  },
+                );
               }
-            },
-          ),
-        ));
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Text('Sem indicações no momento!'),
+              );
+            }
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          },
+        ),
+      ),
+    );
   }
 }
