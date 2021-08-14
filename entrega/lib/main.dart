@@ -7,9 +7,9 @@ import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 final ThemeData temaPatrao = ThemeData(
   primaryColor: Color(0xffFF0000),
-  
-  backgroundColor: Colors.grey,
-  colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Color(0xff8B0000),
+  backgroundColor: Colors.blue,
+  colorScheme: ColorScheme.fromSwatch().copyWith( 
+  secondary: Color(0xff8B0000),
   primary: Color(0xffFF0000),
   ),
 );

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ListaIndicacoes extends StatefulWidget {
   const ListaIndicacoes({Key key}) : super(key: key);
@@ -17,8 +18,10 @@ class _ListaIndicacoesState extends State<ListaIndicacoes> {
         FirebaseFirestore.instance.collection("indicacoes").snapshots();
 
     reference.listen((event) {
-      _streamController.add(event);
-      print("quantidade de docs " + event.docs.length.toString());
+      if (mounted) {
+        _streamController.add(event);
+      }
+      // print("quantidade de docs " + event.docs.length.toString());
     });
   }
 
@@ -28,6 +31,16 @@ class _ListaIndicacoesState extends State<ListaIndicacoes> {
         .collection("indicacoes")
         .doc(idDoc)
         .delete();
+  }
+
+  _abrirTelefone(String telefone) async {
+    var telefoneUrl = "tel:$telefone";
+
+    if (await canLaunch(telefoneUrl)) {
+      await launch(telefoneUrl);
+    } else {
+      throw 'Could not launch $telefoneUrl';
+    }
   }
 
   @override
@@ -66,22 +79,24 @@ class _ListaIndicacoesState extends State<ListaIndicacoes> {
                         querySnapshot.docs.toList();
                     QueryDocumentSnapshot indicacao = list[indice];
                     return ListTile(
-                        title: Text("Empresa: " + indicacao["nomeFantasia"]),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Telefone: " + indicacao["telefone"])
-                          ],
+                      title: Text("Empresa: " + indicacao["nomeFantasia"]),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [Text("Telefone: " + indicacao["telefone"])],
+                      ),
+                      trailing: IconButton(
+                        onPressed: () {
+                          _deletaIndicacao(indicacao);
+                        },
+                        icon: Icon(
+                          Icons.delete,
+                          color: Theme.of(context).primaryColor,
                         ),
-                        trailing: IconButton(
-                          onPressed: () {
-                            _deletaIndicacao(indicacao);
-                          },
-                          icon: Icon(
-                            Icons.delete,
-                            color: Theme.of(context).primaryColor,
-                          ),
-                        ));
+                      ),
+                      onLongPress: () {
+                        _abrirTelefone(indicacao["telefone"]);
+                      },
+                    );
                   },
                 );
               }

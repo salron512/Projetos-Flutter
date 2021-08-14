@@ -300,6 +300,9 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
                                       Padding(
                                         padding: EdgeInsets.all(5),
                                         child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                              primary: Theme.of(context)
+                                                  .backgroundColor),
                                           child: Text('Galeria'),
                                           onPressed: () {
                                             Navigator.pushNamed(

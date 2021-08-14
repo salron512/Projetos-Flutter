@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:entrega/util/RecupepraFirebase.dart';
 import 'package:flutter/material.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class GrupoDeProduto extends StatefulWidget {
   @override
@@ -12,6 +13,57 @@ class GrupoDeProduto extends StatefulWidget {
 class _GrupoDeProdutoState extends State<GrupoDeProduto> {
   StreamController _streamController = StreamController.broadcast();
   TextEditingController _controllerGrupo = TextEditingController();
+  TextEditingController _controllerNomeAdicional = TextEditingController();
+  TextEditingController _controllerValorAdicional = TextEditingController();
+
+  var _mascaraPreco =
+      MaskTextInputFormatter(mask: '########', filter: {"#": RegExp(r'[0-9]')});
+
+  _alertCadastraAdicionais(QueryDocumentSnapshot queryDocumentSnapshot) {
+    showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            title: Text("Cadastro de adicionais"),
+            content: Container(
+              width: 250,
+              height: 250,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Text('Insira as informações do adicional'),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 8),
+                    child: TextField(
+                      textCapitalization: TextCapitalization.sentences,
+                      keyboardType: TextInputType.text,
+                      decoration: InputDecoration(
+                          label: Text("Digite o nome do adicional")),
+                      controller: _controllerNomeAdicional,
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 8),
+                    child: TextField(
+                      textCapitalization: TextCapitalization.sentences,
+                      
+                      inputFormatters: [_mascaraPreco],
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        prefix: Text('R\$ '),
+                        
+                          label: Text("Digite o preço do adicional")),
+                      controller: _controllerValorAdicional,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+  }
 
   _recuperaListaGrupoProdutos() {
     String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
@@ -27,14 +79,12 @@ class _GrupoDeProdutoState extends State<GrupoDeProduto> {
 
   @override
   void initState() {
-  
     super.initState();
     _recuperaListaGrupoProdutos();
   }
 
   @override
   void dispose() {
-
     super.dispose();
     _streamController.close();
   }
@@ -117,7 +167,6 @@ class _GrupoDeProdutoState extends State<GrupoDeProduto> {
               TextButton(
                   onPressed: () {
                     if (controllerGrupoEditar.text.isNotEmpty) {
-                     
                       String idDoc = grupo.reference.id;
                       FirebaseFirestore.instance
                           .collection("grupoProduto")
@@ -239,9 +288,19 @@ class _GrupoDeProdutoState extends State<GrupoDeProduto> {
                                 onPressed: () {
                                   _excluirGrupo(grupoProduto.reference.id);
                                 }),
+                                 IconButton(
+                                icon: Icon(
+                                  Icons.delete,
+                                  color: Colors.red,
+                                ),
+                                onPressed: () {
+                                  
+                                }),
                           ],
                         ),
                         onTap: () => _alertEditar(grupoProduto),
+                        onLongPress: () =>
+                            _alertCadastraAdicionais(grupoProduto),
                       );
                     },
                   );

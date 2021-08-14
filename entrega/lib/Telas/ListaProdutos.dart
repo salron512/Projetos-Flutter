@@ -445,11 +445,15 @@ class _ListaProdutosState extends State<ListaProdutos> {
               Padding(
                 padding: EdgeInsets.all(8),
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    primary: Theme.of(context).backgroundColor
+                  ),
                     onPressed: () {
                       Navigator.pushNamed(context, '/grupo');
                     },
                     child: Text("Cadastrar Grupo de produtos")),
-              )
+              ),
+              
             ],
           )),
     );

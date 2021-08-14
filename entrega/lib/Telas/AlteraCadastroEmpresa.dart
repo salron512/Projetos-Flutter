@@ -332,6 +332,7 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
                   children: [
                     Text("Fechado"),
                     Switch(
+                      activeColor: Theme.of(context).primaryColor,
                         value: _aberto,
                         onChanged: (bool valor) {
                           setState(() {
@@ -629,7 +630,8 @@ class _AlteraCadastroEmpresaState extends State<AlteraCadastroEmpresa> {
                           );
                         }).toList();
                       },
-                    )),
+                    )
+                    ),
                 Text(
                   "Categoria selecionada: " + _escolhaCategoria,
                   style: TextStyle(

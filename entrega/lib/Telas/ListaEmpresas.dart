@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:entrega/util/Empresa.dart';
 import 'package:entrega/util/Localizacao.dart';
+import 'package:entrega/util/RecupepraFirebase.dart';
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
@@ -14,7 +15,17 @@ class ListaEmpressas extends StatefulWidget {
 
 class _ListaEmpressasState extends State<ListaEmpressas> {
   Future _recuperaListaEmpresas() async {
-    String cidade = await Localizacao.recuperaLocalizacao();
+    //String cidade = await Localizacao.recuperaLocalizacao();
+    String cidade = '';
+    String idDocumento = RecuperaFirebase.RECUPERAIDUSUARIO();
+    DocumentSnapshot doc = await FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(idDocumento)
+        .get();
+    Map<String, dynamic> mapUsuario = doc.data();
+    cidade = mapUsuario['cidade'];
+    print(cidade);
+
     List listaRecuperada = [];
 
     String categoria = widget.categoria;

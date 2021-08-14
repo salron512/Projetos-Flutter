@@ -139,7 +139,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Home"),
+        title: Text("Eclipse Delivery"),
         actions: [
           IconButton(
               icon: Icon(

@@ -21,6 +21,8 @@ class _AlteraCadastroState extends State<AlteraCadastro> {
   TextEditingController _controllerEndereco = TextEditingController();
   TextEditingController _controllerBairro = TextEditingController();
   TextEditingController _controllerCpf = TextEditingController();
+  List<String> listaCidades = ["Mirassol d'Oeste"];
+  String _cidade = '';
 
   _recuperaDadosUsuaurio() async {
     String uid = RecuperaFirebase.RECUPERAIDUSUARIO();
@@ -34,6 +36,9 @@ class _AlteraCadastroState extends State<AlteraCadastro> {
     _controllerEndereco.text = dadosUsuario["endereco"];
     _controllerBairro.text = dadosUsuario["bairro"];
     _controllerCpf.text = dadosUsuario["cpf"];
+    setState(() {
+      _cidade = dadosUsuario["cidade"];
+    });
   }
 
   _verificaCampos() {
@@ -61,6 +66,7 @@ class _AlteraCadastroState extends State<AlteraCadastro> {
                   "endereco": endereco,
                   "bairro": bairro,
                   'cpf': cpf,
+                  "cidade": _cidade,
                 }).then((value) => Navigator.pushNamedAndRemoveUntil(
                         context, "/home", (route) => false));
               } else {
@@ -93,6 +99,11 @@ class _AlteraCadastroState extends State<AlteraCadastro> {
         _msgErro = "Por favor preencha o campo nome";
       });
     }
+  }
+    _escolhaMenuCidade(String cidadeEscolhida) {
+    setState(() {
+      _cidade = cidadeEscolhida;
+    });
   }
 
   @override
@@ -251,6 +262,32 @@ class _AlteraCadastroState extends State<AlteraCadastro> {
                               borderRadius: BorderRadius.circular(15))),
                       controller: _controllerBairro),
                 ),
+                Padding(
+                    padding: EdgeInsets.only(bottom: 5),
+                    child: PopupMenuButton<String>(
+                      color: Color(0xff37474f),
+                      icon: Text("Escolha sua cidade"),
+                      onSelected: _escolhaMenuCidade,
+                      // ignore: missing_return
+                      itemBuilder: (context) {
+                        return listaCidades.map((String item) {
+                          return PopupMenuItem<String>(
+                            value: item,
+                            child: Text(item,
+                                style: TextStyle(color: Colors.white)),
+                          );
+                        }).toList();
+                      },
+                    )
+                    ),
+                    Text(
+                  "Cidade selecionada: " + _cidade,
+                  style: TextStyle(
+                    fontSize: 15,
+                  ),
+                ),
+                
+                
                 Text(
                   _msgErro,
                   style: TextStyle(
@@ -263,7 +300,6 @@ class _AlteraCadastroState extends State<AlteraCadastro> {
                   child: ElevatedButton(
                     child: Text(
                       "Atualizar",
-                      style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
                     style: ElevatedButton.styleFrom(
                       primary: Theme.of(context).primaryColor,
