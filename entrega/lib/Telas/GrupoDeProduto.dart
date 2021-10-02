@@ -40,7 +40,9 @@ class _GrupoDeProdutoState extends State<GrupoDeProduto> {
                       textCapitalization: TextCapitalization.sentences,
                       keyboardType: TextInputType.text,
                       decoration: InputDecoration(
-                          label: Text("Digite o nome do adicional")),
+                        labelText: "Digite o nome do adicional" ,
+                          //label: Text("Digite o nome do adicional")
+                          ),
                       controller: _controllerNomeAdicional,
                     ),
                   ),
@@ -53,8 +55,9 @@ class _GrupoDeProdutoState extends State<GrupoDeProduto> {
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         prefix: Text('R\$ '),
-                        
-                          label: Text("Digite o preço do adicional")),
+                        labelText: "Digite o preço do adicional",
+                          //label: Text("Digite o preço do adicional")
+                          ),
                       controller: _controllerValorAdicional,
                     ),
                   )

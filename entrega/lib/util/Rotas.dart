@@ -9,6 +9,7 @@ import 'package:entrega/Telas/Carrinho.dart';
 import 'package:entrega/Telas/DetalhesEntrega.dart';
 import 'package:entrega/Telas/Financeiro.dart';
 import 'package:entrega/Telas/Grid.dart';
+import 'package:entrega/Telas/GridUsuario.dart';
 import 'package:entrega/Telas/GrupoDeProduto.dart';
 import 'package:entrega/Telas/Home.dart';
 import 'package:entrega/Telas/Imagem.dart';
@@ -45,6 +46,8 @@ class Rotas {
 
       case "/cadastro":
         return MaterialPageRoute(builder: (_) => Cadastro());
+         case "/gridusuario":
+        return MaterialPageRoute(builder: (_) => GridUsuario(args));
 
       case "/listagrupoprodutosusuario":
         return MaterialPageRoute(

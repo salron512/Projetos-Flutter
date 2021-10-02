@@ -1,23 +1,23 @@
-// ignore_for_file: must_be_immutable
-
 import 'dart:async';
 import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-class Grid extends StatefulWidget {
+class GridUsuario extends StatefulWidget {
   String id;
-  Grid(this.id);
+  GridUsuario(this.id);
 
   @override
-  _GridState createState() => _GridState();
+  _GridUsuarioState createState() => _GridUsuarioState();
 }
 
-class _GridState extends State<Grid> {
-  // ignore: close_sinks
+class _GridUsuarioState extends State<GridUsuario> {
+
+   // ignore: close_sinks
   StreamController _streamController = StreamController.broadcast();
   // ignore: unused_field
   bool _subindoImagem = false;
@@ -202,7 +202,6 @@ class _GridState extends State<Grid> {
     super.dispose();
     _streamController.close();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -282,33 +281,7 @@ class _GridState extends State<Grid> {
             },
           ),
         ),
-        bottomNavigationBar: BottomAppBar(
-          color: Theme.of(context).primaryColor,
-          child: Visibility(
-              visible: _permissao,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(right: 15),
-                    child: IconButton(
-                        iconSize: 40,
-                        color: Colors.white,
-                        onPressed: () {
-                          _recuperaImagem(true);
-                        },
-                        icon: Icon(Icons.camera_alt_outlined)),
-                  ),
-                  IconButton(
-                      iconSize: 40,
-                      color: Colors.white,
-                      onPressed: () {
-                        _recuperaImagem(false);
-                      },
-                      icon: Icon(Icons.photo_rounded)),
-                ],
-              )),
-        )
+  
         );
   }
 }

@@ -306,7 +306,7 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
                                           child: Text('Galeria'),
                                           onPressed: () {
                                             Navigator.pushNamed(
-                                                context, '/grid',
+                                                context, '/gridusuario',
                                                 arguments: produtos.id);
                                           },
                                         ),
