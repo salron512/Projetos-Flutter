@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -262,10 +263,16 @@ class _GridState extends State<Grid> {
                                         Theme.of(context).primaryColor,
                                   ),
                                 )
-                              : Image.network(
+                              : CachedNetworkImage(
+                                  imageUrl: dados["urlGaleria"],
+                                  fit: BoxFit.cover,
+                                ),
+                          /*
+                              Image.network(
                                   dados["urlGaleria"],
                                   fit: BoxFit.cover,
                                 ),
+                                */
                           onTap: () {
                             Navigator.pushNamed(context, "/imagem",
                                 arguments: dados);
@@ -308,7 +315,6 @@ class _GridState extends State<Grid> {
                       icon: Icon(Icons.photo_rounded)),
                 ],
               )),
-        )
-        );
+        ));
   }
 }

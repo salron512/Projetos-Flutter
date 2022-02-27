@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -16,8 +17,7 @@ class GridUsuario extends StatefulWidget {
 }
 
 class _GridUsuarioState extends State<GridUsuario> {
-
-   // ignore: close_sinks
+  // ignore: close_sinks
   StreamController _streamController = StreamController.broadcast();
   // ignore: unused_field
   bool _subindoImagem = false;
@@ -202,86 +202,91 @@ class _GridUsuarioState extends State<GridUsuario> {
     super.dispose();
     _streamController.close();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Galeria"),
-        ),
-        body: Container(
-          // decoration: BoxDecoration(color: Theme.of(context).accentColor),
-          padding: EdgeInsets.only(left: 15, right: 15, top: 5, bottom: 5),
-          child: StreamBuilder(
-            stream: _streamController.stream,
-            // ignore: missing_return
-            builder: (context, snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.none:
+      appBar: AppBar(
+        title: Text("Galeria"),
+      ),
+      body: Container(
+        // decoration: BoxDecoration(color: Theme.of(context).accentColor),
+        padding: EdgeInsets.only(left: 15, right: 15, top: 5, bottom: 5),
+        child: StreamBuilder(
+          stream: _streamController.stream,
+          // ignore: missing_return
+          builder: (context, snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.none:
+                return Center(
+                  child: Text("Sem conexão"),
+                );
+                break;
+              case ConnectionState.waiting:
+                return Center(
+                  child: CircularProgressIndicator(
+                    color: Theme.of(context).primaryColor,
+                  ),
+                );
+                break;
+              case ConnectionState.active:
+              case ConnectionState.done:
+                QuerySnapshot querySnapshot = snapshot.data;
+                if (querySnapshot.docs.length == 0) {
                   return Center(
-                    child: Text("Sem conexão"),
-                  );
-                  break;
-                case ConnectionState.waiting:
-                  return Center(
-                    child: CircularProgressIndicator(
-                      color: Theme.of(context).primaryColor,
+                    child: Text(
+                      "Sem imagens na galeria",
+                      style: TextStyle(fontSize: 15, color: Colors.black),
                     ),
                   );
-                  break;
-                case ConnectionState.active:
-                case ConnectionState.done:
-                  QuerySnapshot querySnapshot = snapshot.data;
-                  if (querySnapshot.docs.length == 0) {
-                    return Center(
-                      child: Text(
-                        "Sem imagens na galeria",
-                        style: TextStyle(fontSize: 15, color: Colors.black),
-                      ),
-                    );
-                  } else {
-                    return GridView.count(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 3,
-                      crossAxisSpacing: 3,
-                      children: List.generate(
-                          // ignore: missing_return
-                          querySnapshot.docs.length, (indice) {
-                        List<DocumentSnapshot> urls =
-                            querySnapshot.docs.toList();
-                        DocumentSnapshot dados = urls[indice];
-                        return GestureDetector(
-                          child: dados["urlGaleria"] == null
-                              ? Container(
-                                  decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .secondary),
-                                  child: CircularProgressIndicator(
-                                    backgroundColor:
-                                        Theme.of(context).primaryColor,
-                                  ),
-                                )
-                              : Image.network(
+                } else {
+                  return GridView.count(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 3,
+                    crossAxisSpacing: 3,
+                    children: List.generate(
+                        // ignore: missing_return
+                        querySnapshot.docs.length, (indice) {
+                      List<DocumentSnapshot> urls = querySnapshot.docs.toList();
+                      DocumentSnapshot dados = urls[indice];
+                      return GestureDetector(
+                        child: dados["urlGaleria"] == null
+                            ? Container(
+                                decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary),
+                                child: CircularProgressIndicator(
+                                  backgroundColor:
+                                      Theme.of(context).primaryColor,
+                                ),
+                              )
+                            : CachedNetworkImage(
+                                imageUrl: dados["urlGaleria"],
+                                fit: BoxFit.cover,
+                              ),
+                        /*
+                              Image.network(
                                   dados["urlGaleria"],
                                   fit: BoxFit.cover,
                                 ),
-                          onTap: () {
-                            Navigator.pushNamed(context, "/imagem",
-                                arguments: dados);
-                          },
-                          onLongPress: () {
-                            _apagaImagem(dados.reference.id, dados["path"]);
-                          },
-                        );
-                      }),
-                    );
-                  }
-                  break;
-              }
-            },
-          ),
+                                */
+                        onTap: () {
+                          Navigator.pushNamed(context, "/imagem",
+                              arguments: dados);
+                        },
+                        onLongPress: () {
+                          _apagaImagem(dados.reference.id, dados["path"]);
+                        },
+                      );
+                    }),
+                  );
+                }
+                break;
+            }
+          },
         ),
-  
-        );
+      ),
+    );
   }
 }

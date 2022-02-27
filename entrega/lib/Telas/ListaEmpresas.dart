@@ -1,6 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:entrega/util/Empresa.dart';
-import 'package:entrega/util/Localizacao.dart';
 import 'package:entrega/util/RecupepraFirebase.dart';
 import 'package:flutter/material.dart';
 
@@ -135,11 +135,18 @@ class _ListaEmpressasState extends State<ListaEmpressas> {
                               : Container(
                                   height: 50,
                                   width: 50,
-                                  child: Image.network(
+                                  child: CachedNetworkImage(imageUrl: dadosEmpresa.urlImagem,
+                                  fit:  BoxFit.cover,
+                                  ), 
+                                  /*
+                                  Image.network(
                                     dadosEmpresa.urlImagem,
                                     fit: BoxFit.cover,
                                   ),
+
                                 ),
+                                */
+                              ),
                           title: Text(
                             dadosEmpresa.nomeFantasia,
                             style: TextStyle(color: Colors.white),

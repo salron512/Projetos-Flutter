@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -26,12 +27,20 @@ class _ImagemState extends State<Imagem> {
                 child: PhysicalModel(
                   color: Colors.white,
                   elevation: 8,
-                  child: Image.network(
+                  child:
+                  CachedNetworkImage(
+                    imageUrl: widget.dados["urlGaleria"],
+                    width: 500,
+                    height: 500, 
+                  ) ,
+                  /*
+                  Image.network(
                     widget.dados["urlGaleria"],
                     width: 500,
                     height: 500,
                     //fit: BoxFit.contain,
                   ),
+                  */
                 )),
           )),
     );

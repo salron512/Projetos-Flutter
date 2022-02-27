@@ -4,6 +4,7 @@ import 'package:entrega/util/RecupepraFirebase.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ListaProdutos extends StatefulWidget {
   @override
@@ -265,8 +266,9 @@ class _ListaProdutosState extends State<ListaProdutos> {
               ),
             ),
             actions: [
-              TextButton(onPressed: ()=> Navigator.pop(context),
-               child: Text("Cancelar"))
+              TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text("Cancelar"))
             ],
           );
         });
@@ -337,20 +339,29 @@ class _ListaProdutosState extends State<ListaProdutos> {
                               children: [
                                 dados["urlImagem"] != null
                                     ? Container(
-                                        child: Image.network(
+                                        child: CachedNetworkImage(
+                                        imageUrl: dados["urlImagem"],
+                                        fit: BoxFit.cover,
+                                        height: 120,
+                                        width: 120,
+                                      )
+                                        /*
+                                        Image.network(
                                           dados["urlImagem"],
                                           fit: BoxFit.cover,
                                           height: 120,
                                           width: 120,
                                         ),
-                                      )
+                                        */
+                                        )
                                     : Container(
                                         child: Image.asset(
-                                        "images/error.png",
-                                        fit: BoxFit.cover,
-                                        height: 120,
-                                        width: 120,
-                                      )),
+                                          "images/error.png",
+                                          fit: BoxFit.cover,
+                                          height: 120,
+                                          width: 120,
+                                        ),
+                                      ),
                                 Padding(
                                   padding: EdgeInsets.only(left: 5),
                                   child: Column(
@@ -445,15 +456,13 @@ class _ListaProdutosState extends State<ListaProdutos> {
               Padding(
                 padding: EdgeInsets.all(8),
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).backgroundColor
-                  ),
+                    style: ElevatedButton.styleFrom(
+                        primary: Theme.of(context).backgroundColor),
                     onPressed: () {
                       Navigator.pushNamed(context, '/grupo');
                     },
                     child: Text("Cadastrar Grupo de produtos")),
               ),
-              
             ],
           )),
     );

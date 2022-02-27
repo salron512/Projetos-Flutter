@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:entrega/util/Produtos.dart';
@@ -264,12 +265,20 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
                               produtos.urlImagem != null
                                   ? Container(
                                       padding: EdgeInsets.only(right: 8),
-                                      child: Image.network(
+                                      child: CachedNetworkImage(
+                                        imageUrl: produtos.urlImagem,
+                                        fit: BoxFit.cover,
+                                        height: 120,
+                                        width: 120,
+                                      ),
+                                      /*
+                                      Image.network(
                                         produtos.urlImagem,
                                         fit: BoxFit.cover,
                                         height: 120,
                                         width: 120,
                                       ),
+                                      */
                                     )
                                   : Container(
                                       padding: EdgeInsets.only(right: 8),
