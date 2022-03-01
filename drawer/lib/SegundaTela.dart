@@ -10,7 +10,7 @@ class _SegundaTelaState extends State<SegundaTela> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Text("texto"),
+        child: Text("Inicio"),
       ),
     );
   }

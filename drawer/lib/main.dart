@@ -1,10 +1,12 @@
+import 'package:drawer/Cadastro.dart';
 import 'package:drawer/SegundaTela.dart';
 import 'package:drawer/TerceiraTela.dart';
 import 'package:flutter/material.dart';
+
 void main() => runApp(MaterialApp(
-  debugShowCheckedModeBanner: false,
-  home: Home(),
-));
+      debugShowCheckedModeBanner: false,
+      home: Home(),
+    ));
 
 class Home extends StatefulWidget {
   @override
@@ -13,10 +15,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int index = 0;
-  List<Widget> _listatelas = [
-    SegundaTela(),
-    TerceiraTela()
-  ];
+  List<Widget> _listatelas = [SegundaTela(), TerceiraTela(), Cadastro()];
 
   String imagem = "images/padrao.png";
   @override
@@ -30,13 +29,17 @@ class _HomeState extends State<Home> {
           children: <Widget>[
             DrawerHeader(
               child: Container(
-               child: Column(
-                children:<Widget> [
-                  Image.asset(imagem, width: 100, height: 100,),
-                  Text("Titulo"),
-          ],
-        ),
-        ),
+                child: Column(
+                  children: <Widget>[
+                    Image.asset(
+                      imagem,
+                      width: 100,
+                      height: 100,
+                    ),
+                    Text("Titulo"),
+                  ],
+                ),
+              ),
               decoration: BoxDecoration(
                 color: Colors.blue,
               ),
@@ -45,20 +48,30 @@ class _HomeState extends State<Home> {
               leading: Icon(Icons.ac_unit),
               title: Text("Primeira tela"),
               onTap: () {
-              //Navigator.push(context, MaterialPageRoute(builder: (context) => SegundaTela()));
-              setState(() {
-                index = 0;
-                Navigator.pop(context);
-              });
+                //Navigator.push(context, MaterialPageRoute(builder: (context) => SegundaTela()));
+                setState(() {
+                  index = 0;
+                  Navigator.pop(context);
+                });
               },
             ),
             ListTile(
               leading: Icon(Icons.account_balance_wallet),
               title: Text('Segunda Tela'),
               onTap: () {
-               setState(() {
-                 index = 1;
-               });
+                setState(() {
+                  index = 1;
+                });
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.access_alarms_sharp),
+              title: Text('Terceira tela'),
+              onTap: () {
+                setState(() {
+                  index = 2;
+                });
                 Navigator.pop(context);
               },
             ),
@@ -67,9 +80,8 @@ class _HomeState extends State<Home> {
       ),
       body: Container(
         padding: EdgeInsets.all(16),
-        child: _listatelas[index] ,
+        child: _listatelas[index],
       ),
     );
   }
 }
-
