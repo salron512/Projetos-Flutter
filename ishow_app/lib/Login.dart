@@ -72,7 +72,7 @@ class _LoginState extends State<Login>
                   height: 400,
                   decoration: BoxDecoration(
                       image: DecorationImage(
-                          image: AssetImage("imagens/fundo.png"),
+                          image: AssetImage("images/fundo.png"),
                           fit: BoxFit.fill
                       )
                   ),
@@ -87,14 +87,14 @@ class _LoginState extends State<Login>
                           left: 10,
                           child: FadeTransition(
                             opacity: _animacaoFade,
-                            child: Image.asset("imagens/detalhe1.png"),
+                            child: Image.asset("images/detalhe1.png"),
                           ),
                         ),
                         Positioned(
                           left: 50,
                           child: FadeTransition(
                             opacity: _animacaoFade,
-                            child: Image.asset("imagens/detalhe2.png"),
+                            child: Image.asset("images/detalhe2.png"),
                           ),
                         )
                       ],
