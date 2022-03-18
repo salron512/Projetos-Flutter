@@ -9,7 +9,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  var connection = PostgreSQLConnection("localhost", 5432, "ecodados",
+  var connection = PostgreSQLConnection("192.168.1.50", 5432, "ecodados",
       username: "postgres", password: "postgres");
   // ignore: non_constant_identifier_names
 
@@ -19,17 +19,21 @@ class _HomeState extends State<Home> {
 
   _Inserir() {
     connection.query(
-        "insert into tgerfavoritos  (idpesquisa, usuario, quantidade) values (1, 'André', 1) ");
+        "insert into tgerfavoritos  (idpesquisa, usuario, quantidade)" +
+            " values (1, 'André', 1) ");
   }
 
   _Presquisa() async {
     //select * from tgerpesquisagrupoparametro
-    List<List<dynamic>> results = await connection.query(
-      "select * from tgerpesquisagrupoparametro",
-    );
+    print('executando');
+    List
+         results = await connection.mappedResultsQuery(
+        "select dataalteracao, nomegrupo, versaominima from tgerpesquisagrupoparametro");
 
-    for (final row in results) {
-      print("resultado " + row.toString());
+    for (var row in results) {
+      var data = row['tgerpesquisagrupoparametro']['dataalteracao'];
+      
+      print(data);
     }
   }
 
@@ -43,27 +47,27 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        alignment: Alignment.center,
+          alignment: Alignment.center,
           child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ElevatedButton(
-            child: Text("Iniciar"),
-            onPressed: () {
-              _Presquisa();
-            },
-          ),
-          Padding(
-            padding: EdgeInsets.all(8),
-            child: ElevatedButton(
-              child: Text("inserir"),
-              onPressed: () {
-                _Inserir();
-              },
-            ),
-          )
-        ],
-      )),
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                child: Text("Iniciar"),
+                onPressed: () {
+                  _Presquisa();
+                },
+              ),
+              Padding(
+                padding: EdgeInsets.all(8),
+                child: ElevatedButton(
+                  child: Text("inserir"),
+                  onPressed: () {
+                    _Inserir();
+                  },
+                ),
+              )
+            ],
+          )),
     );
   }
 }

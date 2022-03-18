@@ -257,7 +257,8 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
                       // ignore: missing_return
                       itemBuilder: (context, indice) {
                         Produtos produtos = listaProduto[indice];
-                        return Container(
+                        return SafeArea(
+                            child: Container(
                           padding: EdgeInsets.all(4),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -288,56 +289,60 @@ class _ListaProdutosUsuarioState extends State<ListaProdutosUsuario> {
                                         height: 120,
                                         width: 120,
                                       )),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    produtos.nome,
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Text("R\$ " + produtos.preco),
-                                  Text(produtos.descricao),
-                                  produtos.estoqueAtivo == true
-                                      ? Text("Quantidade disponínel " +
-                                          produtos.estoque.toString())
-                                      : Text(""),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.all(5),
-                                        child: ElevatedButton(
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      produtos.nome,
+                                      maxLines: 2,
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text("R\$ " + produtos.preco),
+                                    Text(produtos.descricao),
+                                    produtos.estoqueAtivo == true
+                                        ? Text("Quantidade disponínel " +
+                                            produtos.estoque.toString())
+                                        : Text(""),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.all(5),
+                                          child: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                                primary: Theme.of(context)
+                                                    .backgroundColor),
+                                            child: Text('Galeria'),
+                                            onPressed: () {
+                                              Navigator.pushNamed(
+                                                  context, '/gridusuario',
+                                                  arguments: produtos.id);
+                                            },
+                                          ),
+                                        ),
+                                        ElevatedButton(
                                           style: ElevatedButton.styleFrom(
                                               primary: Theme.of(context)
-                                                  .backgroundColor),
-                                          child: Text('Galeria'),
+                                                  .primaryColor),
+                                          child: Text('Comprar'),
                                           onPressed: () {
-                                            Navigator.pushNamed(
-                                                context, '/gridusuario',
-                                                arguments: produtos.id);
+                                            if (_tipoUsuario != "empresa") {
+                                              _alerQtd(produtos);
+                                            }
                                           },
                                         ),
-                                      ),
-                                      ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                            primary:
-                                                Theme.of(context).primaryColor),
-                                        child: Text('Comprar'),
-                                        onPressed: () {
-                                          if (_tipoUsuario != "empresa") {
-                                            _alerQtd(produtos);
-                                          }
-                                        },
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              )
                             ],
                           ),
-                        );
+                        ));
 
                         /*
                          ListTile(
