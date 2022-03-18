@@ -81,10 +81,11 @@ class _CadastroState extends State<Cadastro> {
                               }).then((value) async {
                                 String uid =
                                     RecuperaFirebase.RECUPERAIDUSUARIO();
-                                var status = await OneSignal.shared
-                                    .getPermissionSubscriptionState();
-                                String playerId =
-                                    status.subscriptionStatus.userId;
+
+                                final status =
+                                    await OneSignal.shared.getDeviceState();
+
+                                String playerId = status.userId;
                                 FirebaseFirestore.instance
                                     .collection("usuarios")
                                     .doc(uid)

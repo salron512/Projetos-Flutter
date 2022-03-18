@@ -31,7 +31,6 @@ import 'package:entrega/Telas/Mapa.dart';
 import 'package:entrega/Telas/MinhasEntregasEntregador.dart';
 import 'package:entrega/Telas/PerfilProduto.dart';
 import 'package:entrega/Telas/RecuperaSenha.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Rotas {

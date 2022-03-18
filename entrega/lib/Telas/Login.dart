@@ -26,9 +26,11 @@ class _LoginState extends State<Login> {
           setState(() {
             _msg = "Entrando...";
           });
+          
           String uid = await RecuperaFirebase.RECUPERAIDUSUARIO();
-          var status = await OneSignal.shared.getPermissionSubscriptionState();
-          String playerId = status.subscriptionStatus.userId;
+          final status = await OneSignal.shared.getDeviceState();
+          String playerId = status.userId;
+
           FirebaseFirestore.instance.collection("usuarios").doc(uid).update({
             "playerId": playerId,
           });

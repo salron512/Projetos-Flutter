@@ -8,6 +8,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+// ignore: must_be_immutable
 class GridUsuario extends StatefulWidget {
   String id;
   GridUsuario(this.id);
@@ -72,6 +73,7 @@ class _GridUsuarioState extends State<GridUsuario> {
     });
   }
 
+  // ignore: unused_element
   Future _recuperaImagem(bool daCamera) async {
     var picker = ImagePicker();
     PickedFile imagemSelecionada;

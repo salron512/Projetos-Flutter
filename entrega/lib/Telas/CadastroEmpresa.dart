@@ -90,10 +90,10 @@ class _CadastroEmpresaState extends State<CadastroEmpresa> {
                                         .createUserWithEmailAndPassword(
                                             email: email, password: senha)
                                         .then((value) async {
-                                      var status = await OneSignal.shared
-                                          .getPermissionSubscriptionState();
-                                      String playerId =
-                                          status.subscriptionStatus.userId;
+                                      final status = await OneSignal.shared
+                                          .getDeviceState();
+
+                                      String playerId = status.userId;
 
                                       idUsuario = value.user.uid;
                                       await FirebaseFirestore.instance

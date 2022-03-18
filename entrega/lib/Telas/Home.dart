@@ -107,7 +107,7 @@ class _HomeState extends State<Home> {
       // sempre que o content da notificação for aterado é necessario alterar o
       // o switch
       if (result != null) {
-        String dados = result.notification.payload.body;
+        String dados = result.notification.body;
 
         print("ok " + dados);
         switch (dados) {
