@@ -18,7 +18,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         
-        title: Text("Tela de venda"),
+        title: const Text("Tela de venda"),
       ),
       // ignore: avoid_unnecessary_containers
       body: Container(
@@ -26,15 +26,15 @@ class _HomeState extends State<Home> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsets.only(top: 5, left: 5, right: 5),
+              padding: const EdgeInsets.only(top: 5, left: 5, right: 5),
               child: TextField(
                 autofocus: true,
                 keyboardType: TextInputType.emailAddress,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 20,
                 ),
                 decoration: InputDecoration(
-                    contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                    contentPadding: const EdgeInsets.fromLTRB(32, 16, 32, 16),
                     hintText: "Vendedor",
                     filled: true,
                     fillColor: Colors.white,
