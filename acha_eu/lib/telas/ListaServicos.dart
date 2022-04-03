@@ -1,6 +1,7 @@
 import 'package:acha_eu/model/Categorias.dart';
 import 'package:acha_eu/model/Usuario.dart';
 import 'package:acha_eu/util/Localizacao.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -130,10 +131,12 @@ class _ListaSericosState extends State<ListaSericos> {
                           color: Color(0xff37474f),
                           child: ListTile(
                             leading: CircleAvatar(
-                                maxRadius: 40,
+                               
                                 backgroundColor: Colors.grey,
                                 backgroundImage: dados.urlImagem != null
-                                    ? NetworkImage(dados.urlImagem)
+                                    ? CachedNetworkImageProvider(
+                                        dados.urlImagem,
+                                      )
                                     : null),
                             title: Text(
                               dados.nome,

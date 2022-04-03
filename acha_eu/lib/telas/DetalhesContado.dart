@@ -1,4 +1,5 @@
 import 'package:acha_eu/model/Usuario.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:whatsapp_unilink/whatsapp_unilink.dart';
@@ -50,17 +51,15 @@ class _DetalhesContadoState extends State<DetalhesContado> {
     }
   }
 
- 
-
   _abrirWhatsApp() async {
-     String telefone = widget.usuario.whatsapp;
-  final link = WhatsAppUnilink(
-    phoneNumber: '+55$telefone',
-    text: 
-    "Encontrei seu contato pelo app Chama Eu e desejo solicitar um orçamento.",
-  );
-  await launch('$link');
-}
+    String telefone = widget.usuario.whatsapp;
+    final link = WhatsAppUnilink(
+      phoneNumber: '+55$telefone',
+      text:
+          "Encontrei seu contato pelo app Chama Eu e desejo solicitar um orçamento.",
+    );
+    await launch('$link');
+  }
 
   _abrirTelefone() async {
     String telefone = widget.usuario.telefone;
@@ -87,13 +86,12 @@ class _DetalhesContadoState extends State<DetalhesContado> {
         title: Text(widget.usuario.nome),
       ),
       body: Container(
-      //  decoration: BoxDecoration(color: Color(0xffDCDCDC)),
+        //  decoration: BoxDecoration(color: Color(0xffDCDCDC)),
         alignment: Alignment.center,
         child: SingleChildScrollView(
             padding: EdgeInsets.all(16),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+            
               children: [
                 CircleAvatar(
                     backgroundImage: widget.usuario.urlImagem != null
@@ -108,12 +106,12 @@ class _DetalhesContadoState extends State<DetalhesContado> {
                       "Whatasapp",
                       style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
-                  style: ElevatedButton.styleFrom(
+                    style: ElevatedButton.styleFrom(
                       primary: Colors.green,
-                    padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(32)),
-                  ),
+                      padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(32)),
+                    ),
                     onPressed: () {
                       _abrirWhatsApp();
                     },
@@ -126,12 +124,12 @@ class _DetalhesContadoState extends State<DetalhesContado> {
                       "Telefone",
                       style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
-                  style: ElevatedButton.styleFrom(
+                    style: ElevatedButton.styleFrom(
                       primary: Color(0xff37474f),
-                    padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(32)),
-                  ),
+                      padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(32)),
+                    ),
                     onPressed: () {
                       _abrirTelefone();
                     },
@@ -141,7 +139,7 @@ class _DetalhesContadoState extends State<DetalhesContado> {
                     alignment: Alignment.center,
                     height: 250,
                     decoration: BoxDecoration(
-                      //  color: Color(0xffDCDCDC),
+                        //  color: Color(0xffDCDCDC),
                         borderRadius: BorderRadius.circular(32),
                         border: Border.all(color: Colors.black)),
                     child: Column(
@@ -258,7 +256,7 @@ class _DetalhesContadoState extends State<DetalhesContado> {
                       alignment: Alignment.center,
                       height: 250,
                       decoration: BoxDecoration(
-                         // color: Color(0xffDCDCDC),
+                          // color: Color(0xffDCDCDC),
                           borderRadius: BorderRadius.circular(32),
                           border: Border.all(color: Colors.black)),
                       child: Column(
