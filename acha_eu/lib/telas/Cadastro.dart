@@ -177,7 +177,8 @@ class _CadastroState extends State<Cadastro> {
   }
 
   _recuperaListaCidade(String estado) {
-    FirebaseFirestore db = FirebaseFirestore.instance;
+    // ignore: unused_local_variable
+    FirebaseFirestore  db = FirebaseFirestore.instance;
     Query query =
         FirebaseFirestore.instance.collection("cidades");
 

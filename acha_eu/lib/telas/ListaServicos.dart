@@ -2,9 +2,7 @@ import 'package:acha_eu/model/Categorias.dart';
 import 'package:acha_eu/model/Usuario.dart';
 import 'package:acha_eu/util/Localizacao.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 
 // ignore: must_be_immutable
 class ListaSericos extends StatefulWidget {
@@ -17,45 +15,44 @@ class ListaSericos extends StatefulWidget {
 class _ListaSericosState extends State<ListaSericos> {
   List<Usuario> _listaContados = [];
   String _categoria;
-  String _msgErro = "Sem contatos para essa categoria :(";
 
   Future _recuperaContatos() async {
     //recupera a lista de pofissionais pela categoria e cidade
     //
-   
+
     String cidadeUsuario;
     _categoria = widget.categoria.nome;
-   
-      cidadeUsuario = await Localizacao.recuperaLocalizacao();
-      FirebaseFirestore db = FirebaseFirestore.instance;
-      print("cidade teste " + cidadeUsuario);
 
-      var snapshot = await db
-          .collection("usuarios")
-          .where("cidade", isEqualTo: cidadeUsuario)
-          .where("categoria", isEqualTo: widget.categoria.nome)
-          .get();
-      for (var item in snapshot.docs) {
-        Map<String, dynamic> dados = item.data();
-        Usuario usuario = Usuario();
-        usuario.nome = dados["nome"];
-        usuario.descricaoAtividade = dados["descricaoAtividade"];
-        usuario.telefone = dados["telefone"];
-        usuario.whatsapp = dados["whatsapp"];
-        usuario.descricao = dados["descricao"];
-        usuario.email = dados["email"];
-        usuario.cidade = dados["cidade"];
-        usuario.estado = dados["estado"];
-        usuario.urlImagem = dados["urlImagem"];
-        usuario.descricaoAtividade = dados["descricaoAtividade"];
-        usuario.dinheiro = dados["dinheiro"];
-        usuario.cheque = dados["cheque"];
-        usuario.cartaoCredito = dados["cartaoCredito"];
-        usuario.cartaoDebito = dados["cartaoDebito"];
-        usuario.pix = dados["pix"];
-        _listaContados.add(usuario);
-      }
-      return _listaContados;
+    cidadeUsuario = await Localizacao.recuperaLocalizacao();
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    print("cidade teste " + cidadeUsuario);
+
+    var snapshot = await db
+        .collection("usuarios")
+        .where("cidade", isEqualTo: cidadeUsuario)
+        .where("categoria", isEqualTo: widget.categoria.nome)
+        .get();
+    for (var item in snapshot.docs) {
+      Map<String, dynamic> dados = item.data();
+      Usuario usuario = Usuario();
+      usuario.nome = dados["nome"];
+      usuario.descricaoAtividade = dados["descricaoAtividade"];
+      usuario.telefone = dados["telefone"];
+      usuario.whatsapp = dados["whatsapp"];
+      usuario.descricao = dados["descricao"];
+      usuario.email = dados["email"];
+      usuario.cidade = dados["cidade"];
+      usuario.estado = dados["estado"];
+      usuario.urlImagem = dados["urlImagem"];
+      usuario.descricaoAtividade = dados["descricaoAtividade"];
+      usuario.dinheiro = dados["dinheiro"];
+      usuario.cheque = dados["cheque"];
+      usuario.cartaoCredito = dados["cartaoCredito"];
+      usuario.cartaoDebito = dados["cartaoDebito"];
+      usuario.pix = dados["pix"];
+      _listaContados.add(usuario);
+    }
+    return _listaContados;
   }
 
   @override

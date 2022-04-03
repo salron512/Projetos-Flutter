@@ -49,9 +49,10 @@ dependencies:
   mask_text_input_formatter: ^1.1.0
   intl: 0.17.0
   http: ^0.13.1
-  geolocator: ^7.0.3
+  geolocator: ^8.2.0
   geocoding: ^2.0.0
   whatsapp_unilink: ^2.0.0
+  cached_network_image: ^3.2.0
 
 dev_dependencies:
   flutter_test:

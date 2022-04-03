@@ -1,9 +1,9 @@
 import 'package:acha_eu/model/Categorias.dart';
 import 'package:acha_eu/util/Localizacao.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -289,7 +289,8 @@ class _ListaCategoriasState extends State<ListaCategorias> {
                                       maxRadius: 40,
                                       backgroundColor: Colors.grey,
                                       backgroundImage: dados.urlImagem != null
-                                          ? NetworkImage(dados.urlImagem)
+                                          ? CachedNetworkImageProvider(
+                                              dados.urlImagem)
                                           : null),
                                   Padding(
                                     padding: EdgeInsets.only(top: 8),

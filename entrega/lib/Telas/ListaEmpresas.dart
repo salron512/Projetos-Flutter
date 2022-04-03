@@ -25,10 +25,11 @@ class _ListaEmpressasState extends State<ListaEmpressas> {
     Map<String, dynamic> mapUsuario = doc.data();
     cidade = mapUsuario['cidade'];
     print(cidade);
-
+    
     List listaRecuperada = [];
 
     String categoria = widget.categoria;
+    cidade = "Mirassol d'Oeste";
     CollectionReference reference =
         FirebaseFirestore.instance.collection("usuarios");
 

@@ -2,7 +2,6 @@ import 'package:acha_eu/model/Usuario.dart';
 import 'package:acha_eu/util/RecuperaFirebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -33,24 +32,7 @@ class _PagamentoState extends State<Pagamento> {
       " para se tornar um anúnciante em sua cidade ";
   String _mensagemErro = "";
 
-  /*
-    DateTime pagamentoDia = DateTime(anoPagamento, mesPagamento, diaPagamento);
-    var diaAtual = DateTime.now();
-    var resultado = diaAtual
-        .difference(pagamentoDia)
-        .inDays;
-    print("resultado em dias: " + resultado.toString());
-    if(resultado > 32){
-      print("vencido");
-    }else{
-      print("pagamento ok!");
-    }
-  }
-  @override
-  void initState() {
-    super.initState();
-  }
-   */
+ 
   _salvapagamento() async {
     String id = RecuperaFirebase.recuperaUsuario();
     FirebaseFirestore db = FirebaseFirestore.instance;
