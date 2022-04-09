@@ -131,11 +131,12 @@ class _ListaSericosState extends State<ListaSericos> {
                           color: Color(0xff37474f),
                           child: ListTile(
                             leading: CircleAvatar(
-                               
+                               radius: 30,
                                 backgroundColor: Colors.grey,
                                 backgroundImage: dados.urlImagem != null
                                     ? CachedNetworkImageProvider(
                                         dados.urlImagem,
+                                       scale: 10
                                       )
                                     : null),
                             title: Text(
