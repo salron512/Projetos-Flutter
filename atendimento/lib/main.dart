@@ -1,4 +1,5 @@
 import 'package:atendimento/Entrar.dart';
+import 'package:atendimento/Home.dart';
 import 'package:atendimento/util/Rotas.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
