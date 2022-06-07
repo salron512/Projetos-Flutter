@@ -1,5 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:atendimento/Home.dart';
+import 'package:atendimento/model/Clientes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
@@ -11,8 +16,9 @@ class Entrar extends StatefulWidget {
 }
 
 class _EntrarState extends State<Entrar> {
+  Clientes _cliente = new Clientes();
   // ignore: prefer_final_fields
-  TextEditingController _controllerCnpj = TextEditingController();
+  TextEditingController _controllerCnpj = TextEditingController(text: '00.000.000/0001-11');
   // ignore: prefer_final_fields
   var _mascaraCnpj = MaskTextInputFormatter(
       mask: '##.###.###/####-##', filter: {"#": RegExp(r'[0-9]')});
@@ -43,10 +49,20 @@ class _EntrarState extends State<Entrar> {
         Map<String, dynamic> result = dados;
         String confirmacaoCnpj = result["cnpj"];
 
-      
-        if (confirmacaoCnpj == cnpj) {
-          // ignore: use_build_context_synchronously
-          Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);
+        _cliente.Cnpj = result["cnpj"];
+        _cliente.bairro = result["bairro"];
+        _cliente.razaoSocial = result["razaoSocial"];
+        _cliente.nomeFantasia = result["nomeFantasia"];
+        _cliente.telefone = result["telefone"];
+        _cliente.endereco = result["endereco"];
+
+        if (_cliente.Cnpj == cnpj) {
+          FirebaseAuth.instance.signInAnonymously();
+
+          Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false,
+              arguments: _cliente);
+
+          //Navigator.pushReplacementNamed(context, '/home', arguments: _cliente);
         } else {
           setState(() {
             _msg = 'Cnpj não encontrado';
@@ -58,6 +74,23 @@ class _EntrarState extends State<Entrar> {
         _msg = "Cnpj não entrado";
       });
     }
+  }
+
+/*
+  _veririficaUsuario() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    // ignore: await_only_futures
+    var usuario = await auth.currentUser;
+    if (usuario != null) {
+      // ignore: use_build_context_synchronously
+      Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false);
+    }
+  }
+*/
+  @override
+  void initState() {
+    super.initState();
+    // _veririficaUsuario();
   }
 
   @override
@@ -89,10 +122,10 @@ class _EntrarState extends State<Entrar> {
                           ),
                         ),
                         Padding(
-                          padding:const EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(8),
                           child: Text(
                             _msg,
-                            style:const TextStyle(
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -100,18 +133,17 @@ class _EntrarState extends State<Entrar> {
                           ),
                         ),
                         Padding(
-                          padding:const EdgeInsets.only(bottom: 8),
+                          padding: const EdgeInsets.only(bottom: 8),
                           child: TextField(
                             inputFormatters: [_mascaraCnpj],
                             autofocus: true,
                             keyboardType: TextInputType.number,
-                            style:const TextStyle(
+                            style: const TextStyle(
                               fontSize: 20,
                             ),
                             decoration: InputDecoration(
-                              
                                 contentPadding:
-                                 const   EdgeInsets.fromLTRB(32, 16, 32, 16),
+                                    const EdgeInsets.fromLTRB(32, 16, 32, 16),
                                 hintText: "CNPJ",
                                 filled: true,
                                 fillColor: Colors.white,
@@ -155,12 +187,7 @@ class _EntrarState extends State<Entrar> {
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(15)),
                             ),
-                            onPressed: () {
-                              //Navigator.pushNamed(context, "/cadastro");
-                              MaterialPageRoute(
-                                builder: (context) => Home(),
-                              );
-                            },
+                            onPressed: () {},
                           ),
                         ),
                       ],

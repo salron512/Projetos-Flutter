@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'firebase_options.dart';
 
+
 final ThemeData temaPatrao = ThemeData(
   primaryColor: Color.fromARGB(255, 108, 85, 236),
   backgroundColor:  Colors.blue,
