@@ -65,7 +65,7 @@ class _HomeState extends State<Home> {
           ListTile(
             // ignore: prefer_const_literals_to_create_immutables
             title: Row(
-              children: [
+              children: const [
                 Text("Codigo de Barras    "),
                 Text("Produto         "),
                 Text("Marca          "),
@@ -81,6 +81,7 @@ class _HomeState extends State<Home> {
               itemBuilder: (context, indice) {
                 Produto produto = _listaProdutos[indice];
                 return Card(
+                  
                   child: ListTile(
                     title: Row(
                       children: [
@@ -113,6 +114,7 @@ class _HomeState extends State<Home> {
                       ],
                     ),
                   ),
+                  
                 );
               },
             ),
