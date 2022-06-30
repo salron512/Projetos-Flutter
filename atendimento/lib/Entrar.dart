@@ -18,7 +18,7 @@ class Entrar extends StatefulWidget {
 class _EntrarState extends State<Entrar> {
   Clientes _cliente = new Clientes();
   // ignore: prefer_final_fields
-  TextEditingController _controllerCnpj = TextEditingController(text: '00.000.000/0001-11');
+  TextEditingController _controllerCnpj = TextEditingController(text: '00.000.000/0000-00');
   // ignore: prefer_final_fields
   var _mascaraCnpj = MaskTextInputFormatter(
       mask: '##.###.###/####-##', filter: {"#": RegExp(r'[0-9]')});
