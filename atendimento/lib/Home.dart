@@ -1,23 +1,105 @@
 // ignore_for_file: sort_child_properties_last
 
-import 'package:atendimento/Sol.dart';
-import 'package:atendimento/model/Clientes.dart';
+
+import 'package:atendimento/ListaEmpresas.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
-  Clientes cliente;
-  Home(this.cliente);
-//Home({Key? key}) : super(key: key);
+  const Home({Key? key}) : super(key: key);
 
   @override
   State<Home> createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
-  int _i = 0;
-  List<Widget> _listatelas = [
-    Sol(),
-  ];
+  int _index = 0;
+  final TextEditingController _controllerEmpresa = TextEditingController();
+ List<Widget> _listaTelas =[
+  ListaEmpresas(),
+ ];
+
+  void _sair() async {
+    await FirebaseAuth.instance.signOut().then((value) {
+      Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+    });
+  }
+
+  void _cadastrarEmpresa() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Cadastro de empresa"),
+            content: SizedBox(
+              width: 250,
+              height: 250,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: 120,
+                    width: 120,
+                    child: Image.asset(
+                      'images/empresa.png',
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(top: 5),
+                    child: Text("Digite o nome da empresa"),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: TextField(
+                      keyboardType: TextInputType.text,
+                      textCapitalization: TextCapitalization.sentences,
+                      controller: _controllerEmpresa,
+                    ),
+                  )
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _gravaChekList();
+                    _controllerEmpresa.clear();
+                  },
+                  child: const Text('Confirmar')),
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _controllerEmpresa.clear();
+                  },
+                  child: const Text("Cancelar"))
+            ],
+          );
+        });
+  }
+
+  void _gravaChekList() {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    String uid = auth.currentUser!.uid;
+    String empresa = _controllerEmpresa.text;
+    if (empresa.isNotEmpty) {
+      try {
+        FirebaseFirestore.instance.collection('Empresas').doc().set({
+          'idUsuario': uid,
+          'empresa': empresa,
+          'ativo': true,
+          'dataAbertura': DateTime.now().toString(),
+          'dataFechamento': ''
+        });
+      } on FirebaseException catch (e) {
+        print(e);
+      }
+    } else {}
+  }
+
+ 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,11 +114,6 @@ class _HomeState extends State<Home> {
                 children: <Widget>[
                   Expanded(
                     child: Image.asset('images/companhia.png'),
-                  ),
-                  Text(
-                    widget.cliente.nomeFantasia,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 20),
                   ),
                 ],
               ),
@@ -57,17 +134,22 @@ class _HomeState extends State<Home> {
             leading: const Icon(Icons.exit_to_app),
             title: const Text("Sair"),
             onTap: () {
-              Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
+              _sair();
             },
           ),
         ]),
       ),
-      body:  Container(
-          decoration: BoxDecoration(color: Theme.of(context).primaryColor),
-          alignment: Alignment.center,
-          child: _listatelas[_i],
-        ),
-
+      body: _listaTelas[_index],
+      floatingActionButton: FloatingActionButton(
+          // ignore: prefer_const_constructors
+          child:  Icon(
+            Icons.add,
+            color: Colors.white,
+          ),
+          backgroundColor: const Color.fromARGB(255, 28, 30, 146),
+          onPressed: (() {
+            _cadastrarEmpresa();
+          })),
     );
   }
 }

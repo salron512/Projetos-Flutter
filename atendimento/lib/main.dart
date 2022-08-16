@@ -1,5 +1,4 @@
 import 'package:atendimento/Entrar.dart';
-import 'package:atendimento/Home.dart';
 import 'package:atendimento/util/Rotas.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -8,11 +7,11 @@ import 'firebase_options.dart';
 
 
 final ThemeData temaPatrao = ThemeData(
-  primaryColor: Color.fromARGB(255, 108, 85, 236),
+  primaryColor: const Color.fromARGB(255, 108, 85, 236),
   backgroundColor:  Colors.blue,
   colorScheme: ColorScheme.fromSwatch().copyWith( 
-  secondary: Color.fromARGB(255, 83, 104, 131),
-  primary: Color.fromARGB(255, 28, 30, 146),
+  secondary: Colors.white,
+  primary: const Color.fromARGB(255, 28, 30, 146),
   ),
 );
 void main() async {

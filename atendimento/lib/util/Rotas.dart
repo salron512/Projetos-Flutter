@@ -1,20 +1,20 @@
 import 'package:atendimento/Entrar.dart';
 import 'package:atendimento/Home.dart';
-import 'package:atendimento/model/Clientes.dart';
+import 'package:atendimento/RecuperarSenha.dart';
 import 'package:flutter/material.dart';
 
 class Rotas {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     // ignore: unused_local_variable
-     final args = settings.arguments as dynamic;
-   
+    final args = settings.arguments as dynamic;
 
     switch (settings.name) {
       case "/":
         return MaterialPageRoute(builder: (_) => Entrar());
-        case "/home":
-        return  MaterialPageRoute(builder: (_) => Home(args));
-
+      case "/home":
+        return MaterialPageRoute(builder: (_) => Home());
+      case "/recuperaSenha":
+        return MaterialPageRoute(builder: (_) => RecuperarSenha());
 
       default:
         return MaterialPageRoute(
