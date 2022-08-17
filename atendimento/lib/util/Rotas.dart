@@ -1,5 +1,6 @@
 import 'package:atendimento/Entrar.dart';
 import 'package:atendimento/Home.dart';
+import 'package:atendimento/Modulos.dart';
 import 'package:atendimento/RecuperarSenha.dart';
 import 'package:flutter/material.dart';
 
@@ -15,6 +16,8 @@ class Rotas {
         return MaterialPageRoute(builder: (_) => Home());
       case "/recuperaSenha":
         return MaterialPageRoute(builder: (_) => RecuperarSenha());
+        case "/modulos":
+        return MaterialPageRoute(builder: (_) => Modulos());
 
       default:
         return MaterialPageRoute(

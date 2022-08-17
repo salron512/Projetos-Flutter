@@ -71,6 +71,8 @@ flutter:
   - images/alert.png
   - images/fpassword.png
   - images/empresa.png
+  - images/comp.png
+  - images/triste.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
