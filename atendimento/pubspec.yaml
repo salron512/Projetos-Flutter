@@ -40,6 +40,7 @@ dependencies:
   firebase_auth: ^3.3.19
   cloud_firestore: ^3.4.4
   mask_text_input_formatter: ^2.3.0
+  firebase_storage: ^10.3.6
 
 dev_dependencies:
   flutter_test:
@@ -73,6 +74,7 @@ flutter:
   - images/empresa.png
   - images/comp.png
   - images/triste.png
+  - images/excluir.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

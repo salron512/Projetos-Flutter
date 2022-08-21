@@ -17,7 +17,7 @@ class Rotas {
       case "/recuperaSenha":
         return MaterialPageRoute(builder: (_) => RecuperarSenha());
         case "/modulos":
-        return MaterialPageRoute(builder: (_) => Modulos());
+        return MaterialPageRoute(builder: (_) => Modulos(args));
 
       default:
         return MaterialPageRoute(

@@ -1,10 +1,11 @@
 // ignore_for_file: sort_child_properties_last
 
-
 import 'package:atendimento/ListaEmpresas.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
+import 'util/CheckList.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -16,9 +17,9 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int _index = 0;
   final TextEditingController _controllerEmpresa = TextEditingController();
- List<Widget> _listaTelas =[
-  ListaEmpresas(),
- ];
+  List<Widget> _listaTelas = [
+    ListaEmpresas(),
+  ];
 
   void _sair() async {
     await FirebaseAuth.instance.signOut().then((value) {
@@ -64,41 +65,42 @@ class _HomeState extends State<Home> {
               TextButton(
                   onPressed: () {
                     Navigator.pop(context);
+                    _controllerEmpresa.clear();
+                  },
+                  child: const Text("Cancelar")),
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
                     _gravaChekList();
                     _controllerEmpresa.clear();
                   },
                   child: const Text('Confirmar')),
-              TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _controllerEmpresa.clear();
-                  },
-                  child: const Text("Cancelar"))
             ],
           );
         });
   }
 
-  void _gravaChekList() {
+  void _gravaChekList() async {
     FirebaseAuth auth = FirebaseAuth.instance;
     String uid = auth.currentUser!.uid;
     String empresa = _controllerEmpresa.text;
     if (empresa.isNotEmpty) {
       try {
-        FirebaseFirestore.instance.collection('Empresas').doc().set({
+        await FirebaseFirestore.instance.collection('Empresas').doc().set({
           'idUsuario': uid,
           'empresa': empresa,
           'ativo': true,
           'dataAbertura': DateTime.now().toString(),
           'dataFechamento': ''
+        }).then((value) {
+          CheckListImplantacao checkList = CheckListImplantacao();
+          checkList.cadastraCheckList(empresa);
         });
       } on FirebaseException catch (e) {
         print(e);
       }
     } else {}
   }
-
- 
 
   @override
   Widget build(BuildContext context) {
@@ -142,7 +144,7 @@ class _HomeState extends State<Home> {
       body: _listaTelas[_index],
       floatingActionButton: FloatingActionButton(
           // ignore: prefer_const_constructors
-          child:  Icon(
+          child: Icon(
             Icons.add,
             color: Colors.white,
           ),
