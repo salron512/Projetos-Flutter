@@ -1,4 +1,3 @@
-
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:atendimento/model/Modulo.dart';
@@ -76,6 +75,7 @@ class _ModulosState extends State<Modulos> {
                         crossAxisSpacing: 2,
                         children: List.generate(Listamodulos!.length, ((index) {
                           Modulo item = Listamodulos[index];
+                          item.empresa = widget.empresa;
                           return Padding(
                             padding: const EdgeInsets.all(8),
                             child: Container(
@@ -87,17 +87,25 @@ class _ModulosState extends State<Modulos> {
                                 ),
 
                                 // ignore: prefer_interpolation_to_compose_strings
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                      width: 100,
-                                      height: 100,
-                                      child: Image.network(item.urlImagem),
-                                    ),
-                                    Text(item.nome),
-                                  ],
+                                child: GestureDetector(
+                                  onTap: (() {
+                                    Navigator.pushNamed(
+                                        context, "/checkList",
+                                        arguments: item);
+                                  }),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      SizedBox(
+                                        width: 100,
+                                        height: 100,
+                                        child: Image.network(item.urlImagem),
+                                      ),
+                                      Text(item.nome),
+                                    ],
+                                  ),
                                 )),
                           );
                         })));

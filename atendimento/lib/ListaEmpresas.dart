@@ -68,7 +68,8 @@ class _ListaEmpresasState extends State<ListaEmpresas> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(color: Theme.of(context).primaryColor),
+      decoration: BoxDecoration(
+        color: Theme.of(context).primaryColor),
       child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('Empresas')

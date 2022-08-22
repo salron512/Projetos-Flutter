@@ -1,5 +1,6 @@
 import 'package:atendimento/Entrar.dart';
 import 'package:atendimento/Home.dart';
+import 'package:atendimento/ListaCheckList.dart';
 import 'package:atendimento/Modulos.dart';
 import 'package:atendimento/RecuperarSenha.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,8 @@ class Rotas {
         return MaterialPageRoute(builder: (_) => RecuperarSenha());
         case "/modulos":
         return MaterialPageRoute(builder: (_) => Modulos(args));
+         case "/checkList":
+        return MaterialPageRoute(builder: (_) => ListaCheckList(args));
 
       default:
         return MaterialPageRoute(

@@ -94,7 +94,7 @@ class _HomeState extends State<Home> {
           'dataFechamento': ''
         }).then((value) {
           CheckListImplantacao checkList = CheckListImplantacao();
-          checkList.cadastraCheckList(empresa);
+          checkList.cadastraCheckList(empresa, uid);
         });
       } on FirebaseException catch (e) {
         print(e);

@@ -1,7 +1,15 @@
+// ignore_for_file: unnecessary_this
+
 class Modulo {
   late String _nome;
   late String _url;
   late String _urlImagem;
+  late String _empresa;
+
+
+  get empresa => this._empresa;
+
+ set empresa( value) => this._empresa = value;
 
   String get urlImagem => this._urlImagem;
 
