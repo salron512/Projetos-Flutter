@@ -80,6 +80,7 @@ class _HomeState extends State<Home> {
         });
   }
 
+ 
   void _gravaChekList() async {
     FirebaseAuth auth = FirebaseAuth.instance;
     String uid = auth.currentUser!.uid;
@@ -99,7 +100,7 @@ class _HomeState extends State<Home> {
       } on FirebaseException catch (e) {
         print(e);
       }
-    } else {}
+    }
   }
 
   @override
