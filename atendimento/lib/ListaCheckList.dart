@@ -57,7 +57,7 @@ class _ListaCheckListState extends State<ListaCheckList> {
                   ),
                   const Padding(
                     padding: EdgeInsets.only(top: 5),
-                    child: Text("Deseja comfirma a exclusão do item?"),
+                    child: Text("Deseja confirma a exclusão do item?"),
                   ),
                 ],
               ),
