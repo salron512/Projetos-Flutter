@@ -78,6 +78,8 @@ flutter:
   - images/excluir.png
   - images/negado.png
   - images/lista.png
+  - images/equipe.png
+  - images/atualizar.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

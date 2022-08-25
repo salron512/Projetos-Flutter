@@ -77,7 +77,7 @@ class _ListaEmpresasState extends State<ListaEmpresas> {
 
   void _alteraEmpresa(String empresa, id) {
     _controllerEmpresa.text = empresa;
-   
+
     showDialog(
         context: context,
         builder: (context) {
@@ -120,32 +120,42 @@ class _ListaEmpresasState extends State<ListaEmpresas> {
                   child: const Text("Cancelar")),
               TextButton(
                   onPressed: () async {
-                    print("TESTE "+empresa);
-                     print("CONTROLER "+ _controllerEmpresa.text);
-                    
                     var snapshot = await FirebaseFirestore.instance
                         .collection('Empresas')
                         .where("empresa", isEqualTo: empresa)
                         .get();
                     for (var item in snapshot.docs) {
-                       print("ID "+ item.id);
                       FirebaseFirestore.instance
                           .collection("Empresas")
                           .doc(item.id)
                           .update({'empresa': _controllerEmpresa.text});
                     }
-                    
+
                     CheckListImplantacao check = CheckListImplantacao();
                     check.alteraEmpresa(empresa, _controllerEmpresa.text);
-                    
-                  
+
+                    _alteraEmpresaParticipante(
+                        empresa, _controllerEmpresa.text);
                     Navigator.pop(context);
-                    
                   },
                   child: const Text('Confirmar')),
             ],
           );
         });
+  }
+
+  void _alteraEmpresaParticipante(String empresa, empresaAlterada) async {
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    QuerySnapshot snapshot = await db
+        .collection("Participantes")
+        .where('empresa', isEqualTo: empresa)
+        .get();
+
+    for (var item in snapshot.docs) {
+      db.collection("Participantes").doc(item.id).update({
+        'empresa': empresa
+      });
+    }
   }
 
   _alertNaoTempermissao() {

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Participantes {
-  static void cadastraParticipantes(String empresa, modulo, colaboradores) {
+   cadastraParticipantes(String empresa, modulo, colaboradores) {
     FirebaseFirestore.instance.collection("Participantes").doc().set({
       "modulo": modulo,
       'empresa': empresa,
