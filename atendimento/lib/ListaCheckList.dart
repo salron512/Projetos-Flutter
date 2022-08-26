@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_unnecessary_containers, sort_child_properties_last
+// ignore_for_file: avoid_unnecessary_containers, sort_child_properties_last, prefer_interpolation_to_compose_strings
 
 import 'package:atendimento/model/Modulo.dart';
 import 'package:atendimento/util/Participantes.dart';
@@ -28,7 +28,7 @@ class _ListaCheckListState extends State<ListaCheckList> {
     FirebaseAuth auth = FirebaseAuth.instance;
     String uid = auth.currentUser!.uid;
     FirebaseFirestore.instance.collection("CheckList").doc().set({
-      "dataCadastro": DateTime.now().microsecondsSinceEpoch.toString(),
+      "dataCadastro": DateTime.now().toString(),
       "uid": uid,
       "empresa": widget.empresa.empresa,
       'item': _controllerItemCheckList.text,
@@ -430,11 +430,74 @@ class _ListaCheckListState extends State<ListaCheckList> {
         ],
       ),
       bottomNavigationBar: BottomAppBar(
-          shape: const CircularNotchedRectangle(),
-          child: Container(
-            height: 150,
-            decoration: BoxDecoration(color: Theme.of(context).primaryColor),
-          )),
+        shape: const CircularNotchedRectangle(),
+        child: Container(
+          height: 150,
+          decoration: BoxDecoration(color: Theme.of(context).primaryColor),
+          child: StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection("Participantes")
+                  .where("empresa", isEqualTo: widget.empresa.empresa)
+                  .where('modulo', isEqualTo: widget.empresa.nome)
+                  .snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.none:
+                    return const Center(
+                      child: Text("sem conexão"),
+                    );
+                    break;
+                  case ConnectionState.waiting:
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                      ),
+                    );
+                    break;
+                  case ConnectionState.active:
+                    List listadados = snapshot.data!.docs;
+                    if (listadados.length == 0) {
+                      return const Center(
+                        child: Text("Sem informações cadastrads"),
+                      );
+                    } else {
+                      DocumentSnapshot snapshot = listadados[0];
+                      return Padding(
+                        padding: const EdgeInsets.all(5),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Participantes: ' + snapshot['colaboradores'],
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: Text(
+                                'Obervação: ' + snapshot['observacao'],
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            )
+                          ],
+                        ),
+                      );
+                    }
+                    break;
+                  case ConnectionState.done:
+                    return const Center(
+                      child: Text("ok"),
+                    );
+                    break;
+                }
+              }),
+        ),
+      ),
     );
   }
 }
