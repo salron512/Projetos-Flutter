@@ -42,6 +42,7 @@ dependencies:
   firebase_storage: ^10.3.6
   flutter_slidable: ^0.6.0
   flutter_speed_dial: ^6.0.0
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:
@@ -80,6 +81,7 @@ flutter:
   - images/lista.png
   - images/equipe.png
   - images/atualizar.png
+  - images/editar.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

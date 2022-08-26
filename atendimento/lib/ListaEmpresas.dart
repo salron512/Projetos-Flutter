@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 
 class ListaEmpresas extends StatefulWidget {
   ListaEmpresas({Key? key}) : super(key: key);
@@ -152,9 +154,7 @@ class _ListaEmpresasState extends State<ListaEmpresas> {
         .get();
 
     for (var item in snapshot.docs) {
-      db.collection("Participantes").doc(item.id).update({
-        'empresa': empresa
-      });
+      db.collection("Participantes").doc(item.id).update({'empresa': empresa});
     }
   }
 
@@ -207,6 +207,15 @@ class _ListaEmpresasState extends State<ListaEmpresas> {
   void initState() {
     super.initState();
     _veririficaUsuario();
+  }
+
+  _formatarData(String data) {
+    initializeDateFormatting("pt_BR");
+    var formatador = DateFormat("dd/MM/y H:mm:s");
+
+    DateTime dataConvertida = DateTime.parse(data);
+    String dataFormatada = formatador.format(dataConvertida);
+    return dataFormatada;
   }
 
   @override
@@ -310,7 +319,15 @@ class _ListaEmpresasState extends State<ListaEmpresas> {
                               leading: Image.asset('images/comp.png'),
                               // ignore: prefer_interpolation_to_compose_strings
                               title: Text('Empresa: ' + empresa['empresa']),
-                              subtitle: const Text("Status: Em execução"),
+                              subtitle: Column(
+                               crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text("Status: Em execução"),
+                                  // ignore: prefer_interpolation_to_compose_strings
+                                  Text("Data da abertura: " +
+                                      _formatarData(empresa['dataAbertura'])),
+                                ],
+                              ),
                               onTap: () {
                                 Navigator.pushNamed(context, "/modulos",
                                     arguments: empresa['empresa']);

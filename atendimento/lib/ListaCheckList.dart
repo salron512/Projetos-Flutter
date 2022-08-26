@@ -1,5 +1,4 @@
 // ignore_for_file: avoid_unnecessary_containers, sort_child_properties_last, prefer_interpolation_to_compose_strings
-
 import 'package:atendimento/model/Modulo.dart';
 import 'package:atendimento/util/Participantes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -23,6 +22,7 @@ class _ListaCheckListState extends State<ListaCheckList> {
       TextEditingController();
   final TextEditingController _controllerItemParticipantes =
       TextEditingController();
+  final TextEditingController _controllerObs = TextEditingController();
 
   _cadastraItemCheckList() {
     FirebaseAuth auth = FirebaseAuth.instance;
@@ -107,14 +107,11 @@ class _ListaCheckListState extends State<ListaCheckList> {
                     padding: EdgeInsets.only(top: 5),
                     child: Text("Digite o item do checklist"),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: TextField(
-                      keyboardType: TextInputType.text,
-                      textCapitalization: TextCapitalization.sentences,
-                      controller: _controllerItemCheckList,
-                    ),
-                  )
+                  TextField(
+                    keyboardType: TextInputType.text,
+                    textCapitalization: TextCapitalization.sentences,
+                    controller: _controllerItemCheckList,
+                  ),
                 ],
               ),
             ),
@@ -287,6 +284,82 @@ class _ListaCheckListState extends State<ListaCheckList> {
         });
   }
 
+  void _VerificaObs() async {
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection("Participantes")
+        .where("empresa", isEqualTo: widget.empresa.empresa)
+        .where('modulo', isEqualTo: widget.empresa.nome)
+        .get();
+    bool cond = true;
+    if (snapshot.docs.length > 0) {
+      for (var item in snapshot.docs) {
+        cond = false;
+        _controllerObs.text = item['observacao'];
+        _alertEditaObs(item.id);
+      }
+    }
+
+    if (cond) {
+      Participantes participantes = Participantes();
+      participantes.cadastraParticipantes(widget.empresa.empresa,
+          widget.empresa.nome, _controllerItemParticipantes.text);
+      _controllerItemParticipantes.clear();
+      _VerificaObs();
+    }
+  }
+
+  _alertEditaObs(String idDoc) {
+    showDialog(
+        context: context,
+        builder: ((context) {
+          return AlertDialog(
+            title: const Text("Observação"),
+            content: SizedBox(
+              height: 250,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 5),
+                    child: SizedBox(
+                      height: 120,
+                      width: 120,
+                      child: Image.asset('images/editar.png'),
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 5),
+                    child: Text('Digite a observação'),
+                  ),
+                  TextField(
+                    keyboardType: TextInputType.text,
+                    textCapitalization: TextCapitalization.sentences,
+                    controller: _controllerObs,
+                  )
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: (() {
+                    _controllerObs.text;
+                    Navigator.pop(context);
+                  }),
+                  child: const Text('Cancelar')),
+              TextButton(
+                  onPressed: (() {
+                    FirebaseFirestore.instance
+                        .collection("Participantes")
+                        .doc(idDoc)
+                        .update({'observacao': _controllerObs.text});
+                    Navigator.pop(context);
+                    _controllerObs.clear();
+                  }),
+                  child: const Text('Confirmar')),
+            ],
+          );
+        }));
+  }
+
   void _recuperaUsario() {
     FirebaseAuth auth = FirebaseAuth.instance;
     _uid = auth.currentUser!.uid;
@@ -389,7 +462,7 @@ class _ListaCheckListState extends State<ListaCheckList> {
           },
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+      //floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: SpeedDial(
         backgroundColor: Theme.of(context).primaryColor,
         icon: Icons.add,
@@ -414,7 +487,9 @@ class _ListaCheckListState extends State<ListaCheckList> {
             ),
             label: "Cadastrar observação",
             backgroundColor: Colors.cyan,
-            onTap: () {},
+            onTap: () {
+              _VerificaObs();
+            },
           ),
           SpeedDialChild(
             child: const Icon(
@@ -459,12 +534,16 @@ class _ListaCheckListState extends State<ListaCheckList> {
                     List listadados = snapshot.data!.docs;
                     if (listadados.length == 0) {
                       return const Center(
-                        child: Text("Sem informações cadastrads"),
+                        child: Text(
+                          "Sem informações cadastradas",
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
                       );
                     } else {
                       DocumentSnapshot snapshot = listadados[0];
-                      return Padding(
-                        padding: const EdgeInsets.all(5),
+                      return SingleChildScrollView(
+                        padding: const EdgeInsets.all(10),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
