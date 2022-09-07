@@ -1,4 +1,5 @@
 import 'package:atendimento/util/CheckList.dart';
+import 'package:atendimento/util/Participantes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -61,6 +62,8 @@ class _ListaEmpresasState extends State<ListaEmpresas> {
                   if (idRecuperado == _uid) {
                     CheckListImplantacao check = CheckListImplantacao();
                     check.apagaCheckList(empresa);
+                    Participantes participantes = Participantes();
+                    participantes.deleteParticipantes(empresa);
                     FirebaseFirestore.instance.doc(id).delete();
                     // ignore: use_build_context_synchronously
                     Navigator.pop(context);
@@ -135,9 +138,12 @@ class _ListaEmpresasState extends State<ListaEmpresas> {
 
                     CheckListImplantacao check = CheckListImplantacao();
                     check.alteraEmpresa(empresa, _controllerEmpresa.text);
-
-                    _alteraEmpresaParticipante(
+                    Participantes participantes = Participantes();
+                    print("participantes " + empresa);
+                    participantes.alteraEmpresa(
                         empresa, _controllerEmpresa.text);
+
+                    _alteraEmpresaParticipante(empresa, _controllerEmpresa.text);
                     Navigator.pop(context);
                   },
                   child: const Text('Confirmar')),
@@ -320,7 +326,7 @@ class _ListaEmpresasState extends State<ListaEmpresas> {
                               // ignore: prefer_interpolation_to_compose_strings
                               title: Text('Empresa: ' + empresa['empresa']),
                               subtitle: Column(
-                               crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   const Text("Status: Em execução"),
                                   // ignore: prefer_interpolation_to_compose_strings
@@ -363,7 +369,7 @@ class _ListaEmpresasState extends State<ListaEmpresas> {
                       ),
                     ),
                     const Text(
-                      "sem implantações no momento!",
+                      "Sem implantações no momento!",
                       style: TextStyle(
                           color: Colors.white, fontWeight: FontWeight.bold),
                     )
