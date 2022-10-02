@@ -5,8 +5,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CheckListImplantacao {
   FirebaseFirestore db = FirebaseFirestore.instance;
+
   cadastraCheckList(String empresa, uid) {
     String dataCadastro = DateTime.now().microsecondsSinceEpoch.toString();
+
+
     db.collection("CheckList").doc().set({
       "dataCadastro": dataCadastro,
       "uid": uid,
@@ -25,6 +28,15 @@ class CheckListImplantacao {
       'checado': false
     });
 
+    db.collection("CheckList").doc().set({
+      "dataCadastro": dataCadastro,
+      "uid": uid,
+      "empresa": empresa,
+      'item': "Descrição do item do check list",
+      'modulo': 'Vendas',
+      'checado': false
+    });
+    
     db.collection("CheckList").doc().set({
       "dataCadastro": dataCadastro,
       "uid": uid,
