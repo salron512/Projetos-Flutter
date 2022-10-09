@@ -14,7 +14,7 @@ class UserResource extends Resource {
       ];
 
   FutureOr<Response> _getAllUser() {
-    return Response.ok('bucando usuario');
+    return Response.ok('buscando usuario');
   }
 
   FutureOr<Response> _getUserById(ModularArguments arguments) {
