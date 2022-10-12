@@ -19,13 +19,21 @@ class UserResource extends Resource {
     final database = injector.get<RemoteDatabase>();
     final result =
         await database.query('SELECT id, name, email, role FROM "User";');
-    final usermap = result.map((element) => element['User']).first;
+    final listUser = result.map((e) => e['User']).toList();
 
-    return Response.ok(jsonEncode(usermap));
+    return Response.ok(jsonEncode(listUser));
   }
 
-  FutureOr<Response> _getUserById(ModularArguments arguments) {
-    return Response.ok(arguments.params['id']);
+  FutureOr<Response> _getUserById(ModularArguments arguments, Injector injector)
+   async {
+    final id = await arguments.params['id'];
+    final database = injector.get<RemoteDatabase>();
+    final result = await database.query(
+        'SELECT id, name, email, role FROM "User" WHERE id = @id;',
+        variables: {'id': id});
+    final userMap = result.map((element) => element['User']).first;
+
+    return Response.ok(jsonEncode(userMap));
   }
 
   FutureOr<Response> _createUser(ModularArguments arguments) {
