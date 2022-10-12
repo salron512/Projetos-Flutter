@@ -1,17 +1,27 @@
 import 'dart:async';
 
 import 'package:backend/src/core/services/database/remote_database.dart';
+import 'package:backend/src/core/services/dot_env/dot_env_services.dart';
 import 'package:postgres/postgres.dart';
 import 'package:shelf_modular/shelf_modular.dart';
 
 class PostgresDatabase implements RemoteDatabase, Disposable {
-  PostgresDatabase() {
+  final completer = Completer<PostgreSQLConnection>();
+  final DotEnvService dotEnv;
+  PostgresDatabase(this.dotEnv) {
     _init();
   }
-  final completer = Completer<PostgreSQLConnection>();
+
   _init() async {
-    var connection = PostgreSQLConnection("localhost", 5432, "dart_test",
-        username: "dart", password: "dart");
+    final url = dotEnv['DATABASE_URL']!;
+    final uri = Uri.parse(url);
+    var connection = PostgreSQLConnection(
+      uri.host,
+      uri.port,
+      uri.pathSegments.first,
+      username: uri.userInfo.split(':').first,
+      password: uri.userInfo.split(':').last,
+    );
     await connection.open();
     completer.complete(connection);
   }
