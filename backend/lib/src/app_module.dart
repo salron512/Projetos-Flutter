@@ -16,6 +16,7 @@ class AppModule extends Module {
   List<ModularRoute> get routes =>
       [
         Route.get('/', (Request request) => Response.ok('Inicial')),
-          Route.resource(UserResource())
+          Route.resource(UserResource()),
+          
       ];
 }

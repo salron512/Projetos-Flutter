@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:backend/src/core/services/database/remote_database.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_modular/shelf_modular.dart';
@@ -24,8 +23,8 @@ class UserResource extends Resource {
     return Response.ok(jsonEncode(listUser));
   }
 
-  FutureOr<Response> _getUserById(ModularArguments arguments, Injector injector)
-   async {
+  FutureOr<Response> _getUserById(
+    ModularArguments arguments, Injector injector)async {
     final id = await arguments.params['id'];
     final database = injector.get<RemoteDatabase>();
     final result = await database.query(
