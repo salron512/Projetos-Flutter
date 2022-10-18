@@ -16,34 +16,38 @@ class UserResource extends Resource {
 
   FutureOr<Response> _getAllUser(Injector injector) async {
     final database = injector.get<RemoteDatabase>();
-    final result = await database.query('SELECT id, name, email, role FROM "User";');
+    final result =
+        await database.query('SELECT id, name, email, role FROM "User";');
 
     final listUsers = result.map((e) => e['User']).toList();
 
     return Response.ok(jsonEncode(listUsers));
   }
 
-  FutureOr<Response> _getUserByid(ModularArguments arguments, Injector injector) async {
+  FutureOr<Response> _getUserByid(
+      ModularArguments arguments, Injector injector) async {
     final id = arguments.params['id'];
     final database = injector.get<RemoteDatabase>();
-    final result = await database.query('SELECT id, name, email, role FROM "User" WHERE id = @id;', variables: {'id': id});
+    final result = await database.query(
+        'SELECT id, name, email, role FROM "User" WHERE id = @id;',
+        variables: {'id': id});
     final userMap = result.map((element) => element['User']).first;
     return Response.ok(jsonEncode(userMap));
   }
 
-  FutureOr<Response> _deleteUser(ModularArguments arguments, Injector injector) async {
+  FutureOr<Response> _deleteUser(
+      ModularArguments arguments, Injector injector) async {
     final id = arguments.params['id'];
 
     final database = injector.get<RemoteDatabase>();
-    await database.query('DELETE FROM "User" WHERE id = @id;', variables: {'id': id});
+    await database
+        .query('DELETE FROM "User" WHERE id = @id;', variables: {'id': id});
     return Response.ok(jsonEncode({'message': 'deleted $id'}));
   }
 
-  FutureOr<Response> _createUser(ModularArguments arguments, Injector injector) async {
-
-
+  FutureOr<Response> _createUser(
+      ModularArguments arguments, Injector injector) async {
     final userParams = (arguments.data as Map).cast<String, dynamic>();
- 
 
     final database = injector.get<RemoteDatabase>();
     final result = await database.query(
@@ -54,7 +58,8 @@ class UserResource extends Resource {
     return Response.ok(jsonEncode(userMap));
   }
 
-  FutureOr<Response> _updateUser(ModularArguments arguments, Injector injector) async {
+  FutureOr<Response> _updateUser(
+      ModularArguments arguments, Injector injector) async {
     final userParams = (arguments.data as Map).cast<String, dynamic>();
 
     final columns = userParams.keys
@@ -64,7 +69,8 @@ class UserResource extends Resource {
         )
         .toList();
 
-    final query = 'UPDATE "User" SET ${columns.join(',')} WHERE id=@id RETURNING id, email, role, name;';
+    final query =
+        'UPDATE "User" SET ${columns.join(',')} WHERE id=@id RETURNING id, email, role, name;';
 
     final database = injector.get<RemoteDatabase>();
     final result = await database.query(
