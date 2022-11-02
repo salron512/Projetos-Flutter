@@ -5,6 +5,7 @@ void main() {
   runApp(
     const MaterialApp(
     home: Home(),
+    debugShowCheckedModeBanner: false,
   ));
 }
 
