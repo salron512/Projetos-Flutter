@@ -8,15 +8,22 @@ class ListUser = _ListUser with _$ListUser;
 abstract class _ListUser with Store {
   @observable
   List<Map<String, dynamic>> listUser = [];
+  @observable
+  Map<String, dynamic> queryParameters = {
+    'results': '20',
+    'page': '1',
+    'nat': 'br',
+  };
+  @observable
+  int page = 0;
 
   @action
   Future getUsers() async {
-    final queryParameters = {
-      'results': '20',
-      'nat': 'br',
-    };
+    page++;
+    queryParameters['page'] = page.toString();
+
     var url = Uri.https('randomuser.me', '/api/', queryParameters);
-    print(url.toString());
+
     var response = await http.get(url);
     if (response.statusCode == 200) {
       var jsonResponse = convert.jsonDecode(response.body);
@@ -24,7 +31,7 @@ abstract class _ListUser with Store {
       for (var item in users) {
         listUser.add(item);
       }
-      print('total consulta ${listUser.length}');
+      print('total pagina $page');
       return listUser;
     }
   }

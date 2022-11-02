@@ -25,18 +25,51 @@ mixin _$ListUser on _ListUser, Store {
     });
   }
 
+  late final _$queryParametersAtom =
+      Atom(name: '_ListUser.queryParameters', context: context);
+
+  @override
+  Map<String, dynamic> get queryParameters {
+    _$queryParametersAtom.reportRead();
+    return super.queryParameters;
+  }
+
+  @override
+  set queryParameters(Map<String, dynamic> value) {
+    _$queryParametersAtom.reportWrite(value, super.queryParameters, () {
+      super.queryParameters = value;
+    });
+  }
+
+  late final _$pageAtom = Atom(name: '_ListUser.page', context: context);
+
+  @override
+  int get page {
+    _$pageAtom.reportRead();
+    return super.page;
+  }
+
+  @override
+  set page(int value) {
+    _$pageAtom.reportWrite(value, super.page, () {
+      super.page = value;
+    });
+  }
+
   late final _$getUsersAsyncAction =
       AsyncAction('_ListUser.getUsers', context: context);
 
   @override
-  Future getUsers() {
+  Future<dynamic> getUsers() {
     return _$getUsersAsyncAction.run(() => super.getUsers());
   }
 
   @override
   String toString() {
     return '''
-listUser: ${listUser}
+listUser: ${listUser},
+queryParameters: ${queryParameters},
+page: ${page}
     ''';
   }
 }
