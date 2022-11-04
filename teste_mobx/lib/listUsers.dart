@@ -6,8 +6,8 @@ part 'listUsers.g.dart';
 class ListUser = _ListUser with _$ListUser;
 
 abstract class _ListUser with Store {
-  @observable
-  List<Map<String, dynamic>> listUser = [];
+  ObservableList<Map<String, dynamic>> listUser =
+      ObservableList<Map<String, dynamic>>();
   @observable
   Map<String, dynamic> queryParameters = {
     'results': '20',
@@ -29,10 +29,11 @@ abstract class _ListUser with Store {
       var jsonResponse = convert.jsonDecode(response.body);
       var users = jsonResponse['results'];
       for (var item in users) {
+        print('${item['name']['first']}');
         listUser.add(item);
       }
       print('total pagina $page');
-      return listUser;
+      
     }
   }
 }
