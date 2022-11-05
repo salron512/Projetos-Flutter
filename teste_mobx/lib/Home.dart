@@ -12,8 +12,66 @@ class Home extends StatefulWidget {
 }
 
 final listUser = ListUser();
+String _value = '';
 
 class _HomeState extends State<Home> {
+  _alertUserGender() {
+    showDialog(
+        context: context,
+        builder: ((context) {
+          return AlertDialog(
+              title: const Text('Selecione o filtro'),
+              content: StatefulBuilder(
+                builder: ((context, setState) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      RadioListTile<String>(
+                          title: const Text(
+                            "Ambos sexos",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          value: '',
+                          groupValue: _value,
+                          activeColor: Theme.of(context).primaryColor,
+                          onChanged: (value) {
+                            _value = value!;
+                            listUser.getUsers(value);
+                            Navigator.pop(context);
+                          }),
+                      RadioListTile<String>(
+                          title: const Text(
+                            "Masculino",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          value: 'male',
+                          groupValue: _value,
+                          activeColor: Theme.of(context).primaryColor,
+                          onChanged: (value) {
+                            _value = value!;
+                            listUser.getUsers(value);
+                            Navigator.pop(context);
+                          }),
+                      RadioListTile<String>(
+                          title: const Text(
+                            "Feminino",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          value: 'female',
+                          groupValue: _value,
+                          activeColor: Theme.of(context).primaryColor,
+                          onChanged: (value) {
+                            _value = value!;
+                            listUser.getUsers(value);
+                            Navigator.pop(context);
+                          }),
+                    ],
+                  );
+                }),
+              ));
+        }));
+  }
+
   _alertUser(Map<String, dynamic> userInfo) {
     showDialog(
         context: context,
@@ -39,16 +97,9 @@ class _HomeState extends State<Home> {
                       )),
                   Padding(
                     padding: const EdgeInsets.only(bottom: 3),
-                    child: Text('Nome: ${userInfo['name']['first']} '
+                    child: Text('Nome: ${userInfo['name']['title']} '
+                        '${userInfo['name']['first']} '
                         '${userInfo['name']['last']}'),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 3),
-                    child: Text('Sexo: ${userInfo['gender']}'),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 3),
-                    child: Text('Idade: ${userInfo['dob']['age']}'),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(bottom: 3),
@@ -56,42 +107,7 @@ class _HomeState extends State<Home> {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(bottom: 3),
-                    child: Text(
-                        'Endereço: ${userInfo['location']['street']['name']} '
-                        '${userInfo['location']['street']['number']}'),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 3),
-                    child: Text('Cidade: ${userInfo['location']['city']}'),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 3),
-                    child: Text('Estado: ${userInfo['location']['state']}'),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 3),
-                    child: Text('País: ${userInfo['location']['country']}'),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 3),
-                    child: Text(
-                        'Código postal: ${userInfo['location']['postcode']}'),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 3),
-                    child: Text(
-                        'Latitude: ${userInfo['location']['coordinates']['latitude']}'),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 3),
-                    child: Text(
-                        'Longitude: ${userInfo['location']['coordinates']['longitude']}'),
-                  ),
-                    Padding(
-                    padding: const EdgeInsets.only(bottom: 3),
-                    child: Text(
-                        'Longitude: ${userInfo['location']
-                        ['coordinates']['longitude']}'),
+                    child: Text('Sexo: ${userInfo['gender']}'),
                   ),
                 ],
               ),
@@ -107,7 +123,7 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
-    listUser.getUsers();
+    listUser.getUsers('');
     super.initState();
   }
 
@@ -116,9 +132,18 @@ class _HomeState extends State<Home> {
     return Scaffold(
         appBar: AppBar(
           title: const Text("Lista de usuários"),
-          actions: const [Icon(Icons.search)],
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: IconButton(
+                  onPressed: (() {
+                    _alertUserGender();
+                  }),
+                  icon: const Icon(Icons.filter_rounded)),
+            )
+          ],
         ),
-        body: listUser.listUser == null
+        body: listUser.listUser.isNotEmpty
             ? const Center(
                 child: CircularProgressIndicator(),
               )
@@ -173,7 +198,7 @@ class _HomeState extends State<Home> {
                             child: ElevatedButton(
                               child: const Text("Carregar mais usuários"),
                               onPressed: (() {
-                                listUser.getUsers();
+                                listUser.getUsers(_value);
                               }),
                             ),
                           ),
