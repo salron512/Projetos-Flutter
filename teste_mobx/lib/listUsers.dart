@@ -39,7 +39,7 @@ abstract class _ListUser with Store {
           listUser.clear();
           page = 1;
         }
-        female = false;
+        female = true;
         male = true;
         empty = false;
         break;

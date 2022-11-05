@@ -139,7 +139,7 @@ class _HomeState extends State<Home> {
                   onPressed: (() {
                     _alertUserGender();
                   }),
-                  icon: const Icon(Icons.filter_rounded)),
+                  icon: const Icon(Icons.supervised_user_circle_sharp)),
             )
           ],
         ),
