@@ -29,7 +29,6 @@ abstract class _ListUser with Store {
 
   @action
   Future getUsers(String params) async {
-    var url;
     page++;
     queryParameters['page'] = page.toString();
     switch (params) {
@@ -65,8 +64,8 @@ abstract class _ListUser with Store {
         break;
     }
 
-    url = Uri.https('randomuser.me', '/api/', queryParameters);
-    print('URL $url');
+    var url = Uri.https('randomuser.me', '/api/', queryParameters);
+  
 
     var response = await http.get(url);
     if (response.statusCode == 200) {
@@ -75,9 +74,6 @@ abstract class _ListUser with Store {
       for (var item in users) {
         listUser.add(item);
       }
-
-      print('total pagina $page');
-      print('qtd registros ${listUser.length}');
     }
   }
 }

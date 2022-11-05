@@ -157,7 +157,6 @@ class _HomeState extends State<Home> {
                                 itemBuilder: ((context, index) {
                                   Map<String, dynamic> user =
                                       listUser.listUser[index];
-
                                   return Card(
                                     color: const Color(0xff202125),
                                     //elevation: 8,
