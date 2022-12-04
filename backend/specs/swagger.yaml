@@ -1,0 +1,56 @@
+openapi: 3.0.0
+info:
+  description: "API system"
+  version: "1.0.0"
+  title: "Backend"
+servers:
+  - url: http://localhost:4466
+    description: Local server
+tags:
+- name: "user"
+  description: "Access to User"
+
+
+paths:
+  # auth
+  /auth/login:
+    $ref: 'src/auth.yaml#/components/Login'
+  /auth/check_token:
+    $ref: 'src/auth.yaml#/components/CheckToken'
+  /auth/refresh_token:
+    $ref: 'src/auth.yaml#/components/RefreshToken'
+  /auth/update_password:
+    $ref: 'src/auth.yaml#/components/UpdatePassword'
+
+  # user
+  /user/{id}:
+    $ref: 'src/user.yaml#/components/GetOneOrDelete'
+  /user:
+    $ref: 'src/user.yaml#/components/UserCrud'
+    
+components:
+  securitySchemes:
+    basicAuth:   
+      type: http
+      scheme: basic
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "Auth header (Authorization) Access Token"
+    bearerRefreshAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "RefreshToken"
+  schemas:
+    BackendException:
+      type: object 
+      properties:
+        error: 
+          type: string
+
+
+           
+
+
