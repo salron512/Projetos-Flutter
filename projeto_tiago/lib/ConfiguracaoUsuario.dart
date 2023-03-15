@@ -297,15 +297,12 @@ class _ConfiguracaoUsuarioState extends State<ConfiguracaoUsuario> {
                       Padding(
                         padding: EdgeInsets.only(top: 16, bottom: 10),
                         // ignore: deprecated_member_use
-                        child: RaisedButton(
+                        child: ElevatedButton(
                           child: Text(
                             "Atualizar",
                             style: TextStyle(color: Colors.white, fontSize: 20),
                           ),
-                          color: Color(0xffFF0000),
-                          padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
+                     
                           onPressed: () {
                             _atualizaDados();
                           },
