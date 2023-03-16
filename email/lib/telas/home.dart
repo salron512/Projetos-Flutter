@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:mailer/smtp_server/gmail.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -17,6 +16,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final username = 'andre.vicensotti@gmail.com';
   final password = 'alphatkmriljekba';
+  final TextEditingController _controllerEmail = TextEditingController();
   String _msg = '';
   bool _carregando = false;
   Future _enviaEmail() async {
@@ -25,10 +25,10 @@ class _HomeState extends State<Home> {
     setState(() {
       _msg = 'Enviando email...!';
     });
-
+    String emailDestinatario = _controllerEmail.text;
     final message = Message()
       ..from = Address(username, 'Your name 😀')
-      ..recipients.add(Address('andre.vicensotti@gmail.com'))
+      ..recipients.add(Address(emailDestinatario))
       ..subject = 'Test Dart Mailer library :: 😀 :: ${DateTime.now()}'
       ..text = 'This is the plain text.\nThis is line 2 of the text part.'
       ..attachments = [
@@ -36,7 +36,7 @@ class _HomeState extends State<Home> {
       ];
 
     try {
-      final sendReport = await send(message, smtpServer);
+      await send(message, smtpServer);
       setState(() {
         _carregando = false;
         _msg = 'Email enviado!';
@@ -70,12 +70,9 @@ class _HomeState extends State<Home> {
     _enviaEmail();
   }
 
- 
-
   @override
   void initState() {
     super.initState();
-    
   }
 
   @override
@@ -99,6 +96,27 @@ class _HomeState extends State<Home> {
                 ),
               ],
             )),
+            Padding(
+              padding: const EdgeInsets.only(left: 5, bottom: 5, top: 20),
+              child: SizedBox(
+                width: 250,
+                child: TextField(
+                  keyboardType: TextInputType.emailAddress,
+                  controller: _controllerEmail,
+                  style: const TextStyle(
+                    fontSize: 12,
+                  ),
+                  decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.fromLTRB(5, 3, 5, 3),
+                      // hintText: "E-mail",
+                      label: const Text('Email contabilidade'),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10))),
+                ),
+              ),
+            ),
           ],
         ),
       ),
